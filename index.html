@@ -4072,56 +4072,51 @@ const store = {
   // 游戏字段 = 以 __ 开头的字段
   isGameKey(k){ return k.startsWith("__"); },
 
-  // 从本地加载（合并分组业务数据 + 个人游戏数据）
+  // 从本地加载（糖币归属分组，全部从分组 key 加载）
   loadLocal(){
-    const bizRaw = localStorage.getItem(CONFIG.businessKey);
-    const gameRaw = localStorage.getItem(CONFIG.gameKey);
+    const raw = localStorage.getItem(CONFIG.businessKey);
     const d = {};
-    // 先加载业务数据
-    if(bizRaw){ try { Object.assign(d, JSON.parse(bizRaw)); } catch(e){} }
-    // 再加载游戏数据（不覆盖业务字段）
-    if(gameRaw){ try { const g = JSON.parse(gameRaw); for(const k in g) if(this.isGameKey(k)) d[k] = g[k]; } catch(e){} }
+    if(raw){ try { Object.assign(d, JSON.parse(raw)); } catch(e){} }
+    // 迁移：如果分组 key 没有游戏数据，从个人 key 加载
+    if(!d.__candyLog){
+      const gameRaw = localStorage.getItem(CONFIG.gameKey);
+      if(gameRaw){ try { const g = JSON.parse(gameRaw); for(const k in g) if(this.isGameKey(k)) d[k] = g[k]; } catch(e){} }
+    }
     // 确保模块字段存在
     this.bizKeys.forEach(k => { if(!d[k]) d[k] = structuredClone(CONFIG.modules.find(m=>m.key===k)?.seed||[]); });
     return d;
   },
 
-  // 保存到本地（拆分业务 + 游戏）
+  // 保存到本地（业务+游戏统一存分组 key）
   saveLocal(d){
-    // 业务数据 → 分组 key
-    const biz = {};
-    this.bizKeys.forEach(k => { biz[k] = d[k]; });
-    localStorage.setItem(CONFIG.businessKey, JSON.stringify(biz));
-    // 游戏数据 → 个人 key
-    const game = {};
-    for(const k in d) if(this.isGameKey(k)) game[k] = d[k];
-    localStorage.setItem(CONFIG.gameKey, JSON.stringify(game));
+    const all = {};
+    this.bizKeys.forEach(k => { all[k] = d[k]; });
+    for(const k in d) if(this.isGameKey(k)) all[k] = d[k];
+    localStorage.setItem(CONFIG.businessKey, JSON.stringify(all));
   },
 
-  // 从云端加载（合并分组业务 + 个人游戏）
+  // 从云端加载（糖币归属分组，从分组 key 加载全部）
   async loadCloud(){
     if(!this.sb) return null;
     try {
-      // 并行加载业务和游戏数据
-      const [bizRes, gameRes] = await Promise.all([
-        this.sb.from("workbench_data")
-          .select("id, data, updated_at, device_id")
-          .eq("storage_key", CONFIG.businessKey)
-          .order("updated_at", { ascending: false })
-          .limit(1),
-        this.sb.from("workbench_data")
-          .select("id, data, updated_at, device_id")
-          .eq("storage_key", CONFIG.gameKey)
-          .order("updated_at", { ascending: false })
-          .limit(1)
-      ]);
-      const bizRow = bizRes.data && bizRes.data[0];
-      const gameRow = gameRes.data && gameRes.data[0];
-      if(bizRow || gameRow){
-        const merged = {};
-        if(bizRow && bizRow.data) Object.assign(merged, bizRow.data);
-        if(gameRow && gameRow.data) { const g = gameRow.data; for(const k in g) if(this.isGameKey(k)) merged[k] = g[k]; }
-        return { data: merged, bizRow, gameRow };
+      const { data: rows, error } = await this.sb
+        .from("workbench_data")
+        .select("id, data, updated_at, device_id")
+        .eq("storage_key", CONFIG.businessKey)
+        .order("updated_at", { ascending: false })
+        .limit(1);
+      if(error) throw error;
+      const bizRow = rows && rows[0];
+      if(bizRow && bizRow.data){
+        const d = bizRow.data;
+        // 迁移：如果分组 key 没有游戏数据，从个人 key 加载
+        if(!d.__candyLog){
+          const legacyRow = await this.loadCloudByKey(CONFIG.gameKey);
+          if(legacyRow && legacyRow.data){
+            for(const k in legacyRow.data) if(this.isGameKey(k)) d[k] = legacyRow.data[k];
+          }
+        }
+        return { data: d, bizRow, gameRow: null };
       }
       return null;
     } catch(e) {
@@ -4151,29 +4146,19 @@ const store = {
     }
   },
 
-  // 保存到云端（业务和游戏分别 upsert）
+  // 保存到云端（业务+游戏统一存分组 key）
   async saveCloud(d){
     if(!this.sb) return false;
     try {
-      // 拆分业务和游戏数据
-      const biz = {};
-      this.bizKeys.forEach(k => { biz[k] = d[k]; });
-      const game = {};
-      for(const k in d) if(this.isGameKey(k)) game[k] = d[k];
+      const all = {};
+      this.bizKeys.forEach(k => { all[k] = d[k]; });
+      for(const k in d) if(this.isGameKey(k)) all[k] = d[k];
       const now = new Date().toISOString();
-      // 并行保存
-      const [bizRes, gameRes] = await Promise.all([
-        this.sb.from("workbench_data").upsert({
-          storage_key: CONFIG.businessKey, data: biz,
-          device_id: this.deviceId, updated_at: now
-        }, { onConflict: "storage_key" }),
-        this.sb.from("workbench_data").upsert({
-          storage_key: CONFIG.gameKey, data: game,
-          device_id: this.deviceId, updated_at: now
-        }, { onConflict: "storage_key" })
-      ]);
-      if(bizRes.error) throw bizRes.error;
-      if(gameRes.error) throw gameRes.error;
+      const { error } = await this.sb.from("workbench_data").upsert({
+        storage_key: CONFIG.businessKey, data: all,
+        device_id: this.deviceId, updated_at: now
+      }, { onConflict: "storage_key" });
+      if(error) throw error;
       return true;
     } catch(e) {
       console.warn("Cloud save failed:", e);
@@ -4207,7 +4192,7 @@ const store = {
     }, 800);
   },
 
-  // 实时订阅：同组业务变更 + 个人游戏变更
+  // 实时订阅：同组数据变更（业务+游戏统一在分组 key）
   startRealtime(){
     if(!this.sb) return;
     if(!this._realtimeSub){
@@ -4220,7 +4205,6 @@ const store = {
               const newData = payload.new && payload.new.data;
               const fromDevice = payload.new && payload.new.device_id;
               if(newData && fromDevice !== this.deviceId){
-                // 合并新的业务数据到当前 data
                 Object.assign(data, newData);
                 this.saveLocal(data);
                 render();
@@ -4228,26 +4212,7 @@ const store = {
             }
           )
           .subscribe();
-      } catch(e) { console.warn("Biz realtime failed:", e); }
-    }
-    if(!this._realtimeGameSub){
-      try {
-        this._realtimeGameSub = this.sb
-          .channel("workbench-game")
-          .on("postgres_changes",
-            { event: "*", schema: "public", table: "workbench_data", filter: `storage_key=eq.${CONFIG.gameKey}` },
-            (payload) => {
-              const newData = payload.new && payload.new.data;
-              const fromDevice = payload.new && payload.new.device_id;
-              if(newData && fromDevice !== this.deviceId){
-                for(const k in newData) data[k] = newData[k];
-                this.saveLocal(data);
-                render();
-              }
-            }
-          )
-          .subscribe();
-      } catch(e) { console.warn("Game realtime failed:", e); }
+      } catch(e) { console.warn("Realtime failed:", e); }
     }
   },
 };
@@ -4581,11 +4546,24 @@ function renderInsight(){
 }
 
 /* ---------- MODULE VIEW ---------- */
+let _moduleFilterKey = null;
+let _moduleFilter = "all";
+
 function renderModule(key){
   const m=modOf(key);
-  const allItems=data[key]||[]; // 业务数据已在分组层面共享，无需手动合并
+  const allItems=data[key]||[];
   const t=today();
-  const it = m.type==="todo" ? allItems.filter(x=>!x.date || x.date===t || x.done) : allItems;
+  // 切换模块时重置筛选
+  if(_moduleFilterKey !== key) { _moduleFilterKey = key; _moduleFilter = "all"; }
+  const hasFilter = ["todo","finance","note","progress"].includes(m.type);
+  let it = m.type==="todo" ? allItems.filter(x=>!x.date || x.date===t || x.done) : allItems;
+  // 应用来源筛选
+  if(hasFilter && _moduleFilter !== "all") {
+    it = it.filter(x => {
+      const role = x.createRole || (x.createdBy === "family" ? "family" : "admin");
+      return role === _moduleFilter;
+    });
+  }
   let head="", extra="";
   if(m.type==="finance"){
     const inc=it.filter(x=>x.type==="income").reduce((s,x)=>s+ +x.amount,0);
@@ -4638,12 +4616,12 @@ function renderModule(key){
   } else {
     body=`<div class="empty"><span class="e"><img src="assets/nav-ci-ke.png" style="width:28px;height:28px;object-fit:contain;border-radius:50%" alt=""/></span><div>小猫还在打盹，点上方「新建」添加第一条记录吧</div></div>`;
   }
-  // 筛选标签：全部 / 管理员创建 / 家属创建（仅对支持的业务模块显示）
-  const showFilter = ["todo","money","note"].includes(m.type);
+  // 筛选标签：全部 / 管理员创建 / 家属创建
+  const showFilter = hasFilter;
   const filterBar = showFilter ? `<div class="filter-bar" data-module="${key}">
-    <button class="filter-tab on" data-filter="all">全部</button>
-    <button class="filter-tab" data-filter="admin">👑 管理员</button>
-    <button class="filter-tab" data-filter="family">🐾 家属</button>
+    <button class="filter-tab ${_moduleFilter==='all'?'on':''}" data-filter="all">全部</button>
+    <button class="filter-tab ${_moduleFilter==='admin'?'on':''}" data-filter="admin">👑 管理员</button>
+    <button class="filter-tab ${_moduleFilter==='family'?'on':''}" data-filter="family">🐾 家属</button>
   </div>` : '';
 
   $("#screen").innerHTML = `<div class="greet"><div><h1>${m.name}</h1><p>${m.desc}</p></div>
@@ -4652,36 +4630,16 @@ function renderModule(key){
       ${filterBar}
       <div class="sec-title">记录</div>${body}</div>`;
 
-  // 筛选标签交互
+  // 筛选标签交互：重新渲染模块视图
   if(showFilter) {
     $("#screen").querySelectorAll(".filter-tab").forEach(tab => {
       tab.onclick = () => {
-        $("#screen").querySelectorAll(".filter-tab").forEach(t => t.classList.remove("on"));
-        tab.classList.add("on");
-        const f = tab.dataset.filter;
-        $("#screen").querySelectorAll(".rec, .tl-date-group").forEach(el => {
-          // 按记录的 createRole 筛选
-          const recs = el.querySelectorAll(".rec");
-          if(recs.length === 0) {
-            // tl-date-group: 检查内部所有记录
-            const inner = el.querySelectorAll(".rec");
-            const vis = Array.from(inner).some(r => matchFilter(r, f));
-            el.style.display = vis ? "" : "none";
-          } else {
-            recs.forEach(r => { r.style.display = matchFilter(r, f) ? "" : "none"; });
-          }
-        });
+        _moduleFilter = tab.dataset.filter;
+        renderModule(key);
       };
     });
   }
   wireModule(key);
-}
-
-// 筛选标签匹配：检查 DOM 元素上的 data-create-role 属性
-function matchFilter(el, filter) {
-  if(filter === "all") return true;
-  const role = el.dataset.createRole || el.getAttribute("data-create-role") || "admin";
-  return role === filter;
 }
 
 function renderTimeline(items){
@@ -5569,12 +5527,8 @@ const candy = {
   // 糖币流水
   log() { return data.__candyLog || []; },
 
-  // 检查当前用户是否无糖币权限（家属）
-  _noCandy() { return auth.isFamily(); },
-
   // 添加糖币记录（正向）
   _add(amount, type, description, refId) {
-    if(this._noCandy()) return;
     if(!data.__candyLog) data.__candyLog = [];
     data.__candyLog.unshift({
       id: Date.now() + Math.random(),
@@ -5789,7 +5743,6 @@ const candy = {
 
   // 完成每日任务
   completeDailyTask(taskId) {
-    if(this._noCandy()) return false;
     const daily = this.getDailyTasks();
     const task = daily.tasks.find(t => t.id === taskId);
     if(!task || task.done) return false;
@@ -5949,7 +5902,6 @@ const candy = {
   // ========== 任务/记账奖励 ==========
   // 任务完成奖励
   awardTask(taskTitle, taskId) {
-    if(this._noCandy()) return;
     const amount = this._calcAmount(CANDY_RULES.TASK_COMPLETE);
     this._add(amount, "task", `完成任务: ${taskTitle}`, taskId);
     const buff = this.getActiveBuff();
@@ -5963,7 +5915,6 @@ const candy = {
 
   // 记账奖励
   awardFinance(recordTitle, recordId) {
-    if(this._noCandy()) return;
     const amount = this._calcAmount(CANDY_RULES.FINANCE_RECORD);
     this._add(amount, "finance", `记账: ${recordTitle}`, recordId);
     const buff = this.getActiveBuff();
@@ -5977,6 +5928,7 @@ const candy = {
 
   // 兑换消耗（扣糖币）
   spend(cost, itemName, itemId) {
+    if(auth.isFamily()) return false;
     if(this.total() < cost) return false;
     if(!data.__candyLog) data.__candyLog = [];
     data.__candyLog.unshift({
@@ -6011,12 +5963,9 @@ const candy = {
     let financeCount = 0;
     let totalAward = 0;
 
-    // 扫描已完成且未结算的任务（跳过家属记录，家属无糖币）
+    // 扫描已完成且未结算的任务
     const todos = data[todoKey] || [];
     for(const t of todos) {
-      if(t.createRole === "family" || t.createdBy === "family") {
-        t._candySettled = true; continue;
-      }
       if(t.done && !t._candySettled) {
         const amt = CANDY_RULES.TASK_COMPLETE;
         this._add(amt, "task", `历史任务: ${t.title}`, t.id);
@@ -6026,12 +5975,9 @@ const candy = {
       }
     }
 
-    // 扫描已存在且未结算的记账记录（跳过家属记录）
+    // 扫描已存在且未结算的记账记录
     const moneys = data[moneyKey] || [];
     for(const m of moneys) {
-      if(m.createRole === "family" || m.createdBy === "family") {
-        m._candySettled = true; continue;
-      }
       if(!m._candySettled) {
         const amt = CANDY_RULES.FINANCE_RECORD;
         this._add(amt, "finance", `历史记账: ${m.title || m.category || '记录'}`, m.id);
@@ -7140,8 +7086,8 @@ async function bootstrap() {
       delete data.__historySettled;
       delete data.__candyLog;
       delete data.__catLevel;
-      (data[todoKey] || []).forEach(t => { if(t.done && t.createRole !== "family" && t.createdBy !== "family") delete t._candySettled; });
-      (data[moneyKey] || []).forEach(m => { if(m.createRole !== "family" && m.createdBy !== "family") delete m._candySettled; });
+      (data[todoKey] || []).forEach(t => { if(t.done) delete t._candySettled; });
+      (data[moneyKey] || []).forEach(m => { delete m._candySettled; });
       console.log("🔄 糖币数据丢失，重置结算标记重新核算");
     }
   }
@@ -7216,9 +7162,9 @@ async function bootstrap() {
   }
 }
 
-// 迁移旧 per-user key 到双 key（分组业务 + 个人游戏）
+// 迁移旧 per-user key 到分组 key（业务+游戏统一）
 function migrateToDualKey(legacyKey, bizKey, gameKey) {
-  if(legacyKey === bizKey && legacyKey === gameKey) return;
+  if(legacyKey === bizKey) return;
   try {
     const legacyRaw = localStorage.getItem(legacyKey);
     if(!legacyRaw) return;
@@ -7226,33 +7172,29 @@ function migrateToDualKey(legacyKey, bizKey, gameKey) {
 
     // 检查旧数据是否有真实内容
     const hasRealContent = store.bizKeys.some(k => (legacyData[k] || []).some(x => x.id && x.id > 100));
-    if(!hasRealContent) return; // 旧数据也只有种子数据，不需要迁移
+    const hasGameData = Object.keys(legacyData).some(k => k.startsWith("__"));
+    if(!hasRealContent && !hasGameData) return;
 
-    // 检查分组业务 key 是否已有真实数据
+    // 检查分组 key 是否已有真实数据
     const bizRaw = localStorage.getItem(bizKey);
     let bizHasReal = false;
     if(bizRaw) {
       const bd = JSON.parse(bizRaw);
       bizHasReal = store.bizKeys.some(k => (bd[k] || []).some(x => x.id && x.id > 100));
     }
-    if(!bizHasReal) {
-      // 提取业务字段到分组 key（覆盖种子数据）
-      const biz = {};
-      store.bizKeys.forEach(k => { biz[k] = legacyData[k] || structuredClone(CONFIG.modules.find(m=>m.key===k)?.seed||[]); });
-      localStorage.setItem(bizKey, JSON.stringify(biz));
-      console.log(`📦 业务数据迁移: ${legacyKey} → ${bizKey}`);
+    // 合并业务+游戏数据到分组 key
+    const merged = bizRaw ? JSON.parse(bizRaw) : {};
+    if(!bizHasReal && hasRealContent) {
+      store.bizKeys.forEach(k => { merged[k] = legacyData[k] || structuredClone(CONFIG.modules.find(m=>m.key===k)?.seed||[]); });
     }
-
-    // 如果个人游戏 key 已有数据，不迁移
-    const gameRaw = localStorage.getItem(gameKey);
-    if(!gameRaw) {
-      const game = {};
-      for(const k in legacyData) if(store.isGameKey(k)) game[k] = legacyData[k];
-      localStorage.setItem(gameKey, JSON.stringify(game));
-      console.log(`📦 游戏数据迁移: ${legacyKey} → ${gameKey}`);
+    // 迁移游戏数据（如果分组 key 还没有）
+    if(!merged.__candyLog && hasGameData) {
+      for(const k in legacyData) if(store.isGameKey(k)) merged[k] = legacyData[k];
     }
+    localStorage.setItem(bizKey, JSON.stringify(merged));
+    console.log(`📦 数据迁移: ${legacyKey} → ${bizKey}`);
   } catch(e) {
-    console.error("双 key 迁移失败:", e);
+    console.error("数据迁移失败:", e);
   }
 }
 
