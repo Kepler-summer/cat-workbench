@@ -5042,13 +5042,15 @@ $("#nav").querySelectorAll(".n").forEach(n=>n.onclick=()=>{
 /* ---------- avatar upload ---------- */
 $("#brandCam").innerHTML = icon("camera",18);
 function refreshDrawerAvatar(){
-  const uid = auth.session?.userId;
-  const userAv = (data.__userAvatars||{})[uid];
-  const legacyAv = data.__avatar;
-  const src = userAv || legacyAv;
-  if(src) $("#brandImg").src = src;
+  try{
+    if(typeof auth==="undefined"||!auth.session) return;
+    const uid = auth.session.userId;
+    const userAv = (data.__userAvatars||{})[uid];
+    const legacyAv = data.__avatar;
+    const src = userAv || legacyAv;
+    if(src) $("#brandImg").src = src;
+  }catch(_){}
 }
-refreshDrawerAvatar();
 $("#drawerBrand").onclick = () => $("#avatarInput").click();
 $("#avatarInput").onchange = e => {
   const f = e.target.files && e.target.files[0];
@@ -7249,6 +7251,7 @@ async function bootstrap() {
     }
   }
   buildDrawer();
+  refreshDrawerAvatar();
   render();
 
   // 4.5 历史糖币存量核算（仅首次）
