@@ -4405,11 +4405,11 @@ function renderHome(){
   $("#screen").innerHTML = `
     <div class="greet"><div><h1>${hi}</h1><p>${hiSub}</p></div></div>
     <div class="quote"><img class="cat-deco" src="assets/nav-yan-huo.png" alt="" aria-hidden="true"/>
-      <span class="tag">${icon("quote",13)} 每日金句 · ${q.theme} · 诗·歌·哲思</span>
+      <span class="tag">${icon("quote",13)} 小猫一言 · 今日份的猫粮</span>
       <div class="txt">${esc(q.en)}<em class="src">${esc(q.enBy)}</em></div>
       <div class="quote-lines">
-        <div class="quote-line"><span class="ql-label ql-poem">诗</span><span class="ql-text">${esc(q.poem)}<em class="src">${esc(q.poemBy)}</em></span></div>
-        <div class="quote-line"><span class="ql-label ql-lyric">歌</span><span class="ql-text">${esc(q.lyric)}<em class="src">${esc(q.lyricBy)}</em></span></div>
+        <div class="quote-line"><span class="ql-text">${esc(q.poem)}<em class="src">${esc(q.poemBy)}</em></span></div>
+        <div class="quote-line"><span class="ql-text">${esc(q.lyric)}<em class="src">${esc(q.lyricBy)}</em></span></div>
       </div></div>
     <div class="sec-title">今日概览</div>
     <div class="card rings">${rings}</div>
