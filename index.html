@@ -4181,7 +4181,7 @@ const store = {
     }
   },
 
-  // 加载（优先云端，失败回退本地）
+  // 加载（优先云端，云端无数据返回 null 让 bootstrap 处理迁移）
   async load(){
     const inited = this.initSupabase();
     if(inited){
@@ -4191,11 +4191,9 @@ const store = {
         this.startRealtime();
         return cloud.data;
       }
-      // 云端没数据，用本地的，推一份到云端
-      const local = this.loadLocal();
-      await this.saveCloud(local);
+      // 云端没数据，返回 null 让 bootstrap 尝试旧 key 迁移
       this.startRealtime();
-      return local;
+      return null;
     }
     return this.loadLocal();
   },
@@ -7086,12 +7084,31 @@ async function bootstrap() {
 
   // 2. set up dual storage keys: group business + user game
   const legacyKey = auth.legacyUserKey();
+  const globalKey = CONFIG.storageKey; // 原始全局 key: cat-time-bureau-v1
   CONFIG.businessKey = auth.businessStorageKey();
   CONFIG.gameKey = auth.gameStorageKey();
-  CONFIG.storageKey = CONFIG.businessKey; // backwards compat for any code referencing storageKey
+  CONFIG.storageKey = CONFIG.businessKey; // backwards compat
 
-  // 3. migrate old per-user data to new dual-key system (local)
+  // 2.5 检查分组业务 key 是否只有种子数据，如果是则清除让迁移重跑
+  const bizRaw = localStorage.getItem(CONFIG.businessKey);
+  if(bizRaw) {
+    try {
+      const bd = JSON.parse(bizRaw);
+      const isSeedOnly = store.bizKeys.every(k => (bd[k] || []).every(x => !x.id || x.id <= 100));
+      if(isSeedOnly) {
+        localStorage.removeItem(CONFIG.businessKey);
+        console.log("🔄 分组业务 key 只有种子数据，清除后重新迁移");
+      }
+    } catch(e) {}
+  }
+
+  // 3. 多源迁移：从全局 key 和 per-user key 迁移到双 key
+  // 3.1 先尝试从 per-user key 迁移
   migrateToDualKey(legacyKey, CONFIG.businessKey, CONFIG.gameKey);
+  // 3.2 如果业务 key 仍然没有数据，从全局 key 迁移
+  if(!localStorage.getItem(CONFIG.businessKey)) {
+    migrateToDualKey(globalKey, CONFIG.businessKey, CONFIG.gameKey);
+  }
 
   // 4. load data (local first, cloud async)
   data = store.loadLocal();
@@ -7126,13 +7143,13 @@ async function bootstrap() {
     setTimeout(() => showCatPopup("历史糖币已核算！", `+${histResult.totalAward} 🍬`, false), 500);
   }
 
-  // 5. cloud sync — 加载云端数据，如果没数据尝试从旧 key 迁移
+  // 5. cloud sync — 多源云端迁移
   let cloudData = await store.load();
   if(!cloudData) {
-    // 尝试从旧 per-user key 加载云端数据并迁移到双 key
-    const oldCloudRow = await store.loadCloudByKey(legacyKey);
-    if(oldCloudRow && oldCloudRow.data) {
-      const od = oldCloudRow.data;
+    // 尝试从 per-user key 云端加载
+    const legacyCloudRow = await store.loadCloudByKey(legacyKey);
+    if(legacyCloudRow && legacyCloudRow.data) {
+      const od = legacyCloudRow.data;
       const hasContent = (od.money && od.money.length > 0) ||
         (od.todo && od.todo.length > 0) ||
         (od.note && od.note.length > 0) ||
@@ -7142,14 +7159,34 @@ async function bootstrap() {
         cloudData = od;
         store.saveLocal(cloudData);
         await store.saveCloud(cloudData);
-        console.log(`📦 云端数据已迁移到双 key 系统`);
+        console.log(`📦 云端数据已从 per-user key 迁移到双 key 系统`);
         setTimeout(() => showCatPopup("数据已恢复！", "🎉", false), 800);
+      }
+    }
+    // 如果 per-user key 没有云端数据，尝试从全局 key 加载
+    if(!cloudData) {
+      const globalCloudRow = await store.loadCloudByKey(globalKey);
+      if(globalCloudRow && globalCloudRow.data) {
+        const od = globalCloudRow.data;
+        const hasContent = (od.money && od.money.length > 0) ||
+          (od.todo && od.todo.length > 0) ||
+          (od.note && od.note.length > 0) ||
+          (od.checkin && od.checkin.length > 0) ||
+          (od.progress && od.progress.length > 0);
+        if(hasContent) {
+          cloudData = od;
+          store.saveLocal(cloudData);
+          await store.saveCloud(cloudData);
+          console.log(`📦 云端数据已从全局 key 迁移到双 key 系统`);
+          setTimeout(() => showCatPopup("数据已恢复！", "🎉", false), 800);
+        }
       }
     }
   }
   if(cloudData) {
     data = cloudData;
     const changed = injectSeed();
+    tagLegacyRecords();
     const cloudHist = candy.doHistorySettlement();
     if(cloudHist.settled) {
       console.log(`🍬 云端历史糖币核算：+${cloudHist.totalAward}`);
@@ -7160,6 +7197,9 @@ async function bootstrap() {
     } else {
       render();
     }
+  } else {
+    // 云端和旧 key 都没数据，把本地数据推到云端
+    await store.saveCloud(data);
   }
 }
 
@@ -7171,10 +7211,19 @@ function migrateToDualKey(legacyKey, bizKey, gameKey) {
     if(!legacyRaw) return;
     const legacyData = JSON.parse(legacyRaw);
 
-    // 如果分组业务 key 已有数据，不迁移
+    // 检查旧数据是否有真实内容
+    const hasRealContent = store.bizKeys.some(k => (legacyData[k] || []).some(x => x.id && x.id > 100));
+    if(!hasRealContent) return; // 旧数据也只有种子数据，不需要迁移
+
+    // 检查分组业务 key 是否已有真实数据
     const bizRaw = localStorage.getItem(bizKey);
-    if(!bizRaw) {
-      // 提取业务字段到分组 key
+    let bizHasReal = false;
+    if(bizRaw) {
+      const bd = JSON.parse(bizRaw);
+      bizHasReal = store.bizKeys.some(k => (bd[k] || []).some(x => x.id && x.id > 100));
+    }
+    if(!bizHasReal) {
+      // 提取业务字段到分组 key（覆盖种子数据）
       const biz = {};
       store.bizKeys.forEach(k => { biz[k] = legacyData[k] || structuredClone(CONFIG.modules.find(m=>m.key===k)?.seed||[]); });
       localStorage.setItem(bizKey, JSON.stringify(biz));
@@ -7184,7 +7233,6 @@ function migrateToDualKey(legacyKey, bizKey, gameKey) {
     // 如果个人游戏 key 已有数据，不迁移
     const gameRaw = localStorage.getItem(gameKey);
     if(!gameRaw) {
-      // 提取游戏字段到个人 key
       const game = {};
       for(const k in legacyData) if(store.isGameKey(k)) game[k] = legacyData[k];
       localStorage.setItem(gameKey, JSON.stringify(game));
