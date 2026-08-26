@@ -4401,7 +4401,9 @@ function renderHome(){
   let togetherDays = 0;
   if(data.__togetherDate){
     const start = new Date(data.__togetherDate + "T00:00:00");
-    togetherDays = Math.max(1, Math.floor((Date.now() - start.getTime()) / 86400000) + 1);
+    const baseDays = Math.max(0, Math.floor((Date.now() - start.getTime()) / 86400000));
+    const extra = data.__togetherExtra != null ? parseInt(data.__togetherExtra) : 1;
+    togetherDays = baseDays + extra;
   }
   const gameSummary = `<div class="home-points-card">
     <div class="hpc-row" data-open="game">
@@ -4568,6 +4570,7 @@ function wireHome(todoKey){
       <h2>🐱🐱 在一起的日子</h2>
       <div class="sub">选择你们在一起的那一天，小猫会帮你记住每一天</div>
       <div style="padding:16px 0"><input type="date" id="togetherDate" value="${data.__togetherDate||''}" style="width:100%;padding:12px 14px;border:1px solid var(--border-input);border-radius:var(--radius-tile);font-size:16px;font-family:var(--font);background:var(--surface-card);color:var(--text)"></div>
+      <label style="display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer;font-size:14px;color:var(--text-sub)"><input type="checkbox" id="togetherExtra" ${data.__togetherExtra!=0?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)"><span>加一天（当天算第 1 天，而非第 0 天）</span></label>
       <div class="modal-actions"><button class="btn ghost" id="tg-cancel">取消</button><button class="btn" id="tg-ok" style="background:var(--accent)">确定</button></div></div>`;
     document.body.appendChild(overlay);
     const close=()=>overlay.remove();
@@ -4575,7 +4578,8 @@ function wireHome(todoKey){
     overlay.querySelector("#tg-cancel").onclick=close;
     overlay.querySelector("#tg-ok").onclick=()=>{
       const d=overlay.querySelector("#togetherDate").value;
-      if(d){ data.__togetherDate=d; store.save(); close(); render(); }
+      const extra=overlay.querySelector("#togetherExtra").checked?1:0;
+      if(d){ data.__togetherDate=d; data.__togetherExtra=extra; store.save(); close(); render(); }
     };
   };
   const findTodo=el=>(data[todoKey]||[]).find(i=>i.id==el.dataset.id);
