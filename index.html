@@ -4398,12 +4398,10 @@ function renderHome(){
   const doneTasks = todayTodos.filter(x=>x.done).length;
   const todayMoney = (data.money || []).filter(x=>x.date === tdy).length;
   const collectCount = Object.keys(candy.getCollection()).length;
-  const firstRecordTs = (data.todo||[]).concat(data.money||[]).concat(data.note||[])
-    .filter(r=>r.createdAt||r.ts||r.date).map(r=>r.createdAt||r.ts||r.date).sort()[0];
   let togetherDays = 0;
-  if(firstRecordTs){
-    const first = new Date(typeof firstRecordTs==="number"?firstRecordTs:new Date(firstRecordTs).getTime());
-    togetherDays = Math.max(1, Math.floor((Date.now()-first.getTime())/86400000)+1);
+  if(data.__togetherDate){
+    const start = new Date(data.__togetherDate + "T00:00:00");
+    togetherDays = Math.max(1, Math.floor((Date.now() - start.getTime()) / 86400000) + 1);
   }
   const gameSummary = `<div class="home-points-card">
     <div class="hpc-row" data-open="game">
@@ -4426,7 +4424,7 @@ function renderHome(){
   const quick = CONFIG.quickAdd.filter(q=>auth.canEdit(q.module)).map(q=>`<button class="qbtn" data-quick="${q.module}"><span class="e" style="background:${q.tint};color:${q.color}">${icon(q.icon,20)}<i class="qplus">${icon("plus",10,3)}</i></span><span class="l">${q.label}</span></button>`).join("");
 
   $("#screen").innerHTML = `
-    <div class="greet"><div><h1>${hi}</h1><p>${hiSub}</p>${togetherDays?`<div class="greet-together">🐱🐱 在一起 ${togetherDays} 天</div>`:''}</div></div>
+    <div class="greet"><div><h1>${hi}</h1><p>${hiSub}</p><div class="greet-together js-together" title="点击设置在一起的日子">🐱🐱 ${togetherDays?`在一起 ${togetherDays} 天`:'点击设置在一起的日子'}</div></div></div>
     <div class="quote"><img class="cat-deco" src="assets/nav-yan-huo.png" alt="" aria-hidden="true"/>
       <span class="tag">${icon("quote",13)} 小猫一言 · 今日份的猫粮</span>
       <div class="txt">${esc(q.en)}<em class="src">${esc(q.enBy)}</em></div>
@@ -4561,6 +4559,25 @@ function wireHome(todoKey){
     if(tab && el.dataset.open==="game") gameTab=tab;
   });
   $("#screen").querySelectorAll("[data-quick]").forEach(el=>el.onclick=()=>{ go(el.dataset.quick); openEditor(el.dataset.quick,null); });
+  // 在一起计时器：点击编辑日期
+  const tg=$("#screen").querySelector(".js-together");
+  if(tg) tg.onclick=()=>{
+    const overlay=document.createElement("div"); overlay.className="overlay";
+    overlay.innerHTML=`<div class="modal"><div class="grab"></div>
+      <div class="modal-cat"><img src="assets/nav-ci-ke.png" alt=""></div>
+      <h2>🐱🐱 在一起的日子</h2>
+      <div class="sub">选择你们在一起的那一天，小猫会帮你记住每一天</div>
+      <div style="padding:16px 0"><input type="date" id="togetherDate" value="${data.__togetherDate||''}" style="width:100%;padding:12px 14px;border:1px solid var(--border-input);border-radius:var(--radius-tile);font-size:16px;font-family:var(--font);background:var(--surface-card);color:var(--text)"></div>
+      <div class="modal-actions"><button class="btn ghost" id="tg-cancel">取消</button><button class="btn" id="tg-ok" style="background:var(--accent)">确定</button></div></div>`;
+    document.body.appendChild(overlay);
+    const close=()=>overlay.remove();
+    overlay.onclick=e=>{ if(e.target===overlay) close(); };
+    overlay.querySelector("#tg-cancel").onclick=close;
+    overlay.querySelector("#tg-ok").onclick=()=>{
+      const d=overlay.querySelector("#togetherDate").value;
+      if(d){ data.__togetherDate=d; store.save(); close(); render(); }
+    };
+  };
   const findTodo=el=>(data[todoKey]||[]).find(i=>i.id==el.dataset.id);
   // 今日计划卡：勾选完成
   $("#screen").querySelectorAll(".js-tc-chk").forEach(el=>el.onclick=e=>{
