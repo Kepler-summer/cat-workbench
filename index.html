@@ -5569,8 +5569,12 @@ const candy = {
   // 糖币流水
   log() { return data.__candyLog || []; },
 
+  // 检查当前用户是否无糖币权限（家属）
+  _noCandy() { return auth.isFamily(); },
+
   // 添加糖币记录（正向）
   _add(amount, type, description, refId) {
+    if(this._noCandy()) return;
     if(!data.__candyLog) data.__candyLog = [];
     data.__candyLog.unshift({
       id: Date.now() + Math.random(),
@@ -5785,6 +5789,7 @@ const candy = {
 
   // 完成每日任务
   completeDailyTask(taskId) {
+    if(this._noCandy()) return false;
     const daily = this.getDailyTasks();
     const task = daily.tasks.find(t => t.id === taskId);
     if(!task || task.done) return false;
@@ -5944,6 +5949,7 @@ const candy = {
   // ========== 任务/记账奖励 ==========
   // 任务完成奖励
   awardTask(taskTitle, taskId) {
+    if(this._noCandy()) return;
     const amount = this._calcAmount(CANDY_RULES.TASK_COMPLETE);
     this._add(amount, "task", `完成任务: ${taskTitle}`, taskId);
     const buff = this.getActiveBuff();
@@ -5957,6 +5963,7 @@ const candy = {
 
   // 记账奖励
   awardFinance(recordTitle, recordId) {
+    if(this._noCandy()) return;
     const amount = this._calcAmount(CANDY_RULES.FINANCE_RECORD);
     this._add(amount, "finance", `记账: ${recordTitle}`, recordId);
     const buff = this.getActiveBuff();
@@ -6004,9 +6011,12 @@ const candy = {
     let financeCount = 0;
     let totalAward = 0;
 
-    // 扫描已完成且未结算的任务
+    // 扫描已完成且未结算的任务（跳过家属记录，家属无糖币）
     const todos = data[todoKey] || [];
     for(const t of todos) {
+      if(t.createRole === "family" || t.createdBy === "family") {
+        t._candySettled = true; continue;
+      }
       if(t.done && !t._candySettled) {
         const amt = CANDY_RULES.TASK_COMPLETE;
         this._add(amt, "task", `历史任务: ${t.title}`, t.id);
@@ -6016,9 +6026,12 @@ const candy = {
       }
     }
 
-    // 扫描已存在且未结算的记账记录
+    // 扫描已存在且未结算的记账记录（跳过家属记录）
     const moneys = data[moneyKey] || [];
     for(const m of moneys) {
+      if(m.createRole === "family" || m.createdBy === "family") {
+        m._candySettled = true; continue;
+      }
       if(!m._candySettled) {
         const amt = CANDY_RULES.FINANCE_RECORD;
         this._add(amt, "finance", `历史记账: ${m.title || m.category || '记录'}`, m.id);
@@ -7127,8 +7140,8 @@ async function bootstrap() {
       delete data.__historySettled;
       delete data.__candyLog;
       delete data.__catLevel;
-      (data[todoKey] || []).forEach(t => { if(t.done) delete t._candySettled; });
-      (data[moneyKey] || []).forEach(m => { delete m._candySettled; });
+      (data[todoKey] || []).forEach(t => { if(t.done && t.createRole !== "family" && t.createdBy !== "family") delete t._candySettled; });
+      (data[moneyKey] || []).forEach(m => { if(m.createRole !== "family" && m.createdBy !== "family") delete m._candySettled; });
       console.log("🔄 糖币数据丢失，重置结算标记重新核算");
     }
   }
