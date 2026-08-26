@@ -6,10 +6,10 @@
 <meta http-equiv="Expires" content="0">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>猫咪时间报 · 未来时间管理局</title>
+<title>二猫 · 我们一起记账和规划时间</title>
 <style>
   /* ============================================================
-     THEME TOKENS — 卡通小猫 × 未来时间管理局
+     THEME TOKENS — 二猫 · 情侣共同记账与时间规划
      蓝色科技底纹 · 绿色主色调 · 活泼趣味
      ============================================================ */
   :root {
@@ -73,8 +73,12 @@
     --radius-sheet: 22px;            /* 底部弹窗顶部圆角 */
 
     /* ---- 阴影 ---- */
-    --shadow-card: 0 1px 3px rgba(26,41,56,.06), 0 4px 16px rgba(26,41,56,.06);   /* 卡片/面板 */
+    --shadow-card: 0 2px 12px rgba(26,41,56,.05), 0 4px 20px rgba(26,41,56,.04);   /* 卡片/面板，更柔和 */
     --shadow-overlay: 0 10px 28px rgba(26,41,56,.15);                             /* 弹窗/toast/悬浮按钮 */
+
+    /* ---- 情侣色对 ---- */
+    --accent-pair-1: #e8a0a0;   /* 浅珊瑚（猫一·管理员） */
+    --accent-pair-2: #a0c4e8;   /* 浅天蓝（猫二·家属） */
 
     /* ---- 字体与布局 ---- */
     --font: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
@@ -127,6 +131,8 @@
     font-size:12px; font-weight:600; padding:6px 14px; border-radius:999px; cursor:pointer; transition:all .2s; }
   .filter-tab:hover { border-color:var(--accent); color:var(--accent); }
   .filter-tab.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .filter-tab.on[data-filter="admin"] { background:#4a7ab5; border-color:#4a7ab5; }
+  .filter-tab.on[data-filter="family"] { background:#c97878; border-color:#c97878; }
   .sec-title .more svg { color: var(--text-tertiary); }
 
   /* ---------- timeline ---------- */
@@ -163,6 +169,9 @@
   .greet h1 { font-size: 22px; font-weight: 700; letter-spacing: 0; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: #2c3e50; }
   .greet h1::after { content: " ~"; color: var(--accent); font-weight: 600; }
   .greet p { color: var(--text-secondary); font-size: 13px; margin-top: 5px; }
+  .greet-together { display:inline-flex; align-items:center; gap:3px; margin-top:8px;
+    padding:3px 10px; border-radius:999px; font-size:11px; font-weight:700;
+    background:rgba(255,255,255,.55); color:var(--accent); }
   .greet .add { position: absolute; top: 16px; right: 16px; z-index: 2; border:none; cursor:pointer;
     display:inline-flex; align-items:center; gap:6px; background: var(--accent); color:var(--on-accent);
     font-size: 13px; font-weight: 700; padding: 9px 15px 9px 12px; border-radius: 999px; box-shadow: var(--shadow-overlay);
@@ -181,7 +190,8 @@
 
   /* ---------- overview rings ---------- */
   .rings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 20px 6px; margin-top: 14px; }
-  .ring { display:flex; flex-direction:column; align-items:center; gap: 8px; }
+  .ring { display:flex; flex-direction:column; align-items:center; gap: 8px; cursor:pointer; transition:transform .2s ease-out; }
+  .ring:hover { transform:translateY(-2px) scale(1.03); }
   .ring .dial { position: relative; width: 68px; height: 68px; }
   .ring .dial svg.gauge { transform: rotate(-90deg); width: 68px; height: 68px; }
   .ring .dial .mid { position:absolute; inset:0; display:grid; place-items:center; }
@@ -397,7 +407,9 @@
     display:flex; gap:10px; margin-top:12px; padding-top:12px;
     border-top:1px dashed var(--border-soft); position:relative; z-index:1;
   }
-  .hpc-stat { flex:1; text-align:center; }
+  .hpc-stat { flex:1; text-align:center; cursor:pointer; border-radius:10px; padding:4px 2px; transition:background .15s ease-out; }
+  .hpc-stat:hover { background:rgba(255,255,255,.45); }
+  .hpc-stat:active { background:rgba(255,255,255,.65); }
   .hpc-stat .num { font-size:15px; font-weight:800; color:var(--text); }
   .hpc-stat .lbl { font-size:10px; color:var(--text-secondary); margin-top:2px; }
   .hpc-chevron { flex:0 0 auto; color:var(--text-tertiary); }
@@ -745,8 +757,12 @@
   .group-member { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; gap:8px; }
   .group-member + .group-member { border-top:1px solid var(--border-soft); }
   .group-member .gm-info { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
-  .group-member .gm-avatar { width:32px; height:32px; border-radius:50%; background:var(--surface-nested);
-    display:grid; place-items:center; font-size:16px; flex:0 0 auto; }
+  .group-member .gm-avatar { width:36px; height:36px; border-radius:50%; background:var(--surface-nested);
+    display:grid; place-items:center; font-size:16px; flex:0 0 auto; overflow:hidden; position:relative; cursor:pointer; }
+  .group-member .gm-avatar img { width:100%; height:100%; object-fit:cover; }
+  .group-member .gm-avatar .avatar-cam { position:absolute; inset:0; display:grid; place-items:center;
+    background:rgba(0,0,0,.35); color:#fff; font-size:11px; opacity:0; transition:opacity .15s; border-radius:50%; }
+  .group-member .gm-avatar:hover .avatar-cam { opacity:1; }
   .group-member .gm-name { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .group-member .gm-meta { font-size:11px; color:var(--text-tertiary); margin-top:1px; }
   .group-member .gm-role { font-size:10px; padding:2px 7px; border-radius:20px; flex:0 0 auto; }
@@ -3854,12 +3870,12 @@
     <button class="dclose" id="drawerClose"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
     <div class="brand" id="drawerBrand" title="点击更换头像"><img src="assets/avatar.jpg" alt="头像" id="brandImg"><span class="brand-cam" id="brandCam"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h3l1.5-2h7L17 8.5h3v10H4z"></path><circle cx="12" cy="13" r="3.2"></circle></svg></span></div>
     <input type="file" id="avatarInput" accept="image/*" hidden="">
-    <div><h2 id="drawerName">无尽夏</h2><p id="drawerSlogan">未来时间管理局 · 每日准时报到</p></div>
+    <div><h2 id="drawerName">无尽夏</h2><p id="drawerSlogan">两只小猫，一起把日子过成糖</p></div>
   </div>
   <div class="dsep"></div>
   <div id="drawerList"><div class="ditem" data-go="home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5"></path><path d="M6 10.5V19h12v-8.5"></path></svg>首页</div><div class="ditem" data-go="money"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h11a1.5 1.5 0 0 1 1.5 1.5V8"></path><rect x="3.5" y="7.5" width="17" height="11.5" rx="2.5"></rect><circle cx="16.5" cy="13.2" r="1.3"></circle></svg>记账本</div><div class="ditem" data-go="todo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 6h11"></path><path d="M8.5 12h11"></path><path d="M8.5 18h11"></path><circle cx="4.5" cy="6" r=".9"></circle><circle cx="4.5" cy="12" r=".9"></circle><circle cx="4.5" cy="18" r=".9"></circle></svg>今日计划</div><div class="ditem" data-go="checkin"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4C10 4 4 9 4 17c0 1 .1 2 .5 3 5.5-9 9-9.5 15.5-16z"></path><path d="M4.5 20c3-6 7-9.5 13-11.5"></path></svg>习惯打卡</div><div class="ditem" data-go="goal"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="4"></circle></svg>长期目标</div><div class="ditem" data-go="note"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.2-4L16 5.2l2.8 2.8L8 19z"></path><path d="M14.2 7l2.8 2.8"></path></svg>灵感备忘</div><div class="ditem" data-go="game"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg>糖币看板</div><div class="ditem" data-go="insight"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4"></path><path d="M4 20h16"></path><path d="M8 16v-4"></path><path d="M12 16v-7"></path><path d="M16 16v-2"></path></svg>洞察</div><div class="ditem" data-go="users"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5.5 19c.7-3.2 3.2-5 6.5-5s5.8 1.8 6.5 5"></path></svg>用户管理</div></div>
   <div class="dsep"></div>
-  <div class="dfoot" id="drawerFoot">数据仅存在本机 · 小猫每日准时报到</div>
+  <div class="dfoot" id="drawerFoot">二猫 · 云端同步中</div>
 </aside>
 
 <script>
@@ -3877,9 +3893,9 @@
 const CONFIG = {
   storageKey: "cat-time-bureau-v1",   // 换 key 可强制重置
   maxUsers: 4,                         // 全局账户上限
-  owner: "时间小猫管理局",             // 抽屉顶部标题
-  slogan: "未来时间管理局 · 每日准时报到",
-  brand: "🐱",                         // 抽屉左上角字符标（品牌缩写）
+  owner: "二猫",                       // 抽屉顶部标题
+  slogan: "两只小猫，一起把日子过成糖",
+  brand: "🐱🐱",                       // 抽屉左上角字符标（品牌缩写）
 
   // 每日金句（理财·生命·爱情·时间 四主题轮换，按日期选择）
   quotes: [
@@ -4024,7 +4040,7 @@ const CONFIG = {
       categories: ["学习笔记", "市场观察", "灵感速记", "读书摘录", "AI技术", "金融知识", "生活随笔", "其他"],
       moods: ["灵感", "复盘", "资讯", "备忘"],
       seed: [
-        { id: 61, title: "今日市场观察", content: "大盘缩量整理，关注科技板块轮动机会。时间小猫觉得，耐心等待也是一种策略喵～", mood: "资讯", category: "市场观察", date: isoToday() },
+        { id: 61, title: "今日市场观察", content: "大盘缩量整理，关注科技板块轮动机会。二猫觉得，耐心等待也是一种策略喵～", mood: "资讯", category: "市场观察", date: isoToday() },
         { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
         { id: 9003, title: "周日早晨 · 远家", content: "暖光台灯、透明水杯、屏幕上 09:33 的周日。木桌百叶窗，窗外绿植，一切都慢下来——和那杯抹茶拿铁一个味道。", mood: "备忘", category: "生活随笔", date: "2026-08-23", layout: "feature", image: "assets/matcha-sunday.jpg" },
       ],
@@ -4339,7 +4355,7 @@ function renderHome(){
   const q = CONFIG.quotes[dayOfYear % CONFIG.quotes.length];
   const hour = now.getHours();
   const hi = hour<5?"夜深啦，小猫还在陪你喵~":hour<11?"早安喵，起床啦":hour<13?"午安喵，小憩一下":hour<18?"下午好喵，继续加油":"晚上好喵，今天辛苦啦";
-  const hiSub = hour<5?"别熬太晚哦，小猫会担心的～":hour<11?"新的一天，和小猫一起出发吧":hour<13?"吃午饭啦，顺便打个盹":hour<18?"下午茶时间到，伸个懒腰继续":"欢迎回到时间小猫管理局 · 今日时间线已就绪";
+  const hiSub = hour<5?"别熬太晚哦，小猫会担心的～":hour<11?"新的一天，和小猫一起出发吧":hour<13?"吃午饭啦，顺便打个盹":hour<18?"下午茶时间到，伸个懒腰继续":"欢迎回到二猫 · 今天也要一起加油呀";
 
   // overview rings
   const rings = CONFIG.overview.map(o=>{
@@ -4382,8 +4398,15 @@ function renderHome(){
   const doneTasks = todayTodos.filter(x=>x.done).length;
   const todayMoney = (data.money || []).filter(x=>x.date === tdy).length;
   const collectCount = Object.keys(candy.getCollection()).length;
-  const gameSummary = `<div class="home-points-card" data-open="game">
-    <div class="hpc-row">
+  const firstRecordTs = (data.todo||[]).concat(data.money||[]).concat(data.note||[])
+    .filter(r=>r.createdAt||r.ts||r.date).map(r=>r.createdAt||r.ts||r.date).sort()[0];
+  let togetherDays = 0;
+  if(firstRecordTs){
+    const first = new Date(typeof firstRecordTs==="number"?firstRecordTs:new Date(firstRecordTs).getTime());
+    togetherDays = Math.max(1, Math.floor((Date.now()-first.getTime())/86400000)+1);
+  }
+  const gameSummary = `<div class="home-points-card">
+    <div class="hpc-row" data-open="game">
       <div class="hpc-cat cat-float"><img src="assets/nav-ci-ke.png" alt=""></div>
       <div class="hpc-info">
         <div class="hpc-level"><span>${catLvl.icon}</span>Lv.${catLvl.level} ${catLvl.name}</div>
@@ -4393,17 +4416,17 @@ function renderHome(){
       <div class="hpc-chevron">${icon("chevron",18)}</div>
     </div>
     <div class="hpc-stats">
-      <div class="hpc-stat"><div class="num">+${todayCandy}</div><div class="lbl">今日获得</div></div>
-      <div class="hpc-stat"><div class="num">${doneTasks}/${todayTodos.length}</div><div class="lbl">今日任务</div></div>
-      <div class="hpc-stat"><div class="num">${collectCount}</div><div class="lbl">藏品图鉴</div></div>
-      <div class="hpc-stat"><div class="num">Lv.${catLvl.level}</div><div class="lbl">小猫等级</div></div>
+      <div class="hpc-stat" data-open="game"><div class="num">+${todayCandy}</div><div class="lbl">今日获得</div></div>
+      <div class="hpc-stat" data-open="todo"><div class="num">${doneTasks}/${todayTodos.length}</div><div class="lbl">今日任务</div></div>
+      <div class="hpc-stat" data-open="game" data-tab="collect"><div class="num">${collectCount}</div><div class="lbl">藏品图鉴</div></div>
+      <div class="hpc-stat" data-open="game"><div class="num">Lv.${catLvl.level}</div><div class="lbl">小猫等级</div></div>
     </div>
   </div>`;
 
   const quick = CONFIG.quickAdd.filter(q=>auth.canEdit(q.module)).map(q=>`<button class="qbtn" data-quick="${q.module}"><span class="e" style="background:${q.tint};color:${q.color}">${icon(q.icon,20)}<i class="qplus">${icon("plus",10,3)}</i></span><span class="l">${q.label}</span></button>`).join("");
 
   $("#screen").innerHTML = `
-    <div class="greet"><div><h1>${hi}</h1><p>${hiSub}</p></div></div>
+    <div class="greet"><div><h1>${hi}</h1><p>${hiSub}</p>${togetherDays?`<div class="greet-together">🐱🐱 在一起 ${togetherDays} 天</div>`:''}</div></div>
     <div class="quote"><img class="cat-deco" src="assets/nav-yan-huo.png" alt="" aria-hidden="true"/>
       <span class="tag">${icon("quote",13)} 小猫一言 · 今日份的猫粮</span>
       <div class="txt">${esc(q.en)}<em class="src">${esc(q.enBy)}</em></div>
@@ -4532,14 +4555,25 @@ function confirmCalUncheck(item, ds){
 }
 
 function wireHome(todoKey){
-  $("#screen").querySelectorAll("[data-open]").forEach(el=>el.onclick=()=>go(el.dataset.open));
+  $("#screen").querySelectorAll("[data-open]").forEach(el=>el.onclick=()=>{
+    const tab=el.dataset.tab;
+    go(el.dataset.open);
+    if(tab && el.dataset.open==="game") gameTab=tab;
+  });
   $("#screen").querySelectorAll("[data-quick]").forEach(el=>el.onclick=()=>{ go(el.dataset.quick); openEditor(el.dataset.quick,null); });
   const findTodo=el=>(data[todoKey]||[]).find(i=>i.id==el.dataset.id);
   // 今日计划卡：勾选完成
   $("#screen").querySelectorAll(".js-tc-chk").forEach(el=>el.onclick=e=>{
     e.stopPropagation(); const x=findTodo(el); if(!x) return;
-    if(!x.done) { x.done=true; if(!x._candySettled) { x._candySettled=true; candy.awardTask(x.title, x.id); } }
-    else { x.done=false; }
+    if(!x.done) {
+      x.done=true; if(!x._candySettled) { x._candySettled=true; candy.awardTask(x.title, x.id); }
+      el.classList.add("on");
+      const card=el.closest(".tcard"); if(card) card.classList.add("done");
+      try{ navigator.vibrate && navigator.vibrate(10); }catch(_){}
+    }
+    else { x.done=false; el.classList.remove("on");
+      const card=el.closest(".tcard"); if(card) card.classList.remove("done");
+    }
     persist();
   });
   // 今日计划卡：点击查看详情
@@ -4958,6 +4992,14 @@ function render(){
   else if(view==="game") renderGame();
   else if(view==="users") renderUsers();
   else renderModule(view);
+  // page transition fade-in
+  const screen=$("#screen");
+  if(screen){ screen.style.opacity="0"; screen.style.transform="translateY(8px)";
+    requestAnimationFrame(()=>{ screen.style.transition="opacity .2s ease-out, transform .2s ease-out";
+      screen.style.opacity="1"; screen.style.transform="translateY(0)";
+      setTimeout(()=>{ screen.style.transition=""; },250);
+    });
+  }
 }
 
 /* ---------- drawer ---------- */
@@ -4999,13 +5041,35 @@ $("#nav").querySelectorAll(".n").forEach(n=>n.onclick=()=>{
 
 /* ---------- avatar upload ---------- */
 $("#brandCam").innerHTML = icon("camera",18);
-if(data.__avatar) $("#brandImg").src = data.__avatar;
+function refreshDrawerAvatar(){
+  const uid = auth.session?.userId;
+  const userAv = (data.__userAvatars||{})[uid];
+  const legacyAv = data.__avatar;
+  const src = userAv || legacyAv;
+  if(src) $("#brandImg").src = src;
+}
+refreshDrawerAvatar();
 $("#drawerBrand").onclick = () => $("#avatarInput").click();
 $("#avatarInput").onchange = e => {
   const f = e.target.files && e.target.files[0];
   if(!f) return;
   const reader = new FileReader();
-  reader.onload = () => { data.__avatar = reader.result; $("#brandImg").src = reader.result; store.save(); };
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const size = 200; canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      const min = Math.min(img.width, img.height);
+      ctx.drawImage(img, (img.width-min)/2, (img.height-min)/2, min, min, 0, 0, size, size);
+      const resized = canvas.toDataURL("image/jpeg", 0.85);
+      data.__avatar = resized;
+      const uid = auth.session?.userId;
+      if(uid){ if(!data.__userAvatars) data.__userAvatars = {}; data.__userAvatars[uid] = resized; }
+      $("#brandImg").src = resized; store.save();
+    };
+    img.src = reader.result;
+  };
   reader.readAsDataURL(f);
   e.target.value = "";
 };
@@ -6728,10 +6792,19 @@ async function renderUsers() {
 
       const memberHtml = [admin, family].filter(Boolean).map(u => {
         const isSelf = u.id === cur.userId;
+        const canChangeAvatar = isSelf || (auth.isAdmin() && isMyGroup);
+        const userAvatars = data.__userAvatars || {};
+        const avatarSrc = userAvatars[u.id];
+        const avatarHtml = avatarSrc
+          ? `<img src="${esc(avatarSrc)}" alt="${esc(u.username)}">`
+          : (u.role === 'admin' ? '👑' : '🐱');
+        const camHtml = canChangeAvatar
+          ? `<span class="avatar-cam">${icon("camera",14)}</span>`
+          : '';
         return `
           <div class="group-member">
             <div class="gm-info">
-              <div class="gm-avatar">${u.role === 'admin' ? '👑' : '🐱'}</div>
+              <div class="gm-avatar js-change-avatar" data-uid="${u.id}" data-name="${esc(u.username)}" ${canChangeAvatar?'':'style="cursor:default"'}>${avatarHtml}${camHtml}</div>
               <div>
                 <div class="gm-name">${esc(u.username)}</div>
                 <div class="gm-meta">加入于 ${new Date(u.created_at).toLocaleDateString('zh-CN')}</div>
@@ -6763,7 +6836,7 @@ async function renderUsers() {
         </div>`).join("");
 
       return `
-        <div class="group-card">
+        <div class="group-card" data-gid="${g.id}">
           <div class="gc-head">
             <div class="gc-name">
               ${isMyGroup ? '🏠' : '🐾'} ${esc(g.name)}
@@ -6895,6 +6968,43 @@ async function renderUsers() {
       renderUsers();
     };
   });
+
+  // Avatar upload
+  $("#screen").querySelectorAll(".js-change-avatar").forEach(el => {
+    const uid = +el.dataset.uid;
+    const isSelf = uid === cur.userId;
+    const canChange = isSelf || (auth.isAdmin() && cur.groupId === +el.closest(".group-card")?.dataset?.gid);
+    if(!canChange && el.style.cursor !== "pointer") return;
+    el.onclick = () => {
+      const input = document.createElement("input");
+      input.type = "file"; input.accept = "image/*";
+      input.onchange = e => {
+        const f = e.target.files && e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const size = 200;
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext("2d");
+            const min = Math.min(img.width, img.height);
+            const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+            ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+            const resized = canvas.toDataURL("image/jpeg", 0.85);
+            if(!data.__userAvatars) data.__userAvatars = {};
+            data.__userAvatars[uid] = resized;
+            store.save();
+            renderUsers();
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(f);
+      };
+      input.click();
+    };
+  });
 }
 
 /* ============================================================
@@ -6981,7 +7091,7 @@ async function renderAuth(mode = "login") {
       <button class="auth-btn primary" id="authSubmit" ${!isLogin && isFull ? 'disabled' : ''}>${isLogin ? "登录" : isFull ? "账号已满" : "注册"}</button>
       <button class="auth-btn secondary" id="authToggle">${isLogin ? "没有账号？去注册" : "已有账号？去登录"}</button>
       <div class="auth-err" id="authErr"></div>
-      <div class="auth-info">🐱 布偶小猫时间管理局 · 数据云端同步</div>
+      <div class="auth-info">🐱🐱 二猫 · 我们的小日子，云端同步</div>
     </div>`;
 
   // role selector
@@ -7060,7 +7170,7 @@ async function renderAuth(mode = "login") {
             如有问题请联系对应分组的管理员。
           </div>
           <button class="auth-btn primary" id="backToLogin" style="margin-top:16px">返回登录</button>
-          <div class="auth-info">🐱 布偶小猫时间管理局 · 数据云端同步</div>
+          <div class="auth-info">🐱🐱 二猫 · 我们的小日子，云端同步</div>
         </div>`;
       $("#backToLogin").onclick = () => renderAuth("login");
       return;
