@@ -3881,22 +3881,68 @@ const CONFIG = {
   slogan: "未来时间管理局 · 每日准时报到",
   brand: "🐱",                         // 抽屉左上角字符标（品牌缩写）
 
-  // 每日三句（英文金句 + 诗词 + 歌词，按星期轮换：周一→周日）
+  // 每日金句（理财·生命·爱情·时间 四主题轮换，按日期选择）
   quotes: [
-    { en: "The future depends on what you do today.", enBy: "Gandhi",
-      poem: "长风破浪会有时，直挂云帆济沧海。", poemBy: "李白《行路难》", lyric: "我祈祷拥有一颗透明的心灵，和会流泪的眼睛。", lyricBy: "逃跑计划《夜空中最亮的星》" },
-    { en: "Compound interest is the eighth wonder of the world.", enBy: "Einstein",
-      poem: "会当凌绝顶，一览众山小。", poemBy: "杜甫《望岳》", lyric: "只要你敢想就算没达到还是会有宝藏。", lyricBy: "S.H.E《你曾是少年》" },
-    { en: "The most important investment you can make is in yourself.", enBy: "Warren Buffett",
-      poem: "路漫漫其修远兮，吾将上下而求索。", poemBy: "屈原《离骚》", lyric: "也许我没有天分但我有梦的天真。", lyricBy: "周杰伦《蜗牛》" },
-    { en: "In the middle of difficulty lies opportunity.", enBy: "Einstein",
-      poem: "山重水复疑无路，柳暗花明又一村。", poemBy: "陆游《游山西村》", lyric: "逆风的方向更适合飞翔。", lyricBy: "五月天《倔强》" },
-    { en: "The market is filled with those who know the price of everything, but the value of nothing.", enBy: "Philip Fisher",
-      poem: "不畏浮云遮望眼，自缘身在最高层。", poemBy: "王安石《登飞来峰》", lyric: "当我和世界不一样那就让我不一样。", lyricBy: "五月天《倔强》" },
-    { en: "The only true wisdom is in knowing you know nothing.", enBy: "Socrates",
-      poem: "纸上得来终觉浅，绝知此事要躬行。", poemBy: "陆游《冬夜读书示子聿》", lyric: "谁说污泥满身的不算英雄。", lyricBy: "陈奕迅《孤勇者》" },
-    { en: "AI is the new electricity.", enBy: "Andrew Ng",
-      poem: "欲穷千里目，更上一层楼。", poemBy: "王之涣《登鹳雀楼》", lyric: "曾经跨过山和大海也穿过人山人海。", lyricBy: "朴树《平凡之路》" },
+    // —— 理财智慧 ——
+    { theme:"理财", en:"Compound interest is the eighth wonder of the world.", enBy:"Einstein",
+      poem:"不积跬步，无以至千里；不积小流，无以成江海。", poemBy:"荀子《劝学》", lyric:"只要你敢想就算没达到还是会有宝藏。", lyricBy:"S.H.E《你曾是少年》" },
+    { theme:"理财", en:"The most important investment you can make is in yourself.", enBy:"Warren Buffett",
+      poem:"路漫漫其修远兮，吾将上下而求索。", poemBy:"屈原《离骚》", lyric:"也许我没有天分但我有梦的天真。", lyricBy:"周杰伦《蜗牛》" },
+    { theme:"理财", en:"Do not save what is left after spending, spend what is left after saving.", enBy:"Warren Buffett",
+      poem:"历览前贤国与家，成由勤俭破由奢。", poemBy:"李商隐《咏史》", lyric:"一步一步往上爬，在最高点乘着叶片往前飞。", lyricBy:"周杰伦《蜗牛》" },
+    { theme:"理财", en:"The market is filled with those who know the price of everything, but the value of nothing.", enBy:"Philip Fisher",
+      poem:"不畏浮云遮望眼，自缘身在最高层。", poemBy:"王安石《登飞来峰》", lyric:"当我和世界不一样那就让我不一样。", lyricBy:"五月天《倔强》" },
+    { theme:"理财", en:"Risk comes from not knowing what you're doing.", enBy:"Warren Buffett",
+      poem:"知己知彼，百战不殆。", poemBy:"孙子《孙子兵法》", lyric:"三分天注定，七分靠打拼，爱拼才会赢。", lyricBy:"叶启田《爱拼才会赢》" },
+    { theme:"理财", en:"It's not how much money you make, but how much you keep.", enBy:"Robert Kiyosaki",
+      poem:"一粥一饭，当思来处不易；半丝半缕，恒念物力维艰。", poemBy:"朱柏庐《治家格言》", lyric:"我曾经跨过山和大海，也穿过人山人海。", lyricBy:"朴树《平凡之路》" },
+    { theme:"理财", en:"The four most dangerous words in investing are: this time it's different.", enBy:"John Templeton",
+      poem:"以铜为镜，可以正衣冠；以史为镜，可以知兴替。", poemBy:"《旧唐书·魏徵传》", lyric:"历史重演，那是昨日，也是今天。", lyricBy:"陈奕迅《2001太空漫游》" },
+    // —— 生命意义 ——
+    { theme:"生命", en:"The future depends on what you do today.", enBy:"Gandhi",
+      poem:"长风破浪会有时，直挂云帆济沧海。", poemBy:"李白《行路难》", lyric:"我祈祷拥有一颗透明的心灵，和会流泪的眼睛。", lyricBy:"逃跑计划《夜空中最亮的星》" },
+    { theme:"生命", en:"The only true wisdom is in knowing you know nothing.", enBy:"Socrates",
+      poem:"纸上得来终觉浅，绝知此事要躬行。", poemBy:"陆游《冬夜读书示子聿》", lyric:"谁说污泥满身的不算英雄。", lyricBy:"陈奕迅《孤勇者》" },
+    { theme:"生命", en:"The unexamined life is not worth living.", enBy:"Socrates",
+      poem:"吾日三省吾身。", poemBy:"《论语·学而》", lyric:"退后一步海阔天空，忍一时风平浪静。", lyricBy:"品源《海阔天空》" },
+    { theme:"生命", en:"In the middle of difficulty lies opportunity.", enBy:"Einstein",
+      poem:"山重水复疑无路，柳暗花明又一村。", poemBy:"陆游《游山西村》", lyric:"逆风的方向更适合飞翔。", lyricBy:"五月天《倔强》" },
+    { theme:"生命", en:"Life is what happens to you while you're busy making other plans.", enBy:"John Lennon",
+      poem:"人生得意须尽欢，莫使金樽空对月。", poemBy:"李白《将进酒》", lyric:"每天提醒自己，你很好，就算无人看到。", lyricBy:"好妹妹乐队《说时依旧》" },
+    { theme:"生命", en:"The purpose of our lives is to be happy.", enBy:"Dalai Lama",
+      poem:"采菊东篱下，悠然见南山。", poemBy:"陶渊明《饮酒》", lyric:"就像很久以前，你眉目间额那一抹优柔。", lyricBy:"好妹妹乐队《说时依旧》" },
+    { theme:"生命", en:"To live is the rarest thing in the world. Most people exist, that is all.", enBy:"Oscar Wilde",
+      poem:"路曼曼其修远兮，吾将上下而求索。", poemBy:"屈原《离骚》", lyric:"我等到花儿也谢了，等到月儿也落了。", lyricBy:"张学友《我等到花儿也谢了》" },
+    // —— 爱情感悟 ——
+    { theme:"爱情", en:"The best thing to hold onto in life is each other.", enBy:"Audrey Hepburn",
+      poem:"两情若是久长时，又岂在朝朝暮暮。", poemBy:"秦观《鹊桥仙》", lyric:"只要是你晚一点没关系，最好的人会到身边。", lyricBy:"颜人中《晚安》" },
+    { theme:"爱情", en:"We accept the love we think we deserve.", enBy:"Stephen Chbosky",
+      poem:"曾经沧海难为水，除却巫山不是云。", poemBy:"元稹《离思》", lyric:"后来终于在眼泪中明白，有些人一旦错过就不再。", lyricBy:"刘若英《后来》" },
+    { theme:"爱情", en:"Love is not about how much you say I love you, but how much you prove it's true.", enBy:"Unknown",
+      poem:"身无彩凤双飞翼，心有灵犀一点通。", poemBy:"李商隐《无题》", lyric:"确认过眼神，我遇上对的人。", lyricBy:"林俊杰《醉赤壁》" },
+    { theme:"爱情", en:"The greatest happiness of life is the conviction that we are loved.", enBy:"Victor Hugo",
+      poem:"衣带渐宽终不悔，为伊消得人憔悴。", poemBy:"柳永《蝶恋花》", lyric:"你是我最重要的决定，我愿意每天在你身边苏醒。", lyricBy:"范玮琪《最重要的决定》" },
+    { theme:"爱情", en:"Where there is love there is life.", enBy:"Mahatma Gandhi",
+      poem:"春蚕到死丝方尽，蜡炬成灰泪始干。", poemBy:"李商隐《无题》", lyric:"我想对你说，却害怕都说错，好喜欢你知不知道。", lyricBy:"胡夏《那些年》" },
+    { theme:"爱情", en:"Love is composed of a single soul inhabiting two bodies.", enBy:"Aristotle",
+      poem:"在天愿作比翼鸟，在地愿为连理枝。", poemBy:"白居易《长恨歌》", lyric:"你是我的眼，带我领略四季的变换。", lyricBy:"萧煌奇《你是我的眼》" },
+    { theme:"爱情", en:"To love and be loved is to feel the sun from both sides.", enBy:"David Viscott",
+      poem:"玲珑骰子安红豆，入骨相思知不知。", poemBy:"温庭筠《新添声杨柳枝》", lyric:"你笑起来真好看，像春天的花一样。", lyricBy:"李昕融《你笑起来真好看》" },
+    // —— 时间意义 ——
+    { theme:"时间", en:"The trouble is, you think you have time.", enBy:"Buddha",
+      poem:"盛年不重来，一日难再晨。及时当勉励，岁月不待人。", poemBy:"陶渊明《杂诗》", lyric:"时间都去哪儿了，还没好好感受年轻就老了。", lyricBy:"王铮亮《时间都去哪儿了》" },
+    { theme:"时间", en:"Lost time is never found again.", enBy:"Benjamin Franklin",
+      poem:"一寸光阴一寸金，寸金难买寸光阴。", poemBy:"王贞白《白鹿洞》", lyric:"那春去秋来，你还好吗？", lyricBy:"许巍《蓝莲花》" },
+    { theme:"时间", en:"AI is the new electricity.", enBy:"Andrew Ng",
+      poem:"欲穷千里目，更上一层楼。", poemBy:"王之涣《登鹳雀楼》", lyric:"曾经跨过山和大海也穿过人山人海。", lyricBy:"朴树《平凡之路》" },
+    { theme:"时间", en:"Yesterday is history, tomorrow is a mystery, today is a gift.", enBy:"Eleanor Roosevelt",
+      poem:"花开堪折直须折，莫待无花空折枝。", poemBy:"杜秋娘《金缕衣》", lyric:"只是太年轻，不曾体会，快乐的痕迹。", lyricBy:"杨宗纬《这一路走来》" },
+    { theme:"时间", en:"Time is what we want most, but what we use worst.", enBy:"William Penn",
+      poem:"明日复明日，明日何其多。我生待明日，万事成蹉跎。", poemBy:"钱鹤滩《明日歌》", lyric:"不要那么孤独，请相信这个世界上真的有人在过着你想要的生活。", lyricBy:"大冰《乖，摸摸头》" },
+    { theme:"时间", en:"The two most powerful warriors are patience and time.", enBy:"Tolstoy",
+      poem:"千磨万击还坚劲，任尔东西南北风。", poemBy:"郑燮《竹石》", lyric:"慢慢来，比较快。", lyricBy:"梁静茹《慢慢来》" },
+    { theme:"时间", en:"Time flies over us, but leaves its shadow behind.", enBy:"Nathaniel Hawthorne",
+      poem:"流光容易把人抛，红了樱桃，绿了芭蕉。", poemBy:"蒋捷《一剪梅》", lyric:"那些年错过的大雨，那些年错过的爱情。", lyricBy:"胡夏《那些年》" },
   ],
 
   // 今日概览环形（value 为 0-100 的完成度，calc 返回 {value, sub}）
@@ -4289,7 +4335,8 @@ function ringSVG(pct, color){
 function renderHome(){
   const now = new Date();
   const dow = (now.getDay()+6)%7;               // 周一=0 … 周日=6
-  const q = CONFIG.quotes[dow % CONFIG.quotes.length];
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(),0,0)) / 86400000);
+  const q = CONFIG.quotes[dayOfYear % CONFIG.quotes.length];
   const hour = now.getHours();
   const hi = hour<5?"夜深啦，小猫还在陪你喵~":hour<11?"早安喵，起床啦":hour<13?"午安喵，小憩一下":hour<18?"下午好喵，继续加油":"晚上好喵，今天辛苦啦";
   const hiSub = hour<5?"别熬太晚哦，小猫会担心的～":hour<11?"新的一天，和小猫一起出发吧":hour<13?"吃午饭啦，顺便打个盹":hour<18?"下午茶时间到，伸个懒腰继续":"欢迎回到时间小猫管理局 · 今日时间线已就绪";
@@ -4358,7 +4405,7 @@ function renderHome(){
   $("#screen").innerHTML = `
     <div class="greet"><div><h1>${hi}</h1><p>${hiSub}</p></div></div>
     <div class="quote"><img class="cat-deco" src="assets/nav-yan-huo.png" alt="" aria-hidden="true"/>
-      <span class="tag">${icon("quote",13)} 每日三句 · 励志·哲思·洞见</span>
+      <span class="tag">${icon("quote",13)} 每日金句 · ${q.theme} · 诗·歌·哲思</span>
       <div class="txt">${esc(q.en)}<em class="src">${esc(q.enBy)}</em></div>
       <div class="quote-lines">
         <div class="quote-line"><span class="ql-label ql-poem">诗</span><span class="ql-text">${esc(q.poem)}<em class="src">${esc(q.poemBy)}</em></span></div>
