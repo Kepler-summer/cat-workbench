@@ -4410,10 +4410,13 @@ function ringSVG(pct, color){
 
 /* ---------- DAILY QUOTE ---------- */
 function getDailyQuote(){
-  const todayKey = "__dailyQuote_" + today();
+  const todayKey = "__dailyQuote2_" + today();
   const cached = localStorage.getItem(todayKey);
   if(cached){
-    try { return JSON.parse(cached); } catch(e){}
+    try {
+      const cq = JSON.parse(cached);
+      if(cq && cq.cn) return cq;
+    } catch(e){}
   }
   const fb = CONFIG.fallbackQuotes;
   const enFb = CONFIG.fallbackEnQuotes;
