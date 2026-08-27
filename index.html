@@ -752,6 +752,8 @@
   .group-card .gc-name { font-size:14px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:6px; }
   .group-card .gc-badge { font-size:10px; padding:2px 8px; border-radius:20px; background:var(--accent); color:#fff; font-weight:600; }
   .group-card .gc-count { font-size:11px; color:var(--text-secondary); }
+  .group-card .gc-edit-name { display:inline-flex; align-items:center; cursor:pointer; color:var(--text-tertiary); padding:2px; border-radius:6px; transition:.2s; }
+  .group-card .gc-edit-name:hover { color:var(--accent); background:var(--accent-bg); }
   .group-card .gc-body { padding:4px 0; }
   .group-card .gc-empty { padding:14px; text-align:center; color:var(--text-tertiary); font-size:12px; }
   .group-member { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; gap:8px; }
@@ -7020,7 +7022,8 @@ async function renderUsers() {
         <div class="group-card" data-gid="${g.id}">
           <div class="gc-head">
             <div class="gc-name">
-              ${isMyGroup ? '🏠' : '🐾'} ${esc(g.name)}
+              ${isMyGroup ? '🏠' : '🐾'} <span class="gc-name-text" data-gid="${g.id}">${esc(g.name)}</span>
+              ${isMyGroup && auth.isAdmin() ? `<span class="gc-edit-name js-edit-group-name" data-gid="${g.id}" data-name="${esc(g.name)}">${icon("edit",13)}</span>` : ''}
               ${isMyGroup ? '<span class="gc-badge">我的组</span>' : ''}
             </div>
             <div class="gc-count">${members.length}/2 人</div>
@@ -7075,6 +7078,51 @@ async function renderUsers() {
   // Logout
   const lb = $("#logoutBtn");
   if(lb) lb.onclick = () => auth.logout();
+
+  // Edit group name (only admin in their own group)
+  $("#screen").querySelectorAll(".js-edit-group-name").forEach(el => el.onclick = async () => {
+    const gid = +el.dataset.gid;
+    const oldName = el.dataset.name;
+    const overlay = document.createElement("div"); overlay.className = "overlay";
+    overlay.innerHTML = `<div class="modal"><div class="grab"></div>
+      <div class="modal-cat"><img src="assets/nav-ci-ke.png" alt=""></div>
+      <h2>修改分组名</h2>
+      <div class="sub">给你们的分组起个新名字喵～</div>
+      <input class="ipt" id="gn-input" value="${esc(oldName)}" maxlength="20" placeholder="输入分组名称" style="margin:12px 0;width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;">
+      <div class="modal-actions"><button class="btn ghost" id="gn-cancel">取消</button><button class="btn" id="gn-ok" style="background:var(--accent)">保存</button></div></div>`;
+    document.body.appendChild(overlay);
+    const inp = overlay.querySelector("#gn-input");
+    inp.focus(); inp.select();
+    const close = () => overlay.remove();
+    overlay.onclick = e => { if(e.target === overlay) close(); };
+    overlay.querySelector("#gn-cancel").onclick = close;
+    overlay.querySelector("#gn-ok").onclick = async () => {
+      const newName = inp.value.trim();
+      if(!newName) { inp.focus(); return; }
+      if(newName === oldName) { close(); return; }
+      overlay.querySelector("#gn-ok").textContent = "保存中...";
+      overlay.querySelector("#gn-ok").disabled = true;
+      try {
+        const res = await fetch(CONFIG.sbUrl + "/rest/v1/groups?id=eq." + gid, {
+          method: "PATCH",
+          headers: {
+            "apikey": CONFIG.sbKey,
+            "Authorization": "Bearer " + CONFIG.sbKey,
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({ name: newName })
+        });
+        if(!res.ok) throw new Error("update failed");
+        close();
+        renderUsers();
+      } catch(e) {
+        alert("修改失败，请重试喵～");
+        close();
+      }
+    };
+    inp.onkeydown = e => { if(e.key === "Enter") overlay.querySelector("#gn-ok").click(); };
+  });
 
   // Delete user (only admin can delete, and only family in their own group, or they can delete themselves)
   $("#screen").querySelectorAll(".js-del-user").forEach(el => el.onclick = () => {
