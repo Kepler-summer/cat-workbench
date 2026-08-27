@@ -3928,6 +3928,37 @@ const CONFIG = {
     "你只管努力，剩下的交给时间。",
     "做一个能在低谷里把自己拉起来的人。",
   ],
+  // 英文金句兜底库（现代精选，与中文同日轮换）
+  fallbackEnQuotes: [
+    "The best time to start was yesterday. The next best time is now.",
+    "You don't have to be great to start, but you have to start to be great.",
+    "Small steps every day add up to big results.",
+    "Be the energy you want to attract.",
+    "Done is better than perfect.",
+    "Your only limit is you.",
+    "Progress, not perfection.",
+    "Stay soft, stay kind, but don't let anyone dim your light.",
+    "Life isn't about finding yourself, it's about creating yourself.",
+    "The quieter you become, the more you can hear.",
+    "Don't count the days, make the days count.",
+    "Everything you can imagine is real.",
+    "You are your best thing.",
+    "If you get tired, learn to rest, not to quit.",
+    "What consumes your mind controls your life.",
+    "Do it with passion or not at all.",
+    "Life is short. Buy the shoes, eat the cake, say the thing.",
+    "Be so good they can't ignore you.",
+    "The expert in anything was once a beginner.",
+    "You don't grow in comfort zones.",
+    "Sometimes the smallest step in the right direction ends up being the biggest step of your life.",
+    "Trust the timing of your life.",
+    "You are allowed to be both a masterpiece and a work in progress.",
+    "Less drama, more data.",
+    "If not now, when?",
+    "Collect moments, not things.",
+    "Your vibe attracts your tribe.",
+    "Keep going, you're closer than you think.",
+  ],
   _legacyQuotes: [
     { theme:"理财", en:"Compound interest is the eighth wonder of the world.", enBy:"Einstein",
       poem:"不积跬步，无以至千里；不积小流，无以成江海。", poemBy:"荀子《劝学》", lyric:"只要你敢想就算没达到还是会有宝藏。", lyricBy:"S.H.E《你曾是少年》" },
@@ -4384,19 +4415,24 @@ function getDailyQuote(){
   if(cached){
     try { return JSON.parse(cached); } catch(e){}
   }
-  const fallback = CONFIG.fallbackQuotes;
+  const fb = CONFIG.fallbackQuotes;
+  const enFb = CONFIG.fallbackEnQuotes;
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
-  const q = { content: fallback[dayOfYear % fallback.length], source: "小猫精选", fromApi: false };
+  const i = dayOfYear % fb.length;
+  const q = { cn: fb[i], cnSrc: "小猫精选", en: enFb[i % enFb.length], enSrc: "Daily Quote" };
   localStorage.setItem(todayKey, JSON.stringify(q));
   fetch("https://v1.hitokoto.cn/?c=d&c=h&c=i&c=k&encode=json")
     .then(r=>r.json())
     .then(d=>{
       if(d && d.hitokoto){
-        const apiQ = { content: d.hitokoto, source: d.from || d.from_who || "一言", fromApi: true };
+        const apiQ = { cn: d.hitokoto, cnSrc: d.from || d.from_who || "一言", en: enFb[i % enFb.length], enSrc: "Daily Quote" };
         localStorage.setItem(todayKey, JSON.stringify(apiQ));
-        const el = $("#screen").querySelector(".quote .txt");
+        const el = $("#screen").querySelector(".quote");
         if(el){
-          el.innerHTML = esc(apiQ.content) + '<em class="src">' + esc(apiQ.source) + '</em>';
+          const cnEl = el.querySelector(".q-cn");
+          const enEl = el.querySelector(".q-en");
+          if(cnEl) cnEl.innerHTML = esc(apiQ.cn) + '<em class="src">' + esc(apiQ.cnSrc) + '</em>';
+          if(enEl) enEl.innerHTML = esc(apiQ.en) + '<em class="src">' + esc(apiQ.enSrc) + '</em>';
         }
       }
     })
@@ -4485,7 +4521,8 @@ function renderHome(){
     <div class="greet"><div><h1>${hi}</h1><p>${hiSub}</p><div class="greet-together js-together" title="点击设置在一起的日子">🐱🐱 ${togetherDays?`在一起 ${togetherDays} 天`:'点击设置在一起的日子'}</div></div></div>
     <div class="quote"><img class="cat-deco" src="assets/nav-yan-huo.png" alt="" aria-hidden="true"/>
       <span class="tag">${icon("quote",13)} 小猫一言 · 今日份的猫粮</span>
-      <div class="txt">${esc(q.content)}<em class="src">${esc(q.source)}</em></div>
+      <div class="txt q-cn">${esc(q.cn)}<em class="src">${esc(q.cnSrc)}</em></div>
+      <div class="quote-lines"><div class="quote-line"><span class="ql-text q-en">${esc(q.en)}<em class="src">${esc(q.enSrc)}</em></span></div></div>
       </div>
     <div class="sec-title">今日概览</div>
     <div class="card rings">${rings}</div>
