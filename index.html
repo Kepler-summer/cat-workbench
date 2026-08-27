@@ -3897,9 +3897,38 @@ const CONFIG = {
   slogan: "两只小猫，一起把日子过成糖",
   brand: "🐱🐱",                       // 抽屉左上角字符标（品牌缩写）
 
-  // 每日金句（理财·生命·爱情·时间 四主题轮换，按日期选择）
-  quotes: [
-    // —— 理财智慧 ——
+  // 每日金句兜底库（现代精选，API 不可用时按日期轮换）
+  fallbackQuotes: [
+    "看似不起眼的日复一日，会在某一天突然让你看到坚持的意义。",
+    "努力不是为了让人觉得你了不起，而是让自己看得起自己。",
+    "如果没有天赋，那就一直重复。",
+    "听说生活有时候很不好对付？没关系，我也是。",
+    "如果生活把你的门关上了，那你就再打开，门就是这样用的。",
+    "不是天气，不是运气，是我不放弃。",
+    "你努力了那么久，为什么不再往前跨一步呢？",
+    "勇敢的人先享受世界。",
+    "把日子过出花来。",
+    "人的生命有两次，当你真正明白生命只有一次时，第二次就开始了。",
+    "弱小和勇敢都是相对的，但你得先迈出那一步。",
+    "日日行不怕千万里，天天做不怕千万事。",
+    "胆子大一点呀，世界会给你让路的。",
+    "纵然不知道要做什么，也不要反复怀疑自己，先撒开手去做。",
+    "在做自己喜欢的事情时，再大的困难可能都不是困难。",
+    "所有的不美好都是为了迎接美好，所有困难都会为努力让道。",
+    "世上所有的惊喜和好运，等于你的人品乘以你的努力。",
+    "每一次微小的进步，都是对平庸最有力的反击。",
+    "你不必非得长成玫瑰，做茉莉做雏菊做无名小花都行。",
+    "那些看起来比你厉害的人，说不定比你还不如，他们就是会演。",
+    "关掉手机的那一刻，世界突然安静了，心跳也变得清晰。",
+    "不是所有的问题都需要答案，有些事放下就是最好的解答。",
+    "先把今天过好，明天的事明天再说，后天的事想都别想。",
+    "与其羡慕别人的光，不如自己点亮一盏灯。",
+    "深夜的焦虑代替不了清晨的行动，放下手机去睡吧。",
+    "人生不是轨道，是一片旷野。",
+    "你只管努力，剩下的交给时间。",
+    "做一个能在低谷里把自己拉起来的人。",
+  ],
+  _legacyQuotes: [
     { theme:"理财", en:"Compound interest is the eighth wonder of the world.", enBy:"Einstein",
       poem:"不积跬步，无以至千里；不积小流，无以成江海。", poemBy:"荀子《劝学》", lyric:"只要你敢想就算没达到还是会有宝藏。", lyricBy:"S.H.E《你曾是少年》" },
     { theme:"理财", en:"The most important investment you can make is in yourself.", enBy:"Warren Buffett",
@@ -4292,6 +4321,7 @@ function injectSeed(){
     note: [
       { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
       { id: 9003, title: "周日早晨 · 远家", content: "暖光台灯、透明水杯、屏幕上 09:33 的周日。木桌百叶窗，窗外绿植，一切都慢下来——和那杯抹茶拿铁一个味道。", mood: "备忘", category: "生活随笔", date: "2026-08-23", layout: "feature", image: "assets/matcha-sunday.jpg" },
+      { id: 9004, title: "《权利》读书笔记", content: "去除三块绊脚石：公平世界假设、成功者美化建议、自我设限\n\n建立高权力感的三种方法：\n1. 敢于提要求（敢于开口，敢于求助，敢于被看见）\n2. 学会表演权力感（敢于愤怒，敢于打断别人，敢于表达相反的观点，敢于不被喜欢，有余力时尽量多帮助别人尤其是跨部门可以帮你传播扩大声望的，说话时的身体姿态舒展/眼神坚定/声音语调放慢）\n3. 建立自己的声望（敢于展示自己，展示自己的资源）", mood: "复盘", category: "读书摘录", date: "2026-08-27" },
     ],
   };
   let changed = false;
@@ -4347,12 +4377,38 @@ function ringSVG(pct, color){
       stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg>`;
 }
 
+/* ---------- DAILY QUOTE ---------- */
+function getDailyQuote(){
+  const todayKey = "__dailyQuote_" + today();
+  const cached = localStorage.getItem(todayKey);
+  if(cached){
+    try { return JSON.parse(cached); } catch(e){}
+  }
+  const fallback = CONFIG.fallbackQuotes;
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  const q = { content: fallback[dayOfYear % fallback.length], source: "小猫精选", fromApi: false };
+  localStorage.setItem(todayKey, JSON.stringify(q));
+  fetch("https://v1.hitokoto.cn/?c=d&c=h&c=i&c=k&encode=json")
+    .then(r=>r.json())
+    .then(d=>{
+      if(d && d.hitokoto){
+        const apiQ = { content: d.hitokoto, source: d.from || d.from_who || "一言", fromApi: true };
+        localStorage.setItem(todayKey, JSON.stringify(apiQ));
+        const el = $("#screen").querySelector(".quote .txt");
+        if(el){
+          el.innerHTML = esc(apiQ.content) + '<em class="src">' + esc(apiQ.source) + '</em>';
+        }
+      }
+    })
+    .catch(()=>{});
+  return q;
+}
+
 /* ---------- HOME ---------- */
 function renderHome(){
   const now = new Date();
   const dow = (now.getDay()+6)%7;               // 周一=0 … 周日=6
-  const dayOfYear = Math.floor((now - new Date(now.getFullYear(),0,0)) / 86400000);
-  const q = CONFIG.quotes[dayOfYear % CONFIG.quotes.length];
+  const q = getDailyQuote();
   const hour = now.getHours();
   const hi = hour<5?"夜深啦，小猫还在陪你喵~":hour<11?"早安喵，起床啦":hour<13?"午安喵，小憩一下":hour<18?"下午好喵，继续加油":"晚上好喵，今天辛苦啦";
   const hiSub = hour<5?"别熬太晚哦，小猫会担心的～":hour<11?"新的一天，和小猫一起出发吧":hour<13?"吃午饭啦，顺便打个盹":hour<18?"下午茶时间到，伸个懒腰继续":"欢迎回到二猫 · 今天也要一起加油呀";
@@ -4429,11 +4485,8 @@ function renderHome(){
     <div class="greet"><div><h1>${hi}</h1><p>${hiSub}</p><div class="greet-together js-together" title="点击设置在一起的日子">🐱🐱 ${togetherDays?`在一起 ${togetherDays} 天`:'点击设置在一起的日子'}</div></div></div>
     <div class="quote"><img class="cat-deco" src="assets/nav-yan-huo.png" alt="" aria-hidden="true"/>
       <span class="tag">${icon("quote",13)} 小猫一言 · 今日份的猫粮</span>
-      <div class="txt">${esc(q.en)}<em class="src">${esc(q.enBy)}</em></div>
-      <div class="quote-lines">
-        <div class="quote-line"><span class="ql-text">${esc(q.poem)}<em class="src">${esc(q.poemBy)}</em></span></div>
-        <div class="quote-line"><span class="ql-text">${esc(q.lyric)}<em class="src">${esc(q.lyricBy)}</em></span></div>
-      </div></div>
+      <div class="txt">${esc(q.content)}<em class="src">${esc(q.source)}</em></div>
+      </div>
     <div class="sec-title">今日概览</div>
     <div class="card rings">${rings}</div>
     <div class="sec-title">今日计划</div>
