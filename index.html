@@ -1211,8 +1211,14 @@
   .jn-top { display:flex; align-items:center; justify-content:space-between; padding:20px 6px 10px; }
   .jn-top .jn-date { font-family:var(--font-journal); font-size:18px; color:var(--text); font-weight:600; letter-spacing:.3px; }
   .jn-top .jn-date small { display:block; font-size:10px; color:var(--text-tertiary); font-family:var(--font); font-weight:400; margin-top:3px; letter-spacing:1px; text-transform:uppercase; }
-  .jn-top .jn-logo { display:flex; align-items:center; gap:5px; font-family:var(--font-journal); font-size:16px; color:var(--accent); font-weight:600; letter-spacing:1px; }
-  .jn-top .jn-logo img { width:24px; height:24px; filter: sepia(.2) saturate(.7); }
+  /* 顶部右侧：当前登录用户（头像 + 名字） */
+  .jn-top .jn-user { display:flex; align-items:center; gap:6px; max-width:52%;
+    font-family:var(--font-journal); font-size:15px; color:var(--text); font-weight:600; letter-spacing:.5px; }
+  .jn-top .jn-avatar { width:26px; height:26px; border-radius:50%; overflow:hidden; flex:0 0 auto;
+    background:var(--surface-nested); border:1px solid var(--border-soft); display:grid; place-items:center; }
+  .jn-top .jn-avatar img { width:100%; height:100%; object-fit:cover; }
+  .jn-top .jn-avatar.jn-avatar-txt { font-size:12px; font-family:var(--font); color:var(--text-secondary); }
+  .jn-top .jn-uname { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
   /* 手账 Hero：问候 + 猫咪贴纸 — 留白更大，猫咪更突出 */
   .jn-hero { position:relative; margin:6px 0 18px; padding:24px 20px 20px; background:var(--surface-card);
@@ -1221,8 +1227,15 @@
     filter: drop-shadow(0 4px 12px rgba(58,53,46,.08)); }
   .jn-hero .jn-hello { font-family:var(--font-journal); font-size:22px; color:var(--text); font-weight:600; line-height:1.4; margin-bottom:3px; letter-spacing:.5px; }
   .jn-hero .jn-hello-sub { font-size:11px; color:var(--text-secondary); margin-bottom:12px; letter-spacing:.5px; }
-  .jn-hero .jn-together { display:inline-flex; align-items:center; gap:4px; padding:5px 12px; background:var(--accent-muted);
-    border:1px solid var(--accent); border-radius:20px; font-size:10px; color:var(--accent); font-weight:600; cursor:pointer; letter-spacing:.5px; }
+  /* 复用系统次要按钮规范（同 .btn.ghost）：浅底 + 强边框 + 次文本，不用主色绿 */
+  .jn-hero .jn-together { display:inline-flex; align-items:center; gap:4px; position:relative; z-index:2;
+    padding:5px 12px; background:var(--surface-nested); border:1px solid var(--border-input);
+    border-radius:20px; font-size:10px; color:var(--text-secondary); font-weight:600; cursor:pointer;
+    letter-spacing:.5px; transition:all .25s cubic-bezier(.2,.8,.25,1); }
+  .jn-hero .jn-together:hover { border-color:var(--accent-light); color:var(--text); }
+  .jn-hero .jn-together:active { transform:scale(.96); }
+  .jn-hero .jn-together-names { color:var(--text); font-weight:700; }
+  .jn-hero .jn-together-dot { opacity:.45; margin:0 3px; }
   /* 手账分隔线标题 — tinytype 极细风格 */
   .jn-sec { display:flex; align-items:center; gap:10px; margin:22px 6px 10px; }
   .jn-sec .jn-line { flex:1; height:1px; background:var(--border-soft); opacity:.6; }
@@ -1439,7 +1452,7 @@
     <!-- 顶部标题栏 -->
     <div class="jn-top">
       <div class="jn-date">8月29日<small>周六 · 今天也要开心</small></div>
-      <div class="jn-logo"><img src="assets/nav-ci-ke.png" alt="">二猫</div>
+      <div class="jn-user"></div>
     </div>
 
     <!-- Hero 问候卡 + 猫咪贴纸 -->
@@ -2235,7 +2248,7 @@ function renderHome(){
   });
   const canEditTodo = auth.canEdit("todo");
   const todoList = todayTodos.length ? todayTodos.map(x=>{
-    const famTag = x.createdBy === "family" ? `<span class="jn-tag">家属</span>` : '';
+    const famTag = resolveCreatorRole(x) === "family" ? `<span class="jn-tag">家属</span>` : '';
     return `<div class="jn-todo ${x.done?'done':''}" data-id="${x.id}">
       ${canEditTodo ? `<div class="jn-chk js-jn-chk ${x.done?'on':''}" data-id="${x.id}"></div>` : ''}
       <div class="jn-tt">${esc(x.title)}</div>
@@ -2260,11 +2273,24 @@ function renderHome(){
     togetherDays = baseDays + extra;
   }
 
+  // 顶部右侧：当前登录用户（头像 + 名字），无头像时用首字占位
+  const curName = (auth.session && auth.session.username) || CONFIG.owner;
+  const curAv = currentUserAvatar();
+  const curInitial = esc(String(curName || "?").trim().charAt(0) || "?");
+  const userChip = curAv
+    ? `<span class="jn-avatar"><img src="${attr(curAv)}" alt=""></span><span class="jn-uname">${esc(curName)}</span>`
+    : `<span class="jn-avatar jn-avatar-txt">${curInitial}</span><span class="jn-uname">${esc(curName)}</span>`;
+
+  // 「在一起」按钮前缀：同组两名用户的名字（管理员 ♡ 家属）
+  const pairLabel = (pairNames.admin && pairNames.family)
+    ? `<span class="jn-together-names">${esc(pairNames.admin)} ♡ ${esc(pairNames.family)}</span><span class="jn-together-dot">·</span>`
+    : '';
+
   $("#screen").innerHTML = `
     <!-- 顶部标题栏 -->
     <div class="jn-top">
       <div class="jn-date">${dateStr}<small>${dow} · 今天也要开心</small></div>
-      <div class="jn-logo"><img src="assets/nav-ci-ke.png" alt="">二猫</div>
+      <div class="jn-user">${userChip}</div>
     </div>
 
     <!-- Hero 问候卡 + 猫咪贴纸 -->
@@ -2274,7 +2300,7 @@ function renderHome(){
       <div class="jn-hello">${hi}呀</div>
       <div class="jn-hello-sub">${hiSub}</div>
       <div class="jn-together js-together" title="点击设置在一起的日子">
-        ${togetherDays?`在一起 ${togetherDays} 天`:'设置在一起的日子'}
+        ${pairLabel}${togetherDays?`在一起 ${togetherDays} 天`:'设置在一起的日子'}
       </div>
     </div>
 
@@ -2560,7 +2586,7 @@ function renderModule(key){
   // 应用来源筛选
   if(hasFilter && _moduleFilter !== "all") {
     it = it.filter(x => {
-      const role = x.createRole || (x.createdBy === "family" ? "family" : "admin");
+      const role = resolveCreatorRole(x);
       return role === _moduleFilter;
     });
   }
@@ -2677,7 +2703,7 @@ function headHero(m, big, label, pct){
 
 function recHTML(m,x){
   const canEdit = auth.canEdit(m.key);
-  const creatorRole = x.createRole || (x.createdBy === "family" ? "family" : "admin");
+  const creatorRole = resolveCreatorRole(x);
   const familyTag = creatorRole === "family" ? `<span class="badge family-badge">家属操作</span>` : '';
   const pin= canEdit ? `<button class="pin-btn js-pin ${x.pinned?'on':''}" data-id="${x.id}" title="置顶">${icon("star",15)}</button>` : '';
   const del= canEdit ? `<button class="del js-del" data-id="${x.id}" title="删除">${icon("trash",16)}</button>` : '';
@@ -3037,6 +3063,14 @@ function refreshDrawerAvatar(){
     const src = userAv || legacyAv;
     if(src) $("#brandImg").src = src;
   }catch(_){}
+}
+// 当前登录用户的头像：优先 per-user 头像，其次旧版全局头像，都没有返回空串
+function currentUserAvatar(){
+  try{
+    if(typeof auth==="undefined"||!auth.session) return "";
+    const uid = auth.session.userId;
+    return (data.__userAvatars||{})[uid] || data.__avatar || "";
+  }catch(_){ return ""; }
 }
 $("#drawerBrand").onclick = () => $("#avatarInput").click();
 $("#avatarInput").onchange = e => {
@@ -5475,6 +5509,7 @@ async function bootstrap() {
   injectSeed();
 
   // 4.1 标记存量记录的 createUserId/createRole
+  await loadUserRoleMap();
   tagLegacyRecords();
 
   // 4.2 如果糖币数据丢失（有历史记录但糖币余额为0），重置结算标记重新核算
@@ -5547,6 +5582,7 @@ async function bootstrap() {
   if(cloudData) {
     data = cloudData;
     const changed = injectSeed();
+    await loadUserRoleMap();
     tagLegacyRecords();
     const cloudHist = candy.doHistorySettlement();
     if(cloudHist.settled) {
@@ -5601,18 +5637,49 @@ function migrateToDualKey(legacyKey, bizKey, gameKey) {
 }
 
 // 给存量记录打上 createUserId/createRole 标记
+// userId -> role 映射（来自用户表，用于判定记录归属）
+let _userRoleMap = {};
+// 同组两名用户的名字（管理员 + 家属），用于首页「在一起」按钮
+let pairNames = { admin: "", family: "" };
+async function loadUserRoleMap(){
+  try{
+    const users = await auth.fetchUsers();
+    const map = {};
+    (users||[]).forEach(u => { if(u && u.id != null) map[String(u.id)] = u.role; });
+    _userRoleMap = map;
+    const gid = auth.session ? auth.session.groupId : null;
+    const gu = (users||[]).filter(u => !gid || u.group_id == null || u.group_id == gid);
+    const a = gu.find(u => u.role === "admin");
+    const f = gu.find(u => u.role === "family");
+    pairNames = { admin: (a && a.username) || "", family: (f && f.username) || "" };
+  }catch(e){ _userRoleMap = _userRoleMap || {}; }
+}
+
+// 判定记录创建者角色：优先记录自带标记，其次用 createUserId 查用户表，最后兜底 admin
+function resolveCreatorRole(x){
+  if(!x) return "admin";
+  if(x.createRole) return x.createRole;
+  if(x.createdBy) return x.createdBy;
+  const uid = x.createUserId != null ? String(x.createUserId) : "";
+  if(uid && _userRoleMap[uid]) return _userRoleMap[uid];
+  return "admin";
+}
+
 function tagLegacyRecords() {
-  const userId = auth.session ? auth.session.userId : 0;
-  const role = auth.session ? auth.session.role : "admin";
   store.bizKeys.forEach(k => {
     const items = data[k];
     if(!Array.isArray(items)) return;
     let changed = false;
     items.forEach(item => {
-      if(!item.createUserId) { item.createUserId = userId; changed = true; }
-      if(!item.createRole) { item.createRole = role; changed = true; }
+      // 仅在记录已带 createUserId 时补全 createRole。
+      // 不再用「当前登录者角色」给归属不明的存量记录打标——否则管理员登录会把家属记录
+      // 误标成 admin（家属标签消失），家属登录又会反向污染管理员记录。
+      if(item.createUserId != null && !item.createRole){
+        const r = _userRoleMap[String(item.createUserId)];
+        if(r){ item.createRole = r; changed = true; }
+      }
     });
-    if(changed) console.log(`🏷️ ${k} 存量记录已标记 createUserId/createRole`);
+    if(changed) console.log(`🏷️ ${k} 存量记录已补全 createRole`);
   });
 }
 
