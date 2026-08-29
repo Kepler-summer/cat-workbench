@@ -560,7 +560,7 @@
     box-shadow:var(--shadow-card); }
   .shop-item:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.07); }
   .shop-icon { text-align:center; padding:6px 0; }
-  .shop-icon img { width:48px; height:48px; object-fit:contain; mix-blend-mode:multiply; }
+  .shop-icon img { width:48px; height:48px; object-fit:contain; }
   .shop-body { text-align:center; }
   .shop-name { font-size:13.5px; font-weight:700; color:var(--text); margin-bottom:4px; }
   .shop-desc { font-size:11px; color:var(--text-tertiary); line-height:1.4; }
@@ -593,7 +593,7 @@
     border-color:#b8e0c8; }
   .collect-item.locked { opacity:.45; filter:grayscale(.6); background:var(--bg-secondary); }
   .collect-icon { margin-bottom:4px; }
-  .collect-icon img { width:36px; height:36px; object-fit:contain; mix-blend-mode:multiply; }
+  .collect-icon img { width:36px; height:36px; object-fit:contain; }
   .collect-name { font-size:11px; font-weight:600; color:var(--text);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .collect-count { font-size:11px; color:var(--accent); font-weight:700; margin-top:2px; }
@@ -701,7 +701,7 @@
     width:100%; max-width:340px; padding:24px 20px; box-shadow:var(--shadow-overlay);
     text-align:center; position:relative; }
   .collect-detail-icon { margin-bottom:12px; }
-  .collect-detail-icon img { width:64px; height:64px; object-fit:contain; mix-blend-mode:multiply; }
+  .collect-detail-icon img { width:64px; height:64px; object-fit:contain; }
   .collect-detail-name { font-size:18px; font-weight:800; color:var(--text); margin-bottom:6px; }
   .collect-detail-desc { font-size:12.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:14px; }
   .collect-detail-meta { display:flex; justify-content:center; gap:12px; margin-bottom:16px; }
@@ -935,7 +935,7 @@
 
   /* module header (finance summary) */
   .mod-summary { display:grid; grid-template-columns: 48px repeat(3,1fr); gap: 10px; align-items:center; margin-bottom: 14px; }
-  .mod-summary .hero-cat-img { width:40px; height:40px; object-fit:contain; mix-blend-mode:multiply; }
+  .mod-summary .hero-cat-img { width:40px; height:40px; object-fit:contain; }
   .mini { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-tile); box-shadow: var(--shadow-card); padding: 12px; }
   .mini .l { font-size: 11px; color: var(--text-secondary); }
   .mini .v { font-size: 18px; font-weight: 800; margin-top: 3px; letter-spacing: -.02em; }
@@ -948,7 +948,7 @@
   .hero.has-cover .hero-bg::after { content:""; position:absolute; inset:0; background: linear-gradient(90deg, var(--surface-card) 28%, color-mix(in srgb, var(--surface-card) 60%, transparent) 55%, transparent 80%); }
   .hero.has-cover > .hero-inner { position:relative; z-index:1; padding: 12px 14px; display:flex; align-items:center; gap:12px; }
   .hero-ic { width: 36px; height: 36px; border-radius: var(--radius-tile); display:grid; place-items:center; flex:0 0 auto; }
-  .hero-cat-img { width:48px; height:48px; object-fit:contain; flex:0 0 auto; mix-blend-mode:multiply; pointer-events:none; }
+  .hero-cat-img { width:48px; height:48px; object-fit:contain; flex:0 0 auto; pointer-events:none; }
   .hero-tx { min-width:0; display:flex; align-items:baseline; gap: 7px; flex-wrap:wrap; }
   .hero-v { font-size: 18px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
   .hero-l { font-size: 12px; color: var(--text-secondary); }
@@ -1183,7 +1183,7 @@
   .jn-top .jn-date { font-family:var(--font-journal); font-size:18px; color:var(--text); font-weight:600; letter-spacing:.3px; }
   .jn-top .jn-date small { display:block; font-size:10px; color:var(--text-tertiary); font-family:var(--font); font-weight:400; margin-top:3px; letter-spacing:1px; text-transform:uppercase; }
   .jn-top .jn-logo { display:flex; align-items:center; gap:5px; font-family:var(--font-journal); font-size:16px; color:var(--accent); font-weight:600; letter-spacing:1px; }
-  .jn-top .jn-logo img { width:24px; height:24px; filter: sepia(.2) saturate(.7); mix-blend-mode:multiply; }
+  .jn-top .jn-logo img { width:24px; height:24px; filter: sepia(.2) saturate(.7); }
 
   /* 手账 Hero：问候 + 猫咪贴纸 — 留白更大，猫咪更突出 */
   .jn-hero { position:relative; margin:6px 0 18px; padding:24px 20px 20px; background:var(--surface-card);
@@ -1300,11 +1300,7 @@
     transform: scale(1.1);
   }
 
-  /* 非透明PNG元素使用multiply消除白底（nav-ci-ke.png等） */
-  .nav-img,
-  .cp-ic img, .modal-cat img, .auth-cat img {
-    mix-blend-mode: multiply;
-  }
+
 </style>
 </head>
 <body class="journal-theme">
@@ -2436,7 +2432,7 @@ function renderModule(key){
   } else if(renderItems.length){
     body=renderItems.map(x=>recHTML(m,x)).join("");
   } else {
-    body=`<div class="empty"><span class="e"><img src="assets/nav-ci-ke.png" style="width:28px;height:28px;object-fit:contain;border-radius:50%;mix-blend-mode:multiply" alt=""/></span><div>小猫还在打盹，点上方「新建」添加第一条记录吧</div></div>`;
+    body=`<div class="empty"><span class="e"><img src="assets/nav-ci-ke.png" style="width:28px;height:28px;object-fit:contain;border-radius:50%" alt=""/></span><div>小猫还在打盹，点上方「新建」添加第一条记录吧</div></div>`;
   }
   // 筛选标签：全部 / 管理员创建 / 家属创建
   const showFilter = hasFilter;
@@ -4199,7 +4195,7 @@ function renderGame() {
             return `
             <div class="quick-item">
               <div class="quick-icon-wrap">
-                <div class="quick-icon"><img src="${shopIcon(it.id)}" alt="${it.name}" style="width:32px;height:32px;object-fit:contain;mix-blend-mode:multiply"></div>
+                <div class="quick-icon"><img src="${shopIcon(it.id)}" alt="${it.name}" style="width:32px;height:32px;object-fit:contain"></div>
               </div>
               <div class="quick-body">
                 <div class="quick-name">${it.name}</div>
@@ -4298,7 +4294,7 @@ function renderGame() {
   const currentCat = shopCategories.find(c => c.id === shopCatTab) || shopCategories[0];
   const shopContent = `
     <div class="shop-hint">
-      <span class="hint-ic"><img src="assets/stickers/candy.png" alt="糖币" style="width:20px;height:20px;object-fit:contain;mix-blend-mode:multiply"></span>
+      <span class="hint-ic"><img src="assets/stickers/candy.png" alt="糖币" style="width:20px;height:20px;object-fit:contain"></span>
       <span>当前糖币：<strong>${total}</strong> · ${isAdmin ? '管理员账号，可正常兑换' : '家属账号，仅可浏览不可兑换'}</span>
     </div>
     <div class="shop-cat-nav">${shopNavHtml}</div>
@@ -4412,7 +4408,7 @@ function renderGame() {
 
     ${daily.tasks.map(task => `
       <div class="daily-task-card ${task.done ? 'done' : ''}">
-        <div class="daily-task-icon"><img src="assets/stickers/${task.id==='daily_task'?'star.png':task.id==='daily_money'?'cat-piggy.png':'paw.png'}" alt="${task.name}" style="width:28px;height:28px;object-fit:contain;mix-blend-mode:multiply"></div>
+        <div class="daily-task-icon"><img src="assets/stickers/${task.id==='daily_task'?'star.png':task.id==='daily_money'?'cat-piggy.png':'paw.png'}" alt="${task.name}" style="width:28px;height:28px;object-fit:contain"></div>
         <div class="daily-task-body">
           <div class="daily-task-name">${task.name}</div>
           <div class="daily-task-desc">${task.desc}</div>
