@@ -93,8 +93,9 @@
     background: var(--page-bg);
     color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.55;
     -webkit-font-smoothing: antialiased; letter-spacing: .01em;
-    max-width: 480px; margin: 0 auto; position: relative;
+    max-width: 520px; margin: 0 auto; position: relative;
     min-height: 100vh; overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
   }
   body::before { content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
     background-image:
@@ -104,7 +105,7 @@
     background-size: 28px 28px, 28px 28px, 100% 100%;
     background-position: 0 0, 0 0, center top;
     opacity: 1; }
-  .app { padding: 0 16px calc(var(--nav-h) + 26px); }
+  .app { padding: 0 16px calc(var(--nav-h) + 26px + env(safe-area-inset-bottom)); }
   svg { display: block; }
 
   /* ---------- top bar ---------- */
@@ -288,6 +289,29 @@
   }
   .game-hero-today .num { font-size:20px; font-weight:800; color:var(--module-4); }
   .game-hero-today .lbl { font-size:10px; color:var(--text-secondary); }
+
+  /* 小屏幕适配 */
+  @media (max-width: 359px) {
+    .app { padding-left: 12px; padding-right: 12px; }
+    .greet { padding: 18px 14px 20px; }
+    .greet h1 { font-size: 18px; }
+    .quote { padding: 14px; }
+    .rings { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 16px 4px; }
+    .ring .dial { width: 56px; height: 56px; }
+    .ring .dial svg.gauge { width: 56px; height: 56px; }
+    .panel { padding: 14px; }
+    .game-card { padding: 14px; }
+    .jn-candy .jn-candy-cat { width: 130px; height: 130px; }
+    .mini { padding: 10px; }
+    .mini .v { font-size: 15px; }
+    .mod-summary { gap: 6px; }
+  }
+  /* 横屏适配 */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .greet { padding: 14px 16px; }
+    .greet h1 { font-size: 18px; }
+    .rings { padding: 12px 4px; }
+  }
 
   /* 卡片容器 */
   .game-grid-main {
@@ -934,8 +958,8 @@
   .empty .e { display:inline-grid; place-items:center; width: 58px; height:58px; border-radius: var(--radius-card); background: var(--surface-card); border:1px solid var(--border); color: var(--text-tertiary); margin-bottom: 14px; }
 
   /* module header (finance summary) */
-  .mod-summary { display:grid; grid-template-columns: 48px repeat(3,1fr); gap: 10px; align-items:center; margin-bottom: 14px; }
-  .mod-summary .hero-cat-img { width:40px; height:40px; object-fit:contain; }
+  .mod-summary { display:grid; grid-template-columns: repeat(3,1fr); gap: 10px; align-items:center; margin-bottom: 14px; position:relative; }
+  .mod-summary .hero-cat-img { position:absolute; right:10px; top:8px; width:40px; height:40px; object-fit:contain; pointer-events:none; }
   .mini { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-tile); box-shadow: var(--shadow-card); padding: 12px; }
   .mini .l { font-size: 11px; color: var(--text-secondary); }
   .mini .v { font-size: 18px; font-weight: 800; margin-top: 3px; letter-spacing: -.02em; }
@@ -974,7 +998,7 @@
   .rec.rec-layout-quote .quote-meta { margin-top:8px; font-size:12px; color:var(--text-tertiary); }
 
   /* ---------- bottom nav ---------- */
-  .nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: 100%; max-width: 480px; height: var(--nav-h);
+  .nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: 100%; max-width: 520px; height: var(--nav-h);
     background: var(--surface-card); backdrop-filter: blur(16px); border-top: 1px solid var(--border-soft);
     display: grid; grid-template-columns: repeat(4,1fr); align-items: center; z-index: 30; padding-bottom: env(safe-area-inset-bottom); }
   .nav .n { display:flex; flex-direction:column; align-items:center; gap: 5px; cursor:pointer; color: var(--text-tertiary); font-size: 11px; font-weight: 500; letter-spacing: .5px; transition: color .2s ease; }
@@ -1014,7 +1038,7 @@
     display:flex; align-items:flex-end; justify-content:center; animation: fade .25s ease; }
   @keyframes fade { from { opacity:0; } }
   .modal { background: var(--surface-card); border-radius: 24px 24px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
-    width: 100%; max-width: 480px; box-shadow: var(--shadow-overlay); animation: sheetUp .4s cubic-bezier(.22,.96,.36,1); max-height: 88vh; overflow-y:auto;
+    width: 100%; max-width: 520px; box-shadow: var(--shadow-overlay); animation: sheetUp .4s cubic-bezier(.22,.96,.36,1); max-height: 88vh; overflow-y:auto;
     border-top: 1px solid rgba(255,255,255,.6); }
   @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   .modal .grab { width: 32px; height: 4px; border-radius:999px; background: var(--border-input); margin: 0 auto 16px; opacity:.4; transition: opacity .2s, width .2s; }
@@ -1194,9 +1218,6 @@
   .jn-hero .jn-hello-sub { font-size:11px; color:var(--text-secondary); margin-bottom:12px; letter-spacing:.5px; }
   .jn-hero .jn-together { display:inline-flex; align-items:center; gap:4px; padding:5px 12px; background:var(--accent-muted);
     border:1px solid var(--accent); border-radius:20px; font-size:10px; color:var(--accent); font-weight:600; cursor:pointer; letter-spacing:.5px; }
-  .jn-hero .jn-hero-heart { position:absolute; right:160px; top:18px; width:24px; height:24px; opacity:.5; }
-  .jn-hero .jn-hero-star { position:absolute; right:175px; bottom:18px; width:20px; height:20px; opacity:.4; }
-
   /* 手账分隔线标题 — tinytype 极细风格 */
   .jn-sec { display:flex; align-items:center; gap:10px; margin:22px 6px 10px; }
   .jn-sec .jn-line { flex:1; height:1px; background:var(--border-soft); opacity:.6; }
@@ -1220,9 +1241,6 @@
     border:1px solid var(--border-soft); border-radius:12px; cursor:pointer; overflow:hidden; }
   .jn-candy .jn-candy-cat { position:absolute; right:-8px; bottom:-18px; width:170px; height:170px; object-fit:contain; opacity:.92;
     filter: drop-shadow(0 3px 8px rgba(212,165,116,.15)); }
-  .jn-candy .jn-candy-sticker-1 { position:absolute; right:90px; top:14px; width:28px; height:28px; opacity:.6; transform: rotate(-12deg); }
-  .jn-candy .jn-candy-sticker-2 { position:absolute; right:14px; top:10px; width:22px; height:22px; opacity:.5; transform: rotate(15deg); }
-  .jn-candy .jn-candy-sticker-3 { position:absolute; left:14px; top:10px; width:20px; height:20px; opacity:.45; transform: rotate(-8deg); }
   .jn-candy .jn-candy-title { font-family:var(--font-journal); font-size:12px; color:var(--candy); font-weight:600; margin-bottom:3px; letter-spacing:1px; }
   .jn-candy .jn-candy-level { font-size:10px; color:var(--text-secondary); margin-bottom:10px; letter-spacing:.5px; }
   .jn-candy .jn-candy-num { font-size:28px; font-weight:700; color:var(--candy); font-family:var(--font-journal); letter-spacing:.5px; }
