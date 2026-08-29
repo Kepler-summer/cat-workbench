@@ -2,3 +2,7 @@
 *.log
 node_modules/
 .env
+.trae/
+.trae-html-share-packages/
+*.bak
+*.bak2
