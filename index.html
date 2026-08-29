@@ -1183,7 +1183,7 @@
   .jn-top .jn-date { font-family:var(--font-journal); font-size:18px; color:var(--text); font-weight:600; letter-spacing:.3px; }
   .jn-top .jn-date small { display:block; font-size:10px; color:var(--text-tertiary); font-family:var(--font); font-weight:400; margin-top:3px; letter-spacing:1px; text-transform:uppercase; }
   .jn-top .jn-logo { display:flex; align-items:center; gap:5px; font-family:var(--font-journal); font-size:16px; color:var(--accent); font-weight:600; letter-spacing:1px; }
-  .jn-top .jn-logo img { width:24px; height:24px; filter: sepia(.2) saturate(.7); }
+  .jn-top .jn-logo img { width:24px; height:24px; filter: sepia(.2) saturate(.7); mix-blend-mode:multiply; }
 
   /* 手账 Hero：问候 + 猫咪贴纸 — 留白更大，猫咪更突出 */
   .jn-hero { position:relative; margin:6px 0 18px; padding:24px 20px 20px; background:var(--surface-card);
@@ -3862,7 +3862,7 @@
     <!-- 顶部 Hero 区域 -->
     <div class="game-hero">
       <div class="game-hero-row">
-        <div class="game-hero-cat cat-float"><img src="assets/nav-ci-ke.png" alt="布偶小猫"></div>
+        <div class="game-hero-cat cat-float"><img src="assets/stickers/cat-flag.png" alt="旗帜小猫"></div>
         <div class="game-hero-info">
           <div class="game-hero-level"><span class="lvl-icon">Lv</span>Lv.1 奶猫 · 糖币奖励看板</div>
           <div class="game-hero-pts" id="gameCandyNum">115<span class="pts-unit">糖币</span></div>
@@ -3901,7 +3901,7 @@
         <div class="quick-shop">
           
             <div class="quick-item">
-              <div class="quick-icon">鱼</div>
+              <div class="quick-icon"><img src="assets/stickers/shop-fish.png" alt="小鱼干" style="width:32px;height:32px;object-fit:contain;mix-blend-mode:multiply"></div>
               <div class="quick-name">小鱼干 buff</div>
               <div class="quick-price">120</div>
               <button class="quick-btn js-quick-buy" data-id="fish" disabled="">
@@ -3909,7 +3909,7 @@
               </button>
             </div>
             <div class="quick-item">
-              <div class="quick-icon">罐</div>
+              <div class="quick-icon"><img src="assets/stickers/shop-can.png" alt="猫罐头" style="width:32px;height:32px;object-fit:contain;mix-blend-mode:multiply"></div>
               <div class="quick-name">猫罐头 buff</div>
               <div class="quick-price">180</div>
               <button class="quick-btn js-quick-buy" data-id="can" disabled="">
@@ -4727,7 +4727,7 @@ function renderHome(){
       <div class="jn-line"></div>
     </div>
     <div class="jn-quick-wrap">
-      <img class="jn-quick-cat" src="assets/stickers/cat-pencil.png" alt="">
+      <img class="jn-quick-cat" src="assets/stickers/cat-letter.png" alt="">
       <div class="jn-quick">${quick}</div>
     </div>
 
@@ -4760,7 +4760,7 @@ function renderHome(){
       <div class="jn-more" data-open="todo">全部 →</div>
     </div>
     <div class="jn-todos-wrap">
-      <img class="jn-todos-cat" src="assets/stickers/cat-study.png" alt="">
+      <img class="jn-todos-cat" src="assets/stickers/cat-dream.png" alt="">
       <div class="jn-todos">${todoList}</div>
       ${renderPlacedStickers("todo")}
     </div>`;
@@ -5039,7 +5039,7 @@ function renderModule(key){
   } else if(renderItems.length){
     body=renderItems.map(x=>recHTML(m,x)).join("");
   } else {
-    body=`<div class="empty"><span class="e"><img src="assets/nav-ci-ke.png" style="width:28px;height:28px;object-fit:contain;border-radius:50%" alt=""/></span><div>小猫还在打盹，点上方「新建」添加第一条记录吧</div></div>`;
+    body=`<div class="empty"><span class="e"><img src="assets/nav-ci-ke.png" style="width:28px;height:28px;object-fit:contain;border-radius:50%;mix-blend-mode:multiply" alt=""/></span><div>小猫还在打盹，点上方「新建」添加第一条记录吧</div></div>`;
   }
   // 筛选标签：全部 / 管理员创建 / 家属创建
   const showFilter = hasFilter;
@@ -5084,7 +5084,7 @@ function renderTimeline(items){
 
 /* per-module hero header: compact strip — icon + big number + label + optional progress bar */
 function headHero(m, big, label, pct){
-  const catMap = { finance: "cat-piggy.png", todo: "cat-pencil.png", note: "cat-book.png", checkin: "cat-stars.png", progress: "cat-study.png" };
+  const catMap = { finance: "cat-cloud.png", todo: "cat-medal.png", note: "cat-book.png", checkin: "cat-stars.png", progress: "cat-think.png" };
   const catImg = catMap[m.type] ? `<img class="hero-cat-img" src="assets/stickers/${catMap[m.type]}" alt="">` : "";
   const inner=`<div class="hero-ic" style="background:${m.tint};color:${m.color}">${icon(m.icon,20)}</div>
     <div style="flex:1;min-width:0"><div class="hero-tx"><span class="hero-v">${big}</span><span class="hero-l">${label}</span></div>
@@ -5884,28 +5884,28 @@ const STREAK_MILESTONES = {
 // 超市插画图标映射（复用已有 PNG 贴纸 + 新生成的品类图标）
 const SHOP_ICON_MAP = {
   // Buff
-  fish: "assets/stickers/shop-fish.jpg", can: "assets/stickers/shop-can.jpg",
-  candy: "assets/stickers/candy.png", catGrass: "assets/stickers/shop-grass.jpg",
+  fish: "assets/stickers/shop-fish.png", can: "assets/stickers/shop-can.png",
+  candy: "assets/stickers/candy.png", catGrass: "assets/stickers/shop-grass.png",
   // Toys
-  teaserPink: "assets/stickers/shop-toy.jpg", yarnBall: "assets/stickers/shop-ball.jpg",
-  bellBall: "assets/stickers/shop-ball.jpg", featherToy: "assets/stickers/shop-toy.jpg",
-  fishDoll: "assets/stickers/shop-fish.jpg", cloudPillow: "assets/stickers/shop-bed.jpg",
-  creamBed: "assets/stickers/shop-bed.jpg", starScratch: "assets/stickers/star-sparkle.png",
-  moonPillow: "assets/stickers/shop-bed.jpg", rainbowTeaser: "assets/stickers/shop-toy.jpg",
-  ragdollBlanket: "assets/stickers/shop-bed.jpg", pumpkinBed: "assets/stickers/shop-bed.jpg",
-  butterflyToy: "assets/stickers/shop-toy.jpg", plushMouse: "assets/stickers/paw.png",
-  goldenFish: "assets/stickers/shop-fish.jpg",
+  teaserPink: "assets/stickers/shop-toy.png", yarnBall: "assets/stickers/shop-ball.png",
+  bellBall: "assets/stickers/shop-ball.png", featherToy: "assets/stickers/shop-toy.png",
+  fishDoll: "assets/stickers/shop-fish.png", cloudPillow: "assets/stickers/shop-bed.png",
+  creamBed: "assets/stickers/shop-bed.png", starScratch: "assets/stickers/star-sparkle.png",
+  moonPillow: "assets/stickers/shop-bed.png", rainbowTeaser: "assets/stickers/shop-toy.png",
+  ragdollBlanket: "assets/stickers/shop-bed.png", pumpkinBed: "assets/stickers/shop-bed.png",
+  butterflyToy: "assets/stickers/shop-toy.png", plushMouse: "assets/stickers/paw.png",
+  goldenFish: "assets/stickers/shop-fish.png",
   // Outfits
-  creamBow: "assets/stickers/shop-bow.jpg", blueBowtie: "assets/stickers/shop-bow.jpg",
-  pinkCollar: "assets/stickers/shop-bow.jpg", starClip: "assets/stickers/star.png",
-  moonHat: "assets/stickers/shop-crown.jpg", cloudScarf: "assets/stickers/shop-scarf.jpg",
-  smallCrown: "assets/stickers/shop-crown.jpg", rainbowCape: "assets/stickers/shop-scarf.jpg",
+  creamBow: "assets/stickers/shop-bow.png", blueBowtie: "assets/stickers/shop-bow.png",
+  pinkCollar: "assets/stickers/shop-bow.png", starClip: "assets/stickers/star.png",
+  moonHat: "assets/stickers/shop-crown.png", cloudScarf: "assets/stickers/shop-scarf.png",
+  smallCrown: "assets/stickers/shop-crown.png", rainbowCape: "assets/stickers/shop-scarf.png",
   pawGloves: "assets/stickers/paw.png", creamBag: "assets/stickers/candy-land.png",
-  pearlNeck: "assets/stickers/shop-bow.jpg", ragdollGlass: "assets/stickers/star-glossy.png",
-  fairyHead: "assets/stickers/heart-soft.png", winterScarf: "assets/stickers/shop-scarf.jpg",
-  goldenCrown: "assets/stickers/shop-crown.jpg",
+  pearlNeck: "assets/stickers/shop-bow.png", ragdollGlass: "assets/stickers/star-glossy.png",
+  fairyHead: "assets/stickers/heart-soft.png", winterScarf: "assets/stickers/shop-scarf.png",
+  goldenCrown: "assets/stickers/shop-crown.png",
   // Level
-  milkCake: "assets/stickers/shop-cake.jpg", catStick: "assets/stickers/shop-fish.jpg",
+  milkCake: "assets/stickers/shop-cake.png", catStick: "assets/stickers/shop-fish.png",
   // Memorial
   firstDay: "assets/stickers/star-glossy.png", taskBadge: "assets/stickers/star.png",
   moneyBadge: "assets/stickers/star-sparkle.png", postcard: "assets/stickers/heart-soft.png",
@@ -6802,7 +6802,7 @@ function renderGame() {
             return `
             <div class="quick-item">
               <div class="quick-icon-wrap">
-                <div class="quick-icon">${it.icon}</div>
+                <div class="quick-icon"><img src="${shopIcon(it.id)}" alt="${it.name}" style="width:32px;height:32px;object-fit:contain;mix-blend-mode:multiply"></div>
               </div>
               <div class="quick-body">
                 <div class="quick-name">${it.name}</div>
@@ -7086,7 +7086,7 @@ function renderGame() {
     <!-- 顶部 Hero 区域 -->
     <div class="game-hero">
       <div class="game-hero-row">
-        <div class="game-hero-cat cat-float"><img src="assets/nav-ci-ke.png" alt="布偶小猫"></div>
+        <div class="game-hero-cat cat-float"><img src="assets/stickers/cat-flag.png" alt="旗帜小猫"></div>
         <div class="game-hero-info">
           ${titleHtml}
           <div class="game-hero-level"><span class="lvl-icon">Lv</span>Lv.${lvlInfo.level} ${lvlInfo.name}</div>
