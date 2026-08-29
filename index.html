@@ -161,13 +161,13 @@
   .tl-task .tl-t { font-size:11px; color:var(--text-tertiary); font-weight:600; }
 
   /* ---------- greeting ---------- */
-  .greet { position: relative; overflow: hidden; margin-top: 10px; padding: 22px 20px 24px; border-radius: var(--radius-card);
+  .greet { position: relative; margin-top: 10px; padding: 22px 20px 24px; border-radius: var(--radius-card);
     border: 1px solid var(--border); box-shadow: var(--shadow-card); min-height: 132px;
     background: var(--surface-nested) var(--greet-image) right center / cover no-repeat;
     display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .greet > div:first-child { flex: 1; min-width: 0; }
   .greet-cat { position: relative; z-index: 1; color: var(--accent); opacity: .65; flex: 0 0 auto; }
-  .greet-cat-img { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; object-fit: contain; pointer-events: none; z-index: 1; }
+  .greet-cat-img { position: absolute; right: -16px; bottom: -20px; width: 140px; height: 140px; object-fit: contain; pointer-events: none; z-index: 1; }
   .greet::before { content:""; position:absolute; inset:0; pointer-events:none;
     background: linear-gradient(100deg, var(--surface-nested) 30%, color-mix(in srgb, var(--surface-nested) 70%, transparent) 48%, transparent 70%); }
   .greet > * { position: relative; z-index: 1; }
@@ -1347,6 +1347,7 @@
     <!-- Hero 问候卡 + 猫咪贴纸 -->
     <div class="jn-hero">
       <img class="jn-hero-cat" src="assets/stickers/cat-wave.png" alt="">
+      <img class="placed-sticker" src="assets/stickers/shop-bow.png" alt="" style="left:82.99322359712214%;top:19.11249337915403%;transform:rotate(-2.537956851641699deg)" data-sticker-idx="1" draggable="true"><img class="placed-sticker" src="assets/stickers/shop-bow.png" alt="" style="left:41.8014%;top:39.4506%;transform:rotate(-5.168937989399964deg)" data-sticker-idx="3" draggable="true">
       <div class="jn-hello">下午好呀</div>
       <div class="jn-hello-sub">下午茶时间，伸个懒腰</div>
       <div class="jn-together js-together" title="点击设置在一起的日子">
@@ -1362,7 +1363,7 @@
     <div class="jn-quote">
       <img class="jn-quote-sticker" src="assets/stickers/star-pillow.png" alt="">
       <img class="jn-quote-heart" src="assets/stickers/heart-soft.png" alt="">
-      
+      <img class="placed-sticker" src="assets/stickers/shop-bow.png" alt="" style="left:20.1407%;top:0%;transform:rotate(3.9295845838243935deg)" data-sticker-idx="2" draggable="true">
       <div class="jn-quote-tag">今日份的猫粮</div>
       <div class="jn-q-cn">十年生死两茫茫，不思量，自难忘。<em>江城子·乙卯正月二十日夜记梦</em></div>
       <div class="jn-q-en">Life isn't about finding yourself, it's about creating yourself.<em>Daily Quote</em></div>
@@ -1401,8 +1402,8 @@
       <div class="jn-more" data-open="game">进入 →</div>
     </div>
     <div class="jn-candy" data-open="game">
-      <img class="jn-candy-cat" src="assets/stickers/cat-piggy.png" alt="">
-      <img class="placed-sticker" src="assets/stickers/shop-bow.png" alt="" style="left:80.88117340912831%;top:68.44315139878675%;transform:rotate(5.151189593592722deg)" data-sticker-idx="0" draggable="true" onclick="removeStickerAt(0);render()">
+      <img class="jn-candy-cat" src="assets/stickers/cat-piggy.png" alt="" style="margin-left: auto; margin-right: 0px;">
+      <img class="placed-sticker" src="assets/stickers/shop-bow.png" alt="" style="left:80.88117340912831%;top:68.44315139878675%;transform:rotate(5.151189593592722deg)" data-sticker-idx="0" draggable="true">
       <div class="jn-candy-title">小猫糖罐</div>
       <div class="jn-candy-level">Lv.5 成年猫</div>
       <div class="jn-candy-num" id="homeCandyNum">245<span>糖币</span></div>
@@ -1411,6 +1412,7 @@
         <div class="jn-cs"><b>1/4</b>今日任务</div>
         <div class="jn-cs"><b>1</b>藏品图鉴</div>
       </div>
+      <button class="sticker-decor-btn" data-decor="">装扮贴纸</button>
     </div>
 
     <!-- 今日计划 -->
@@ -5388,5 +5390,6 @@ if(!auth.isLoggedIn()) {
       <div class="cp-msg">贴纸已贴上</div>
       <div class="cp-pts">拖动可移动位置，点击可移除</div>
       <div class="cp-tail"></div></div>
+
 
 </body></html>
