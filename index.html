@@ -1253,10 +1253,13 @@
   .jn-candy .jn-candy-stats { display:flex; gap:16px; margin-top:14px; }
   .jn-candy .jn-cs { font-size:9px; color:var(--text-secondary); letter-spacing:.5px; }
   .jn-candy .jn-cs b { display:block; font-size:12px; color:var(--text); font-weight:600; margin-bottom:1px; }
-  .jn-candy .sticker-decor-btn { position:absolute; right:12px; bottom:12px; padding:5px 12px; border-radius:999px;
-    border:1px solid var(--candy); background:rgba(255,255,255,.75); color:var(--candy); font-size:11px; font-weight:600;
-    cursor:pointer; z-index:3; transition:all .2s; backdrop-filter:blur(4px); }
-  .jn-candy .sticker-decor-btn:hover { background:#fff; box-shadow:0 2px 8px rgba(212,160,92,.2); }
+  .jn-sec .candy-decor-btn { padding:4px 12px 4px 8px; border-radius:999px; border:none;
+    background:linear-gradient(135deg, var(--candy), var(--candy-light)); color:#fff; font-size:10px; font-weight:700;
+    letter-spacing:.5px; cursor:pointer; box-shadow:0 2px 6px rgba(212,160,92,.3);
+    transition:all .2s; display:flex; align-items:center; gap:4px; }
+  .jn-sec .candy-decor-btn:hover { transform:translateY(-1px); box-shadow:0 4px 10px rgba(212,160,92,.4); }
+  .jn-sec .candy-decor-btn:active { transform:translateY(0); }
+  .jn-sec .candy-decor-btn img { width:14px; height:14px; object-fit:contain; }
 
   /* 藏品贴纸展示条 — 手账风贴纸排列 + 略微旋转 */
   .jn-collect-strip {
@@ -1399,7 +1402,7 @@
     <div class="jn-sec">
       <div class="jn-label"><span class="jn-dot"></span>糖果小铺</div>
       <div class="jn-line"></div>
-      <div class="jn-more" data-open="game">进入 →</div>
+      <button class="candy-decor-btn" data-decor=""><img src="assets/stickers/candy.png" alt="">装扮贴纸</button>
     </div>
     <div class="jn-candy" data-open="game">
       <img class="jn-candy-cat" src="assets/stickers/cat-piggy.png" alt="">
@@ -1412,7 +1415,6 @@
         <div class="jn-cs"><b>3/4</b>今日任务</div>
         <div class="jn-cs"><b>1</b>藏品图鉴</div>
       </div>
-      <button class="sticker-decor-btn" data-decor="">装扮贴纸</button>
     </div>
 
     <!-- 今日计划 -->
@@ -2151,22 +2153,19 @@ function renderHome(){
     <div class="jn-sec">
       <div class="jn-label"><span class="jn-dot"></span>糖果小铺</div>
       <div class="jn-line"></div>
-      <div class="jn-more" data-open="game">进入 →</div>
+      <button class="candy-decor-btn" data-decor><img src="assets/stickers/candy.png" alt="">装扮贴纸</button>
     </div>
     <div class="jn-candy" data-open="game">
       <img class="jn-candy-cat" src="assets/stickers/cat-piggy.png" alt="">
       ${renderPlacedStickers("candy")}
       <div class="jn-candy-title">小猫糖罐</div>
-      <div class="jn-candy-level">Lv.${catLvl.level} ${catLvl.name}
-        <div class="level-bar"><div class="level-bar-fill" style="width:${Math.min(100, (totalCandy % 100))}%"></div></div>
-      </div>
+      <div class="jn-candy-level">Lv.${catLvl.level} ${catLvl.name}</div>
       <div class="jn-candy-num" id="homeCandyNum">${totalCandy}<span>糖币</span></div>
       <div class="jn-candy-stats">
-        <div class="jn-cs"><img src="assets/stickers/candy.png" alt=""><b>+${todayCandy}</b></div>
-        <div class="jn-cs"><img src="assets/stickers/star.png" alt=""><b>${doneTasks}/${todayTodos.length}</b></div>
-        <div class="jn-cs"><img src="assets/stickers/heart.png" alt=""><b>${collectCount}</b></div>
+        <div class="jn-cs"><b>+${todayCandy}</b>今日获得</div>
+        <div class="jn-cs"><b>${doneTasks}/${todayTodos.length}</b>今日任务</div>
+        <div class="jn-cs"><b>${collectCount}</b>藏品图鉴</div>
       </div>
-      <button class="sticker-decor-btn" data-decor>装扮贴纸</button>
     </div>
 
     <!-- 今日计划 -->
@@ -4171,7 +4170,7 @@ function bounceCandy() {
 /* ============================================================
    GAME DASHBOARD — 糖币看板 · 奖品超市 · 我的藏品
    ============================================================ */
-let gameTab = "board"; // board | shop | collection | daily
+let gameTab = "board"; // board | shop | collection
 
 function renderGame() {
   const todoMod = CONFIG.modules.find(m => m.type === "todo");
@@ -4255,8 +4254,64 @@ function renderGame() {
       ${allBuffs[0].permanent ? '<span class="buff-time">永久</span>' : `<span class="buff-time" id="buffTimer">${buffCountdown(allBuffs[0])}</span>`}
     </div>` : '';
 
+  const doneDailyCount = daily.tasks.filter(t => t.done).length;
+  const dailyTotalReward = daily.tasks.reduce((s, t) => s + (t.done ? t.reward : 0), 0);
+
+  const dailyContent = `
+    <div class="daily-header">
+      <div class="dh-title">${icon("calendar", 15)} 今日任务</div>
+      <div class="dh-refresh">已完成 ${doneDailyCount}/3 · 已获 ${dailyTotalReward}糖币</div>
+    </div>
+
+    ${daily.tasks.map(task => `
+      <div class="daily-task-card ${task.done ? 'done' : ''}">
+        <div class="daily-task-icon"><img src="assets/stickers/${task.id==='daily_task'?'star.png':task.id==='daily_money'?'cat-piggy.png':'paw.png'}" alt="${task.name}" style="width:28px;height:28px;object-fit:contain"></div>
+        <div class="daily-task-body">
+          <div class="daily-task-name">${task.name}</div>
+          <div class="daily-task-desc">${task.desc}</div>
+        </div>
+        <div class="daily-task-reward">+${task.reward}糖币</div>
+        ${task.done
+          ? `<button class="daily-task-btn done-btn" disabled>已完成</button>`
+          : (task.id === "daily_login"
+              ? `<button class="daily-task-btn js-daily-login" ${!isAdmin ? 'disabled' : ''}>${!isAdmin ? '仅浏览' : '打卡'}</button>`
+              : `<button class="daily-task-btn" disabled>去完成</button>`)
+        }
+      </div>
+    `).join("")}
+
+    <div style="margin-top:20px;">
+      <div class="game-section-title">${icon("star", 15)} 连续记录里程碑</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="game-card" style="padding:12px;">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;">任务连续</div>
+          <div style="font-size:24px;font-weight:800;color:var(--accent);">${taskStreak}天</div>
+          <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">
+            ${STREAK_MILESTONES.task.map(m => {
+              const s = candy._getStreaks();
+              const achieved = s.taskMilestones && s.taskMilestones[m.days];
+              return `<span class="milestone-badge" style="opacity:${achieved?1:.4};margin:2px;">${m.days}天 +${m.reward}糖币</span>`;
+            }).join("")}
+          </div>
+        </div>
+        <div class="game-card" style="padding:12px;">
+          <div style="font-size:12px;font-weight:700;color:var(--module-4);margin-bottom:8px;">记账连续</div>
+          <div style="font-size:24px;font-weight:800;color:var(--module-4);">${moneyStreak}天</div>
+          <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">
+            ${STREAK_MILESTONES.money.map(m => {
+              const s = candy._getStreaks();
+              const achieved = s.moneyMilestones && s.moneyMilestones[m.days];
+              return `<span class="milestone-badge" style="opacity:${achieved?1:.4};margin:2px;">${m.days}天 +${m.reward}糖币</span>`;
+            }).join("")}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
   const boardContent = `
     ${buffBanner}
+    ${dailyContent}
     <div class="game-grid-main">
       <div class="game-card quick">
         <div class="game-section-title">${icon("star", 15)} 快捷兑换</div>
@@ -4467,67 +4522,10 @@ function renderGame() {
     </div>
   `;
 
-  // ============== Tab 4: 每日任务 ==============
-  const doneDailyCount = daily.tasks.filter(t => t.done).length;
-  const dailyTotalReward = daily.tasks.reduce((s, t) => s + (t.done ? t.reward : 0), 0);
-
-  const dailyContent = `
-    <div class="daily-header">
-      <div class="dh-title">${icon("calendar", 15)} 今日任务</div>
-      <div class="dh-refresh">已完成 ${doneDailyCount}/3 · 已获 ${dailyTotalReward}糖币</div>
-    </div>
-
-    ${daily.tasks.map(task => `
-      <div class="daily-task-card ${task.done ? 'done' : ''}">
-        <div class="daily-task-icon"><img src="assets/stickers/${task.id==='daily_task'?'star.png':task.id==='daily_money'?'cat-piggy.png':'paw.png'}" alt="${task.name}" style="width:28px;height:28px;object-fit:contain"></div>
-        <div class="daily-task-body">
-          <div class="daily-task-name">${task.name}</div>
-          <div class="daily-task-desc">${task.desc}</div>
-        </div>
-        <div class="daily-task-reward">+${task.reward}糖币</div>
-        ${task.done
-          ? `<button class="daily-task-btn done-btn" disabled>已完成</button>`
-          : (task.id === "daily_login"
-              ? `<button class="daily-task-btn js-daily-login" ${!isAdmin ? 'disabled' : ''}>${!isAdmin ? '仅浏览' : '打卡'}</button>`
-              : `<button class="daily-task-btn" disabled>去完成</button>`)
-        }
-      </div>
-    `).join("")}
-
-    <div style="margin-top:20px;">
-      <div class="game-section-title">${icon("star", 15)} 连续记录里程碑</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="game-card" style="padding:12px;">
-          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;">任务连续</div>
-          <div style="font-size:24px;font-weight:800;color:var(--accent);">${taskStreak}天</div>
-          <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">
-            ${STREAK_MILESTONES.task.map(m => {
-              const s = candy._getStreaks();
-              const achieved = s.taskMilestones && s.taskMilestones[m.days];
-              return `<span class="milestone-badge" style="opacity:${achieved?1:.4};margin:2px;">${m.days}天 +${m.reward}糖币</span>`;
-            }).join("")}
-          </div>
-        </div>
-        <div class="game-card" style="padding:12px;">
-          <div style="font-size:12px;font-weight:700;color:var(--module-4);margin-bottom:8px;">记账连续</div>
-          <div style="font-size:24px;font-weight:800;color:var(--module-4);">${moneyStreak}天</div>
-          <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">
-            ${STREAK_MILESTONES.money.map(m => {
-              const s = candy._getStreaks();
-              const achieved = s.moneyMilestones && s.moneyMilestones[m.days];
-              return `<span class="milestone-badge" style="opacity:${achieved?1:.4};margin:2px;">${m.days}天 +${m.reward}糖币</span>`;
-            }).join("")}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
   // ============== 主渲染 ==============
   const tabContent = gameTab === "board" ? boardContent
     : gameTab === "shop" ? shopContent
-    : gameTab === "collection" ? collectionContent
-    : dailyContent;
+    : collectionContent;
 
   // Hero 区 buff 标签
   const heroBuffTags = allBuffs.map(b =>
@@ -4578,7 +4576,6 @@ function renderGame() {
       <button class="game-tab ${gameTab==='board'?'active':''}" data-tab="board">${icon("grid", 14)} 总览</button>
       <button class="game-tab ${gameTab==='shop'?'active':''}" data-tab="shop">${icon("star", 14)} 超市</button>
       <button class="game-tab ${gameTab==='collection'?'active':''}" data-tab="collection">${icon("book", 14)} 藏品</button>
-      <button class="game-tab ${gameTab==='daily'?'active':''}" data-tab="daily">${icon("calendar", 14)} 每日</button>
     </div>
 
     <!-- Tab 内容 -->
