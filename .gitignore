@@ -6,3 +6,7 @@ node_modules/
 .trae-html-share-packages/
 *.bak
 *.bak2
+
+# 本地维护工具：含 Supabase 密钥，且可重置任意账号密码，禁止入仓
+reset-password.html
+_test-*.html

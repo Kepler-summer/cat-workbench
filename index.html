@@ -1573,6 +1573,15 @@
 
 <script>
 /* ============================================================
+   图片加载失败兜底：隐藏破碎图标，避免出现难看的占位
+   （捕获阶段监听，静态骨架与动态渲染的图片都覆盖）
+   ============================================================ */
+document.addEventListener("error", function(e){
+  var t = e.target;
+  if(t && t.tagName === "IMG"){ t.style.display = "none"; }
+}, true);
+
+/* ============================================================
    CONFIG — 唯一需要定制的地方。
    modules 里每个模块 = 一个功能页；type 决定它长什么样、记什么字段。
    支持的 type：
@@ -1836,6 +1845,7 @@ const ICONS = {
   moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z"/>',
   cat:'<path d="M5 4l1.5 4M19 4l-1.5 4"/><path d="M4 8C3 11 3 15 5 17c1.5 2.5 5.5 3 7 3s5.5-.5 7-3c2-2 2-6 1-9"/><circle cx="9.5" cy="12" r=".9" fill="currentColor"/><circle cx="14.5" cy="12" r=".9" fill="currentColor"/><path d="M11 15l1 1 1-1"/><path d="M7.5 14l-2 .5M7.5 15.5l-2-.5M16.5 14l2 .5M16.5 15.5l2-.5"/>',
   paw:'<ellipse cx="12" cy="16" rx="5" ry="4" fill="currentColor" fill-opacity="0.35"/><circle cx="6" cy="10" r="2.2" fill="currentColor" fill-opacity="0.35"/><circle cx="12" cy="8" r="2.2" fill="currentColor" fill-opacity="0.35"/><circle cx="18" cy="10" r="2.2" fill="currentColor" fill-opacity="0.35"/>',
+  key:'<circle cx="8" cy="15" r="3.2"/><path d="M10.3 12.7 20 3"/><path d="M17 5l3 3"/><path d="M14 8l2 2"/>',
   cathome:'<path d="M7 7.5C6.5 5 7.5 4 9.5 5" fill="#d5dde8" stroke="#5a4530" stroke-width="2.5" stroke-linejoin="round"/><path d="M17 7.5C17.5 5 16.5 4 14.5 5" fill="#d5dde8" stroke="#5a4530" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="12" cy="13" rx="8" ry="6.5" fill="#fcf5e8" stroke="#5a4530" stroke-width="2.5"/><circle cx="9.5" cy="11.5" r="1" fill="#5a4530"/><circle cx="14.5" cy="11.5" r="1" fill="#5a4530"/><path d="M8.5 14l-1 1.5" stroke="#5a4530" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M15.5 14l1 1.5" stroke="#5a4530" stroke-width="1.2" stroke-linecap="round" fill="none"/><ellipse cx="12" cy="15.5" rx="1.2" ry="1" fill="#5a4530"/>',
   catmoney:'<path d="M5 19C5 13 7.5 10 12 10s7 3 7 9" fill="#fcf5e8" stroke="#5a4530" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="12" cy="15.5" rx="3.5" ry="2.5" fill="#5a4530" fill-opacity=".12" stroke="#5a4530" stroke-width="1.8"/><circle cx="6.5" cy="8" r="2" fill="#fcf5e8" stroke="#5a4530" stroke-width="2.2"/><circle cx="12" cy="6.5" r="2" fill="#fcf5e8" stroke="#5a4530" stroke-width="2.2"/><circle cx="17.5" cy="8" r="2" fill="#fcf5e8" stroke="#5a4530" stroke-width="2.2"/>',
   catgrid:'<circle cx="5.5" cy="5" r=".8" fill="#3a3027"/><circle cx="8.5" cy="5" r=".8" fill="#3a3027"/><circle cx="7" cy="7.5" r="2.8" fill="#e8f0e3" stroke="#3a3027" stroke-width="1.8"/><circle cx="15.5" cy="5" r=".8" fill="#3a3027"/><circle cx="18.5" cy="5" r=".8" fill="#3a3027"/><circle cx="17" cy="7.5" r="2.8" fill="#e0ecf5" stroke="#3a3027" stroke-width="1.8"/><circle cx="5.5" cy="15" r=".8" fill="#3a3027"/><circle cx="8.5" cy="15" r=".8" fill="#3a3027"/><circle cx="7" cy="17.5" r="2.8" fill="#f5ead5" stroke="#3a3027" stroke-width="1.8"/><circle cx="15.5" cy="15" r=".8" fill="#3a3027"/><circle cx="18.5" cy="15" r=".8" fill="#3a3027"/><circle cx="17" cy="17.5" r="2.8" fill="#f0e8f0" stroke="#3a3027" stroke-width="1.8"/>',
@@ -2841,6 +2851,56 @@ function confirmDelete(key,id){
   overlay.querySelector("#c-ok").onclick=()=>{ data[key]=data[key].filter(i=>i.id!=id); persist(); close(); };
 }
 
+/* ---------- change password ---------- */
+function openChangePassword(){
+  const overlay=document.createElement("div"); overlay.className="overlay";
+  overlay.innerHTML=`<div class="modal"><div class="grab"></div>
+    <div class="modal-cat"><img src="assets/nav-ci-ke.png" alt=""></div>
+    <h2>修改登录密码</h2>
+    <div class="sub">只改当前登录账号的密码，不会退出登录喵～</div>
+    <div class="auth-field"><input type="password" id="cp-old" placeholder="原密码" autocomplete="current-password"></div>
+    <div class="auth-field"><input type="password" id="cp-new" placeholder="新密码（至少 4 位）" autocomplete="new-password"></div>
+    <div class="auth-field"><input type="password" id="cp-confirm" placeholder="再输入一次新密码" autocomplete="new-password"></div>
+    <div class="auth-err" id="cp-err"></div>
+    <div class="modal-actions"><button class="btn ghost" id="cp-cancel" style="background:var(--surface-nested);color:var(--text)">取消</button><button class="btn" id="cp-ok" style="background:var(--accent)">保存</button></div></div>`;
+  document.body.appendChild(overlay);
+  const close=()=>overlay.remove();
+  overlay.onclick=e=>{ if(e.target===overlay) close(); };
+  overlay.querySelector("#cp-cancel").onclick=close;
+  const okBtn = overlay.querySelector("#cp-ok");
+  const oldIn = overlay.querySelector("#cp-old");
+  const newIn = overlay.querySelector("#cp-new");
+  const confIn = overlay.querySelector("#cp-confirm");
+  const errEl = overlay.querySelector("#cp-err");
+
+  const validate = () => {
+    const o = oldIn.value, n = newIn.value, c = confIn.value;
+    if(!o || !n || !c){ errEl.textContent = "请填写全部密码"; return false; }
+    if(n.length < 4){ errEl.textContent = "新密码至少 4 位"; return false; }
+    if(n !== c){ errEl.textContent = "两次新密码不一致"; return false; }
+    errEl.textContent = "";
+    return true;
+  };
+  [oldIn, newIn, confIn].forEach(el => el.oninput = validate);
+
+  okBtn.onclick = async () => {
+    if(!validate()) return;
+    okBtn.textContent = "处理中...";
+    okBtn.disabled = true;
+    const r = await auth.changePassword(oldIn.value, newIn.value);
+    okBtn.textContent = "保存";
+    okBtn.disabled = false;
+    if(r.error){
+      errEl.textContent = r.error;
+      errEl.style.color = "";
+      return;
+    }
+    errEl.textContent = "✅ 密码已修改";
+    errEl.style.color = "var(--ok)";
+    setTimeout(close, 900);
+  };
+}
+
 /* ---------- router / nav ---------- */
 function go(v){ view=v; closeDrawer(); render(); window.scrollTo({top:0}); }
 function render(){
@@ -2897,8 +2957,13 @@ function buildDrawer(){
     items.push(...CONFIG.modules.map(m=>`<div class="ditem" data-go="${m.key}">${icon(m.icon,20)}${m.name}</div>`));
     items.push(`<div class="ditem" data-go="game">${icon("star",20)}糖果小铺</div>`);
   }
+  if(auth.isLoggedIn()) {
+    items.push(`<div class="ditem" id="drawerChangePw">${icon("key",20)}修改密码</div>`);
+  }
   $("#drawerList").innerHTML = items.join("");
   $("#drawerList").querySelectorAll("[data-go]").forEach(el=>el.onclick=()=>go(el.dataset.go));
+  const dcp = $("#drawerChangePw");
+  if(dcp) dcp.onclick = () => { closeDrawer(); openChangePassword(); };
 }
 function openDrawer(){
   $("#drawerList").querySelectorAll(".ditem").forEach(el=>el.classList.toggle("active", el.dataset.go===view));
@@ -3158,9 +3223,17 @@ const auth = {
     const hash = await this.hash(password);
     try {
       const { data: rows, error } = await store.sb.from("workbench_users").select("*").eq("username", username).limit(1);
-      if(error || !rows || !rows.length) return { error: "用户名或密码错误" };
+      if(error) {
+        console.error("Supabase login error:", error);
+        const errMsg = (error.message || "").toLowerCase();
+        if(errMsg.includes("jwt") || errMsg.includes("apikey") || errMsg.includes("invalid") || errMsg.includes("unauthorized")) {
+          return { error: "接口鉴权失败，请检查 Supabase 密钥或网络" };
+        }
+        return { error: "无法连接数据库，请检查网络后重试" };
+      }
+      if(!rows || !rows.length) return { error: "该账号不存在，请检查用户名" };
       const u = rows[0];
-      if(u.password_hash !== hash) return { error: "用户名或密码错误" };
+      if(u.password_hash !== hash) return { error: "密码错误，请重新输入" };
       // Family users can only log in if approved
       if(u.role === "family" && u.apply_status && u.apply_status !== "approved") {
         if(u.apply_status === "pending") return { error: "申请待审批中，请等待管理员同意" };
@@ -3170,6 +3243,29 @@ const auth = {
       this.saveSession({ userId: u.id, username: u.username, role: u.role, groupId: u.group_id });
       return { ok: true, user: u };
     } catch(e) { return { error: "登录失败: " + e.message }; }
+  },
+
+  async changePassword(oldPassword, newPassword) {
+    if(!store.sb) return { error: "数据库未连接" };
+    if(!this.isLoggedIn()) return { error: "请先登录" };
+    if(!oldPassword || !newPassword) return { error: "请填写原密码和新密码" };
+    if(newPassword.length < 4) return { error: "新密码至少 4 位" };
+    try {
+      const oldHash = await this.hash(oldPassword);
+      const { data: rows, error: fetchErr } = await store.sb.from("workbench_users").select("*").eq("id", this.session.userId).limit(1);
+      if(fetchErr) return { error: "无法连接数据库，请检查网络后重试" };
+      if(!rows || !rows.length) return { error: "账号不存在" };
+      const u = rows[0];
+      if(u.password_hash !== oldHash) return { error: "原密码不正确" };
+      const newHash = await this.hash(newPassword);
+      const { data: updated, error: updErr } = await store.sb.from("workbench_users")
+        .update({ password_hash: newHash })
+        .eq("id", this.session.userId)
+        .select();
+      if(updErr) return { error: "密码修改失败: " + updErr.message };
+      if(!updated || !updated.length) return { error: "密码修改未生效" };
+      return { ok: true };
+    } catch(e) { return { error: "修改密码失败: " + e.message }; }
   },
 
   /* ---------- Approval ---------- */
@@ -4938,15 +5034,20 @@ async function renderUsers() {
         <div class="ub-name">${esc(cur.username)}</div>
         <div class="ub-role">${cur.role === 'admin' ? '管理员' : '家属'} · 已用 ${totalApproved}/${CONFIG.maxUsers} 名额</div>
       </div>
-      <span class="ub-logout" id="logoutBtn">退出登录</span>
+      <div class="ub-actions" style="display:flex;gap:8px;align-items:center">
+        <span class="ub-change-pw" id="changePwBtn" style="font-size:12px;color:var(--accent);cursor:pointer;padding:6px 14px;border:1px solid var(--accent-muted);border-radius:10px;white-space:nowrap">修改密码</span>
+        <span class="ub-logout" id="logoutBtn">退出登录</span>
+      </div>
     </div>
     ${pendingHtml}
     <div class="sec-title">分组列表 <span style="font-size:11px;font-weight:500;color:var(--text-secondary)">${groups.length} 个分组</span></div>
     ${groupCards}`;
 
-  // Logout
+  // Logout & change password
   const lb = $("#logoutBtn");
   if(lb) lb.onclick = () => auth.logout();
+  const cpw = $("#changePwBtn");
+  if(cpw) cpw.onclick = () => openChangePassword();
 
   // Edit group name (only admin in their own group)
   $("#screen").querySelectorAll(".js-edit-group-name").forEach(el => el.onclick = async () => {
