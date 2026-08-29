@@ -1347,22 +1347,7 @@
     font-family: var(--font-journal);
   }
 
-  /* 进入箭头提示 — 手账风 */
-  .jn-candy .candy-enter-hint {
-    position:absolute; right:16px; top:50%; transform: translateY(-50%);
-    z-index: 3; opacity: 0; transition: all .3s ease;
-    display:flex; align-items:center; gap:4px;
-    font-size:10px; color:var(--candy); font-weight:600; letter-spacing:.5px;
-  }
-  .jn-candy .candy-enter-hint img { width:16px; height:16px; object-fit:contain;
-    animation: slideRight 1.2s ease-in-out infinite;
-    mix-blend-mode: multiply;
-  }
-  .jn-candy:hover .candy-enter-hint { opacity: 1; right: 24px; }
-  @keyframes slideRight {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(4px); }
-  }
+
   .jn-sec .candy-decor-btn { padding:4px 12px 4px 8px; border-radius:999px; border:none;
     background:linear-gradient(135deg, var(--candy), var(--candy-light)); color:#fff; font-size:10px; font-weight:700;
     letter-spacing:.5px; cursor:pointer; box-shadow:0 2px 6px rgba(212,160,92,.3);
@@ -1528,7 +1513,6 @@
         <div class="jn-cs"><b>3/4</b>今日任务</div>
         <div class="jn-cs"><b>1</b>藏品图鉴</div>
       </div>
-      <div class="candy-enter-hint"><span>进入</span><img src="assets/stickers/candy.png" alt=""></div>
     </div>
 
     <!-- 今日计划 -->
@@ -2283,7 +2267,6 @@ function renderHome(){
         <div class="jn-cs"><b>${doneTasks}/${todayTodos.length}</b>今日任务</div>
         <div class="jn-cs"><b>${collectCount}</b>藏品图鉴</div>
       </div>
-      <div class="candy-enter-hint"><span>进入</span><img src="assets/stickers/candy.png" alt=""></div>
     </div>
 
     <!-- 今日计划 -->
