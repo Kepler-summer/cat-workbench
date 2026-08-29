@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>家属数据合并工具</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f9f7f3; color: #333; }
+  h1 { color: #c95a5a; }
+  h2 { color: #555; font-size: 18px; margin-top: 24px; }
+  .card { background: #fff; border: 1px solid #e5e0d8; border-radius: 12px; padding: 16px; margin: 12px 0; }
+  .key-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0ebe3; }
+  .key-name { font-weight: 600; font-size: 13px; font-family: monospace; }
+  .key-status { font-size: 12px; padding: 3px 10px; border-radius: 999px; }
+  .status-found { background: #d5eede; color: #247a50; }
+  .status-empty { background: #f5f0e0; color: #a07a2a; }
+  .status-error { background: #f8eae8; color: #d4574a; }
+  .data-preview { background: #f9f7f3; border-radius: 8px; padding: 10px; font-size: 12px; margin: 8px 0; max-height: 150px; overflow-y: auto; }
+  .data-preview code { white-space: pre-wrap; word-break: break-all; }
+  button { background: #c95a5a; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; cursor: pointer; margin: 4px 0; }
+  button:hover { opacity: 0.85; }
+  button.green { background: #247a50; }
+  button.gray { background: #888; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .log { background: #222; color: #0f0; font-family: monospace; padding: 10px; border-radius: 8px; font-size: 12px; max-height: 400px; overflow-y: auto; }
+  .stat { display: inline-block; margin-right: 16px; font-size: 13px; }
+  .stat b { color: #c95a5a; }
+  .rec-item { padding: 4px 0; border-bottom: 1px solid #f5f0e8; font-size: 12px; }
+  .rec-item .tag { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; margin-left: 6px; }
+  .tag-family { background: #f0e0f5; color: #7a3a8a; }
+  .tag-admin { background: #e0ecf5; color: #3a6a8a; }
+</style>
+</head>
+<body>
+<h1>🐱 家属数据合并工具</h1>
+<p>扫描云端所有 key，找到家属 8 月 26 日晚新增的业务数据，合并到本组共享数据集。</p>
+
+<div id="step1">
+  <button onclick="scanAllKeys()">🔍 第一步：扫描云端所有 Key</button>
+  <div id="scanResult"></div>
+</div>
+
+<div id="step2" style="display:none">
+  <h2>第二步：选择数据源</h2>
+  <p>选择包含家属 8 月 26 日晚间数据的来源：</p>
+  <div id="sourceSelector"></div>
+</div>
+
+<div id="step3" style="display:none">
+  <h2>第三步：预览合并结果</h2>
+  <div id="mergePreview"></div>
+  <button class="green" onclick="executeMerge()">✅ 确认执行合并</button>
+</div>
+
+<div id="logSection" style="display:none">
+  <h2>执行日志</h2>
+  <div class="log" id="logBox"></div>
+</div>
+
+<script>
+const SB_URL = "https://ksljnxlgoajbhxshqvaf.supabase.co";
+const SB_KEY = "sb_publishable_BxKV01FyPcYliI3jwSedqg_ukfbMhgk";
+let sb = null;
+let allKeyData = {};
+let selectedSourceKey = null;
+
+function log(msg) {
+  const box = document.getElementById("logBox");
+  box.innerHTML += msg + "\n";
+  box.scrollTop = box.scrollHeight;
+}
+
+function initSB() {
+  if(!sb && window.supabase) {
+    sb = supabase.createClient(SB_URL, SB_KEY);
+  }
+  return !!sb;
+}
+
+async function loadByKey(key) {
+  if(!initSB()) return null;
+  try {
+    const { data, error } = await sb
+      .from("workbench_data")
+      .select("id, data, storage_key, updated_at, device_id")
+      .eq("storage_key", key)
+      .order("updated_at", { ascending: false })
+      .limit(1);
+    if(error) return { error };
+    if(data && data.length > 0) return data[0];
+    return null;
+  } catch(e) {
+    return { error: e.message };
+  }
+}
+
+function countRecords(d) {
+  if(!d) return { money: 0, todo: 0, note: 0, total: 0 };
+  return {
+    money: (d.money || []).length,
+    todo: (d.todo || []).length,
+    note: (d.note || []).length,
+    total: (d.money || []).length + (d.todo || []).length + (d.note || []).length
+  };
+}
+
+function findFamilyRecords(d) {
+  if(!d) return [];
+  const records = [];
+  const bizKeys = ["money", "todo", "note"];
+  bizKeys.forEach(k => {
+    (d[k] || []).forEach(r => {
+      if(r.createRole === "family" || r.createdBy === "family") {
+        records.push({ ...r, module: k });
+      }
+    });
+  });
+  return records;
+}
+
+function findAug26Records(d) {
+  if(!d) return [];
+  const records = [];
+  const bizKeys = ["money", "todo", "note"];
+  bizKeys.forEach(k => {
+    (d[k] || []).forEach(r => {
+      // 查找 8 月 26 日的记录
+      const dt = r.date || r.createdAt || r.ts || "";
+      if(dt.includes("2026-08-26") || dt.includes("20260826") || 
+         (r.id && r.id > 1787712000000 && r.id < 1787798400000)) {
+        records.push({ ...r, module: k });
+      }
+    });
+  });
+  return records;
+}
+
+async function scanAllKeys() {
+  const result = document.getElementById("scanResult");
+  result.innerHTML = "<p>扫描中...</p>";
+  
+  const keys = [
+    "cat-time-bureau-v1",
+    "cat-time-bureau-v1-u1",
+    "cat-time-bureau-v1-u2",
+    "cat-time-bureau-v1-g1",
+    "cat-time-bureau-v1-default",
+  ];
+  
+  let html = "";
+  
+  for(const key of keys) {
+    const row = await loadByKey(key);
+    allKeyData[key] = row;
+    
+    if(row && row.data) {
+      const d = row.data;
+      const c = countRecords(d);
+      const familyRecs = findFamilyRecords(d);
+      const aug26Recs = findAug26Records(d);
+      
+      html += `<div class="key-row">
+        <span class="key-name">${key}</span>
+        <span class="key-status ${c.total > 0 ? 'status-found' : 'status-empty'}">${c.total > 0 ? c.total + ' 条' : '空'}</span>
+      </div>`;
+      
+      if(c.total > 0) {
+        html += `<div class="data-preview"><code>
+记账: ${c.money} | 任务: ${c.todo} | 灵感: ${c.note}
+家属记录: ${familyRecs.length} | 8/26记录: ${aug26Recs.length}
+更新: ${row.updated_at}
+        </code></div>`;
+        
+        if(familyRecs.length > 0) {
+          html += "<div style='margin:4px 0'>";
+          familyRecs.slice(0, 5).forEach(r => {
+            html += `<div class="rec-item">${r.title || r.content || '无标题'} <span class="tag tag-family">家属</span> [${r.module}]</div>`;
+          });
+          if(familyRecs.length > 5) html += `<div class="rec-item">...还有 ${familyRecs.length - 5} 条</div>`;
+          html += "</div>";
+        }
+      }
+    } else if(row && row.error) {
+      html += `<div class="key-row"><span class="key-name">${key}</span><span class="key-status status-error">错误</span></div>`;
+    } else {
+      html += `<div class="key-row"><span class="key-name">${key}</span><span class="key-status status-empty">无数据</span></div>`;
+    }
+  }
+  
+  result.innerHTML = `<div class="card">${html}</div>`;
+  
+  // 找到有家属数据的 key
+  const familyKeys = [];
+  for(const key of keys) {
+    const row = allKeyData[key];
+    if(row && row.data) {
+      const fr = findFamilyRecords(row.data);
+      const a26 = findAug26Records(row.data);
+      if(fr.length > 0 || a26.length > 0) {
+        familyKeys.push({ key, familyCount: fr.length, aug26Count: a26.length, data: row.data });
+      }
+    }
+  }
+  
+  if(familyKeys.length > 0) {
+    // 展示选择器
+    const selector = document.getElementById("sourceSelector");
+    selector.innerHTML = familyKeys.map((f, i) => 
+      `<div class="card">
+        <label><input type="radio" name="source" value="${f.key}" ${i===0?'checked':''}> 
+        <b>${f.key}</b> — 家属记录 ${f.familyCount} 条, 8/26记录 ${f.aug26Count} 条</label>
+      </div>`
+    ).join("");
+    document.getElementById("step2").style.display = "";
+    document.getElementById("logSection").style.display = "";
+    log("✅ 找到 " + familyKeys.length + " 个 key 包含家属数据");
+  } else {
+    // 没有标记家属的记录，尝试找 u2 key 的全部数据
+    const u2Row = allKeyData["cat-time-bureau-v1-u2"];
+    if(u2Row && u2Row.data) {
+      const c = countRecords(u2Row.data);
+      if(c.total > 0) {
+        const selector = document.getElementById("sourceSelector");
+        selector.innerHTML = `<div class="card">
+          <label><input type="radio" name="source" value="cat-time-bureau-v1-u2" checked> 
+          <b>cat-time-bureau-v1-u2</b> — 家属全部数据 ${c.total} 条（记账 ${c.money}, 任务 ${c.todo}, 灵感 ${c.note}）</label>
+        </div>`;
+        document.getElementById("step2").style.display = "";
+        document.getElementById("logSection").style.display = "";
+        log("⚠️ 没有找到 createRole=family 标记的记录，但 u2 key 有数据，将作为家属数据源");
+      } else {
+        result.innerHTML += `<div class="card"><p style="color:#c95a5a">❌ 云端没有找到家属数据。请确认家属 8 月 26 日晚的数据是否已保存到云端。</p></div>`;
+      }
+    } else {
+      result.innerHTML += `<div class="card"><p style="color:#c95a5a">❌ 云端没有找到任何家属数据。</p></div>`;
+    }
+  }
+}
+
+function getSelectedSource() {
+  const radio = document.querySelector('input[name="source"]:checked');
+  if(!radio) return null;
+  selectedSourceKey = radio.value;
+  return allKeyData[selectedSourceKey];
+}
+
+function previewMerge() {
+  const sourceRow = getSelectedSource();
+  if(!sourceRow || !sourceRow.data) {
+    log("❌ 未选择数据源");
+    return;
+  }
+  
+  const sourceData = sourceRow.data;
+  const targetRow = allKeyData["cat-time-bureau-v1-g1"] || allKeyData["cat-time-bureau-v1-u1"];
+  const targetData = targetRow ? targetRow.data : {};
+  
+  const bizKeys = ["money", "todo", "note"];
+  let toAdd = { money: [], todo: [], note: [] };
+  let duplicates = { money: 0, todo: 0, note: 0 };
+  let existingIds = {};
+  
+  bizKeys.forEach(k => {
+    (targetData[k] || []).forEach(r => {
+      if(r.id) existingIds[k + "_" + r.id] = true;
+    });
+  });
+  
+  bizKeys.forEach(k => {
+    (sourceData[k] || []).forEach(r => {
+      const idKey = k + "_" + r.id;
+      if(existingIds[idKey]) {
+        duplicates[k]++;
+      } else {
+        // 标记为家属创建
+        r.createUserId = r.createUserId || 2;
+        r.createRole = "family";
+        r.createdBy = "family";
+        // 不设置 _candySettled，不触发糖币
+        toAdd[k].push(r);
+      }
+    });
+  });
+  
+  const totalCount = toAdd.money.length + toAdd.todo.length + toAdd.note.length;
+  
+  const preview = document.getElementById("mergePreview");
+  preview.innerHTML = `<div class="card">
+    <h3>合并预览</h3>
+    <div class="stat">新增记账: <b>${toAdd.money.length}</b></div>
+    <div class="stat">新增任务: <b>${toAdd.todo.length}</b></div>
+    <div class="stat">新增灵感: <b>${toAdd.note.length}</b></div>
+    <div class="stat">去重跳过: <b>${duplicates.money + duplicates.todo + duplicates.note}</b></div>
+    <p style="color:#247a50;font-size:13px;margin-top:8px">✅ 新增记录将标记 createRole=family，不触发糖币发放</p>
+    <p style="color:#888;font-size:12px">来源: ${selectedSourceKey} → 目标: cat-time-bureau-v1-g1</p>
+  </div>`;
+  
+  // 保存待合并的数据到全局变量
+  window._mergeData = toAdd;
+  window._targetData = targetData;
+  document.getElementById("step3").style.display = "";
+  
+  if(totalCount === 0) {
+    preview.innerHTML += `<div class="card"><p style="color:#a07a2a">⚠️ 没有需要合并的新记录（可能已合并过，或数据重复）。</p></div>`;
+    document.querySelector('button[onclick="executeMerge()"]').disabled = true;
+  }
+}
+
+// 监听 radio 变化，自动预览
+document.addEventListener("change", (e) => {
+  if(e.target.name === "source") {
+    setTimeout(previewMerge, 100);
+  }
+});
+
+// 扫描完后自动预览
+const observer = new MutationObserver(() => {
+  if(document.getElementById("step2").style.display !== "none" && !document.getElementById("step3").style.display) {
+    setTimeout(previewMerge, 200);
+  }
+});
+
+async function executeMerge() {
+  if(!window._mergeData || !window._targetData) {
+    log("❌ 没有待合并数据");
+    return;
+  }
+  
+  if(!initSB()) {
+    log("❌ Supabase 初始化失败");
+    return;
+  }
+  
+  const toAdd = window._mergeData;
+  const targetData = window._targetData;
+  
+  // 合并数据
+  const merged = {};
+  ["money", "todo", "note", "checkin", "progress"].forEach(k => {
+    merged[k] = [...(targetData[k] || []), ...toAdd[k]];
+  });
+  // 保留游戏数据
+  for(const k in targetData) {
+    if(k.startsWith("__")) merged[k] = targetData[k];
+  }
+  
+  // 保存到云端
+  const now = new Date().toISOString();
+  const deviceId = "merge-" + Date.now();
+  
+  // 拆分业务和游戏
+  const biz = {};
+  ["money", "todo", "note", "checkin", "progress"].forEach(k => { biz[k] = merged[k]; });
+  const game = {};
+  for(const k in merged) if(k.startsWith("__")) game[k] = merged[k];
+  
+  log("📦 保存合并后业务数据到 cat-time-bureau-v1-g1...");
+  try {
+    const { error: bizErr } = await sb.from("workbench_data").upsert({
+      storage_key: "cat-time-bureau-v1-g1",
+      data: biz,
+      device_id: deviceId,
+      updated_at: now
+    }, { onConflict: "storage_key" });
+    if(bizErr) throw bizErr;
+    log("✅ 业务数据保存成功");
+    log("   记账: " + (biz.money||[]).length + " 条");
+    log("   任务: " + (biz.todo||[]).length + " 条");
+    log("   灵感: " + (biz.note||[]).length + " 条");
+  } catch(e) {
+    log("❌ 业务数据保存失败: " + e.message);
+    return;
+  }
+  
+  // 保存游戏数据
+  if(Object.keys(game).length > 0) {
+    log("📦 保存游戏数据到 cat-time-bureau-v1-u1...");
+    try {
+      const { error: gameErr } = await sb.from("workbench_data").upsert({
+        storage_key: "cat-time-bureau-v1-u1",
+        data: game,
+        device_id: deviceId,
+        updated_at: now
+      }, { onConflict: "storage_key" });
+      if(gameErr) throw gameErr;
+      log("✅ 游戏数据保存成功");
+    } catch(e) {
+      log("❌ 游戏数据保存失败: " + e.message);
+    }
+  }
+  
+  // 同时更新本地
+  localStorage.setItem("cat-time-bureau-v1-g1", JSON.stringify(biz));
+  localStorage.setItem("cat-time-bureau-v1-u1", JSON.stringify(game));
+  log("✅ 本地 localStorage 已更新");
+  
+  log("\n🎉 合并完成！请刷新工作台验证。");
+  log("   新增记账 " + toAdd.money.length + " 条, 任务 " + toAdd.todo.length + " 条, 灵感 " + toAdd.note.length + " 条");
+  log("   所有新增记录标记为 createRole=family，不触发糖币发放");
+}
+
+// 自动开始扫描
+window.addEventListener("load", () => {
+  setTimeout(scanAllKeys, 500);
+  // 监听 step2 显示
+  const obs = new MutationObserver(() => {
+    if(document.getElementById("step2").style.display !== "none" && 
+       document.getElementById("step3").style.display === "none") {
+      setTimeout(previewMerge, 200);
+    }
+  });
+  obs.observe(document.getElementById("step2"), { attributes: true, attributeFilter: ["style"] });
+});
+</script>
+</body>
+</html>

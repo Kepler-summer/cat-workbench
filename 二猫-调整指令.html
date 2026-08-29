@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>二猫 · 迭代调整指令 v2</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Noto Sans SC",sans-serif; background:#faf7f2; color:#3a3027; line-height:1.7; }
+  .container { max-width:860px; margin:0 auto; padding:40px 24px 80px; }
+  .header { text-align:center; margin-bottom:48px; padding:40px 24px; background:linear-gradient(135deg,#fff5ee 0%,#fde8d8 50%,#f5dcc8 100%); border-radius:20px; position:relative; overflow:hidden; }
+  .header::before { content:"🐱🐱"; position:absolute; top:12px; right:20px; font-size:28px; opacity:.5; }
+  .header h1 { font-size:32px; font-weight:800; color:#5a3e2b; letter-spacing:-.5px; }
+  .header .subtitle { font-size:14px; color:#9a7b5f; margin-top:8px; }
+  .header .meta { display:flex; justify-content:center; gap:16px; margin-top:16px; font-size:12px; color:#b89a7a; }
+  .header .meta span { background:rgba(255,255,255,.5); padding:4px 12px; border-radius:999px; }
+
+  .toc { background:#fff; border-radius:14px; padding:24px 28px; margin-bottom:40px; border:1px solid #f0e6da; }
+  .toc h3 { font-size:13px; color:#9a7b5f; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; }
+  .toc ol { padding-left:20px; }
+  .toc li { margin-bottom:6px; font-size:14px; }
+  .toc a { color:#7a5c3e; text-decoration:none; }
+  .toc a:hover { color:#c97b4a; }
+
+  .module { background:#fff; border-radius:16px; padding:32px 28px; margin-bottom:28px; border:1px solid #f0e6da; }
+  .module-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .module-num { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; color:#fff; flex-shrink:0; }
+  .module-title { font-size:20px; font-weight:700; color:#5a3e2b; }
+  .module-tag { font-size:11px; padding:3px 10px; border-radius:999px; font-weight:600; margin-left:auto; }
+
+  .priority-high { background:#fee; color:#d44; }
+  .priority-medium { background:#fef9e7; color:#a80; }
+  .priority-low { background:#e8f5f0; color:#2a8; }
+
+  .module-body h4 { font-size:15px; font-weight:700; color:#6a4e3b; margin:20px 0 10px; padding-left:12px; border-left:3px solid #d4a574; }
+  .module-body p { font-size:14px; color:#5a4a3a; margin-bottom:8px; }
+  .module-body ul { padding-left:20px; margin-bottom:12px; }
+  .module-body li { font-size:14px; margin-bottom:6px; color:#5a4a3a; }
+  .module-body code { background:#f8f0e8; padding:2px 6px; border-radius:4px; font-size:13px; color:#8a5a2a; font-family:"SF Mono",Consolas,monospace; }
+  .module-body .code-block { background:#2d2520; color:#f0e0d0; padding:16px 20px; border-radius:10px; font-size:13px; font-family:"SF Mono",Consolas,monospace; margin:12px 0; overflow-x:auto; line-height:1.5; }
+  .module-body .code-block .cmt { color:#a89880; }
+
+  .issue-card { background:#fff8f0; border:1px solid #f0e0d0; border-radius:10px; padding:16px 20px; margin:12px 0; }
+  .issue-card .issue-label { font-size:11px; font-weight:700; color:#c97b4a; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+  .issue-card .issue-desc { font-size:14px; color:#5a4a3a; }
+  .issue-card .issue-fix { margin-top:8px; padding-top:8px; border-top:1px dashed #e0d0c0; font-size:13px; color:#7a6a5a; }
+  .issue-card .issue-fix strong { color:#5a8a5a; }
+
+  .design-ref { background:linear-gradient(135deg,#f5f0e8,#faf5f0); border-radius:12px; padding:20px 24px; margin:16px 0; border:1px solid #ece0d4; }
+  .design-ref h5 { font-size:13px; font-weight:700; color:#8a6a4a; margin-bottom:8px; }
+  .design-ref p { font-size:13px; color:#7a6a5a; margin-bottom:4px; }
+  .design-ref .ref-tag { display:inline-block; font-size:11px; padding:2px 8px; background:#e8dccd; border-radius:4px; color:#8a6a4a; margin-right:4px; margin-bottom:4px; }
+
+  .checklist { background:#f8f5f0; border-radius:12px; padding:20px 24px; margin:16px 0; }
+  .checklist h4 { font-size:14px; font-weight:700; color:#5a3e2b; margin-bottom:12px; }
+  .checklist-item { display:flex; align-items:flex-start; gap:8px; margin-bottom:8px; font-size:13px; color:#5a4a3a; }
+  .checklist-item .box { width:16px; height:16px; border:2px solid #d4a574; border-radius:4px; flex-shrink:0; margin-top:2px; }
+
+  .footer { text-align:center; margin-top:40px; font-size:12px; color:#b89a7a; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🐱🐱 二猫 · 迭代调整指令 v2</h1>
+    <div class="subtitle">情侣共同记账与时间规划工作台 · 基于现有代码迭代</div>
+    <div class="meta">
+      <span>版本: v2.0</span>
+      <span>日期: 2026-08-26</span>
+      <span>仓库: Kepler-summer/cat-workbench</span>
+    </div>
+  </div>
+
+  <div class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#m1">模块1：全域导航与交互修复（游戏架构师 + UI设计师 + 产品经理视角）</a></li>
+      <li><a href="#m2">模块2：用户管理头像功能</a></li>
+      <li><a href="#m3">模块3：品牌重塑「二猫」+ 情侣主题优化</a></li>
+      <li><a href="#m4">模块4：设计精修（融入三个设计技能理念）</a></li>
+      <li><a href="#checklist">部署前校验清单</a></li>
+    </ol>
+  </div>
+
+  <!-- ========== Module 1 ========== -->
+  <div class="module" id="m1">
+    <div class="module-header">
+      <div class="module-num" style="background:linear-gradient(135deg,#e89a6a,#d97a4a)">1</div>
+      <div class="module-title">全域导航与交互修复</div>
+      <span class="module-tag priority-high">优先级: 高</span>
+    </div>
+    <div class="module-body">
+
+      <h4>问题诊断</h4>
+      <p>以三个角色视角协同排查全域交互断裂点：</p>
+
+      <div class="issue-card">
+        <div class="issue-label">问题 #1 — 产品经理视角</div>
+        <div class="issue-desc">
+          首页「糖果小铺」入口卡片 (<code>home-points-card</code>) 展示了"今日任务 <code>doneTasks/total</code>"统计，但整张卡片绑定 <code>data-open="game"</code>，点击后跳转到糖果小铺（游戏页），而非用户期望的「今日计划」页面。用户看到任务数据，自然期望点击进入任务列表。
+        </div>
+        <div class="issue-fix">
+          <strong>修复方案：</strong>将卡片拆分为多个可点击区域：等级/糖币区域 → 进入糖果小铺 (<code>game</code>)；今日任务区域 → 进入今日计划 (<code>todo</code>)；藏品区域 → 进入藏品图鉴 (<code>game</code> + <code>tab=collect</code>)。每个统计指标 (<code>hpc-stat</code>) 独立绑定 <code>data-open</code> 目标。
+        </div>
+      </div>
+
+      <div class="issue-card">
+        <div class="issue-label">问题 #2 — UI设计师视角</div>
+        <div class="issue-desc">
+          首页「今日概览」环形指标 (<code>rings</code>) 绑定了 <code>data-open</code> 跳转，但缺少视觉反馈（hover/active 状态不明显），用户不知道这些圆环可以点击。
+        </div>
+        <div class="issue-fix">
+          <strong>修复方案：</strong>为 <code>.ring</code> 增加 <code>cursor:pointer</code> + hover 微动效（缩放 1.03 + 阴影增强），并在圆环下方增加小字"点击查看"提示。
+        </div>
+      </div>
+
+      <div class="issue-card">
+        <div class="issue-label">问题 #3 — 游戏架构师视角</div>
+        <div class="issue-desc">
+          糖果小铺内部「每日任务」卡片 (<code>daily-task-card</code>) 的完成按钮直接执行 <code>completeDailyTask()</code>，但缺少任务完成后的视觉过渡动画（直接重渲染，体验生硬）。
+        </div>
+        <div class="issue-fix">
+          <strong>修复方案：</strong>任务完成后增加 300ms 收束动画：卡片背景渐变为 <code>.done</code> 状态 + 糖币 +N 飘浮动画 + 微震动反馈（移动端 <code>navigator.vibrate(10)</code>），再触发重渲染。
+        </div>
+      </div>
+
+      <div class="issue-card">
+        <div class="issue-label">问题 #4 — 全域排查</div>
+        <div class="issue-desc">
+          以下区域需全域检查是否存在同类交互断裂：<br>
+          <code>renderHome()</code> 中所有 <code>data-open</code> 元素的跳转目标是否与用户预期一致<br>
+          <code>renderInsight()</code> (洞察页) 中 <code>data-open</code> 跳转是否正常<br>
+          <code>wireHome()</code> 中事件绑定是否覆盖所有动态渲染的元素<br>
+          抽屉菜单 <code>data-go</code> 是否覆盖全部页面路由
+        </div>
+        <div class="issue-fix">
+          <strong>修复方案：</strong>建立导航映射表，确保每个展示数据的区域点击后都跳转到对应详情页：
+          <ul>
+            <li>首页 → 今日计划区域 → <code>go("todo")</code></li>
+            <li>首页 → 糖币统计 → <code>go("game")</code></li>
+            <li>首页 → 藏品统计 → <code>go("game")</code> + 切换藏品 tab</li>
+            <li>首页 → 今日概览环 → 对应模块页</li>
+            <li>洞察页 → 模块入口 → 对应模块页</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4>导航映射表（目标状态）</h4>
+      <div class="code-block"><span class="cmt">// 首页各区域 → 目标页面映射</span>
+首页.问候区      → 无交互（纯展示）
+首页.金句区      → 无交互（纯展示）
+首页.今日概览[0] → go("money")   <span class="cmt">// 记账完成率</span>
+首页.今日概览[1] → go("todo")     <span class="cmt">// 计划完成率</span>
+首页.今日概览[2] → go("note")     <span class="cmt">// 灵感记录数</span>
+首页.今日概览[3] → go("checkin")  <span class="cmt">// 打卡连续天数</span>
+首页.今日计划卡片 → go("todo")     <span class="cmt">// 点击卡片进入详情</span>
+首页.糖果小铺[等级区] → go("game")
+首页.糖果小铺[任务统计] → go("todo")  <span class="cmt">// ← 修复点</span>
+首页.糖果小铺[藏品统计] → go("game")+tab=collect
+首页.快速记录[4按钮] → 对应模块新增表单</div>
+
+    </div>
+  </div>
+
+  <!-- ========== Module 2 ========== -->
+  <div class="module" id="m2">
+    <div class="module-header">
+      <div class="module-num" style="background:linear-gradient(135deg,#6ab8a8,#4a9888)">2</div>
+      <div class="module-title">用户管理页面 · 头像更换功能</div>
+      <span class="module-tag priority-medium">优先级: 中</span>
+    </div>
+    <div class="module-body">
+
+      <h4>现状分析</h4>
+      <p>当前用户管理页面 (<code>renderUsers()</code> 行 6708+) 中，用户头像使用 emoji 占位：<code>👑</code>(管理员) / <code>🐱</code>(家属)。仅抽屉 (<code>#drawerBrand</code>) 有头像上传功能（当前用户），用户管理页面无法为各用户更换头像。</p>
+
+      <h4>需求</h4>
+      <ul>
+        <li>用户管理页面每个用户旁增加「更换头像」入口</li>
+        <li>支持从本地上传图片（复用现有 <code>avatarInput</code> 逻辑）</li>
+        <li>头像上传后存储到 Supabase 云端，跨设备同步</li>
+        <li>管理员可为本组家属更换头像；用户可更换自己的头像</li>
+      </ul>
+
+      <h4>实现方案</h4>
+      <div class="code-block"><span class="cmt">// 1. 用户表新增 avatar 字段（存 Base64 或 Supabase Storage URL）</span>
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+
+<span class="cmt">// 2. renderUsers() 中 gm-avatar 区域改为可点击</span>
+&lt;div class="gm-avatar js-change-avatar"
+     data-uid="${u.id}"
+     data-name="${esc(u.username)}"
+     style="cursor:pointer;position:relative"&gt;
+  ${u.avatar_url
+    ? `&lt;img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"&gt;`
+    : (u.role === 'admin' ? '👑' : '🐱')}
+  &lt;span class="avatar-cam"&gt;📷&lt;/span&gt;
+&lt;/div&gt;
+
+<span class="cmt">// 3. 点击触发文件选择 → 上传 → 更新数据库 → 重新渲染</span>
+$(".js-change-avatar").onclick = () =&gt; {
+  const input = document.createElement("input");
+  input.type = "file"; input.accept = "image/*";
+  input.onchange = async (e) =&gt; {
+    const file = e.target.files[0];
+    const resized = await resizeImage(file, 200); <span class="cmt">// 压缩到 200px</span>
+    await auth.updateUserAvatar(uid, resized);     <span class="cmt">// 写入云端</span>
+    renderUsers();                                  <span class="cmt">// 重新渲染</span>
+  };
+  input.click();
+};</div>
+
+      <h4>权限控制</h4>
+      <ul>
+        <li>管理员：可更换本组所有用户头像</li>
+        <li>家属：仅可更换自己头像（用户管理页面中仅自己的头像可点击）</li>
+        <li>跨组用户头像不可修改</li>
+      </ul>
+
+      <h4>头像使用场景联动</h4>
+      <ul>
+        <li>抽屉侧栏 <code>#brandImg</code>：显示当前用户头像</li>
+        <li>用户管理页面 <code>gm-avatar</code>：显示各用户头像</li>
+        <li>记账/计划/灵感记录的来源筛选标签：头像缩略图（可选，后续迭代）</li>
+      </ul>
+
+    </div>
+  </div>
+
+  <!-- ========== Module 3 ========== -->
+  <div class="module" id="m3">
+    <div class="module-header">
+      <div class="module-num" style="background:linear-gradient(135deg,#b89acc,#987ab8)">3</div>
+      <div class="module-title">品牌重塑「二猫」+ 情侣主题优化</div>
+      <span class="module-tag priority-high">优先级: 高</span>
+    </div>
+    <div class="module-body">
+
+      <h4>品牌定位</h4>
+      <p><strong>名称：</strong>二猫</p>
+      <p><strong>定位：</strong>情侣共同记账与时间规划程序 — 两只布偶小猫，一起经营生活的每一天</p>
+      <p><strong>风格关键词：</strong>清新奶油、软萌治愈、现代简约、情侣日常、有网感不土嗨</p>
+
+      <h4>文案修改清单（保留软萌风格，提升时尚感）</h4>
+      <div class="code-block"><span class="cmt">// 以下为需要修改的文案点位</span>
+
+// 1. 页面 title
+"猫咪时间报 · 未来时间管理局"
+→ "二猫 · 我们一起记账和规划时间"
+
+// 2. CONFIG 配置
+owner: "时间小猫管理局"
+→ owner: "二猫"
+
+slogan: "未来时间管理局 · 每日准时报到"
+→ slogan: "两只小猫，一起把日子过成糖"
+
+brand: "🐱"
+→ brand: "🐱🐱"  <span class="cmt">// 两只猫</span>
+
+// 3. 抽屉底部
+"数据仅存在本机 · 小猫每日准时报到"
+→ "二猫 · 云端同步中"
+
+// 4. 登录页
+"🐱 布偶小猫时间管理局 · 数据云端同步"
+→ "🐱🐱 二猫 · 我们的小日子，云端同步"
+
+// 5. 首页问候语（保留时段逻辑，优化文案）
+"欢迎回到时间小猫管理局 · 今日时间线已就绪"
+→ "欢迎回到二猫 · 今天也要一起加油呀"
+（其余时段问候语保留，仅调整品牌相关措辞）
+
+// 6. 灵感种子数据中的"时间小猫"提及
+"时间小猫觉得，耐心等待也是一种策略喵～"
+→ "二猫觉得，耐心等待也是一种策略喵～"</div>
+
+      <h4>主题视觉优化方向（不动底部图标和 banner 主图）</h4>
+      <ul>
+        <li><strong>保留：</strong>底部导航 4 个图标 (<code>nav-ci-ke.png</code> 等) + 首页 banner 主图 (<code>banner-cats-new.jpg</code>) + 整体奶油浅色系配色</li>
+        <li><strong>优化：</strong>卡片圆角从 12px 提升到 16px，增加柔和感</li>
+        <li><strong>优化：</strong>标题字体加粗层级更分明（h1: 800, h2: 700, body: 400）</li>
+        <li><strong>优化：</strong>增加情侣元素微细节：首页问候区显示双猫互动剪影 SVG（轻量装饰，不抢主视觉）</li>
+        <li><strong>优化：</strong>按钮圆角统一为 999px（胶囊形），更现代</li>
+        <li><strong>优化：</strong>卡片阴影从 <code>0 2px 8px</code> 调整为 <code>0 4px 20px rgba(0,0,0,.06)</code>，更柔和通透</li>
+        <li><strong>新增：</strong>首页增加"我们在一起 X 天"情侣计时器（小巧、放在问候区右侧）</li>
+      </ul>
+
+      <div class="design-ref">
+        <h5>设计参考 · Hallmark 理念融入</h5>
+        <p>参考 Hallmark 的"refuses to look AI-generated"原则，避免以下 AI 生成痕迹：</p>
+        <p><span class="ref-tag">拒绝居中堆叠</span><span class="ref-tag">拒绝渐变背景一刀切</span><span class="ref-tag">拒绝 emoji 滥用</span><span class="ref-tag">拒绝等宽卡片网格</span></p>
+        <p>具体：首页布局采用不对称构图（左大右小），问候区偏左、概览环偏右，打破对称感</p>
+      </div>
+
+      <div class="design-ref">
+        <h5>设计参考 · Emil Kowalski 动画理念</h5>
+        <p>页面切换：使用 <code>ease-out</code> 而非 <code>ease-in</code>（出场快→减速停下，符合自然预期）</p>
+        <p>卡片 hover：transform <code>translateY(-2px)</code> + 阴影增强，时长 200ms</p>
+        <p>弹窗/抽屉：使用 <code>cubic-bezier(0.32,0.72,0,1)</code> 替代默认 ease</p>
+        <p>列表项删除/添加：使用 <code>max-height</code> + <code>opacity</code> 过渡，而非直接 display:none</p>
+      </div>
+
+      <div class="design-ref">
+        <h5>设计参考 · UI/UX Pro Max 理念</h5>
+        <p>信息层级：每屏只突出 1 个主要操作（F 型视觉扫描），次要操作收进抽屉/折叠</p>
+        <p>色彩约束：主色不超过 3 种，其余用中性灰；当前 4 模块色保留但降低饱和度 10%</p>
+        <p>间距系统：统一使用 4px 倍数（4/8/12/16/24/32/48），消除随意间距</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== Module 4 ========== -->
+  <div class="module" id="m4">
+    <div class="module-header">
+      <div class="module-num" style="background:linear-gradient(135deg,#7a9acc,#5a7ab8)">4</div>
+      <div class="module-title">设计精修（融入三个设计技能理念）</div>
+      <span class="module-tag priority-low">优先级: 低</span>
+    </div>
+    <div class="module-body">
+
+      <h4>整体调性</h4>
+      <p>保留布偶小猫清新奶油萌系风格，不做颠覆性改版。以下是微调项，让整体更有时尚网感、适合现代情侣使用。</p>
+
+      <h4>4.1 字体系统优化</h4>
+      <ul>
+        <li>正文：当前系统字体保留</li>
+        <li>标题/数字：引入 <code>font-weight:800</code> 层级，数字用 <code>font-variant-numeric:tabular-nums</code> 等宽对齐</li>
+        <li>金句区：英文用衬线体（<code>Georgia</code> 或 <code>"Noto Serif SC"</code>），中文用楷体感，增加文艺气质</li>
+      </ul>
+
+      <h4>4.2 色彩微调（保持配色不变，降饱和 + 提质感）</h4>
+      <div class="code-block"><span class="cmt">// CSS 变量微调建议</span>
+--bg: #faf7f2;          <span class="cmt">// 保留</span>
+--surface: #ffffff;      <span class="cmt">// 保留</span>
+--surface-card: #fffdf8; <span class="cmt">// 略微调暖</span>
+--border: #f0e6da;       <span class="cmt">// 保留</span>
+--text: #3a3027;         <span class="cmt">// 保留</span>
+--text-secondary: #8a7b6a; <span class="cmt">// 略降饱和</span>
+--text-tertiary: #b8a898;   <span class="cmt">// 略降饱和</span>
+--accent: #d97a4a;        <span class="cmt">// 保留（暖橘）</span>
+--candy: #e89ab8;         <span class="cmt">// 保留（粉）</span>
+<span class="cmt">// 新增情侣色对</span>
+--accent-pair-1: #e8a0a0; <span class="cmt">// 浅珊瑚（猫一）</span>
+--accent-pair-2: #a0c4e8; <span class="cmt">// 浅天蓝（猫二）</span></div>
+
+      <h4>4.3 动效系统（Emil Kowalski 风格）</h4>
+      <ul>
+        <li>页面切换：淡入 + <code>translateY(8px)</code> → 0，200ms <code>ease-out</code></li>
+        <li>卡片入场：<code>stagger</code> 错落，每项延迟 50ms</li>
+        <li>数字变化：滚动动画（从旧值过渡到新值），而非直接跳变</li>
+        <li>勾选任务：勾选框 200ms 弹性 + 文字删除线从左到右展开</li>
+        <li>糖币获得：+N 文字从记录位置飘起，<code>translateY(-30px)</code> + <code>opacity:1→0</code>，800ms</li>
+      </ul>
+
+      <h4>4.4 情侣元素（轻量、不破坏现有风格）</h4>
+      <ul>
+        <li>首页问候区右侧：小巧的"在一起 X 天"计时器（pills 形，<code>--accent-pair-1</code> 底色）</li>
+        <li>记账本筛选标签：管理员标签用 <code>--accent-pair-2</code>，家属标签用 <code>--accent-pair-1</code>，视觉区分清晰</li>
+        <li>抽屉底部：双猫剪影 SVG 装饰（极简线条，2 只猫面对面）</li>
+        <li>金句区保留现有猫装饰图 (<code>nav-yan-huo.png</code>)，不替换</li>
+      </ul>
+
+      <h4>4.5 不变动清单（硬约束）</h4>
+      <ul>
+        <li>底部导航 4 个图标 (<code>assets/nav-*.png</code>) — 不替换</li>
+        <li>首页 banner 主图 (<code>assets/banner-cats-new.jpg</code>) — 不替换</li>
+        <li>头像图 (<code>assets/avatar.jpg</code>) — 不替换</li>
+        <li>金句背景图 (<code>assets/quote-bg.jpg</code>) — 不替换</li>
+        <li>整体奶油浅色系配色 — 不改变</li>
+        <li>软萌文案风格 — 保留（仅品牌名替换）</li>
+      </ul>
+
+    </div>
+  </div>
+
+  <!-- ========== Checklist ========== -->
+  <div class="module" id="checklist">
+    <div class="module-header">
+      <div class="module-num" style="background:linear-gradient(135deg,#5aba7a,#3a9a5a)">✓</div>
+      <div class="module-title">部署前校验清单</div>
+      <span class="module-tag priority-high">必须全通过</span>
+    </div>
+    <div class="module-body">
+
+      <div class="checklist">
+        <h4>模块1 · 导航修复</h4>
+        <div class="checklist-item"><div class="box"></div>首页糖果小铺卡片各统计指标点击跳转到正确页面</div>
+        <div class="checklist-item"><div class="box"></div>首页今日概览环点击跳转到对应模块</div>
+        <div class="checklist-item"><div class="box"></div>今日计划卡片点击进入计划详情</div>
+        <div class="checklist-item"><div class="box"></div>全域所有 data-open/data-go 跳转目标正确</div>
+        <div class="checklist-item"><div class="box"></div>每日任务完成有过渡动画</div>
+        <div class="checklist-item"><div class="box"></div>环/卡片 hover 有视觉反馈</div>
+      </div>
+
+      <div class="checklist">
+        <h4>模块2 · 头像功能</h4>
+        <div class="checklist-item"><div class="box"></div>用户管理页面每个用户显示头像（图片或默认 emoji）</div>
+        <div class="checklist-item"><div class="box"></div>管理员可更换本组所有用户头像</div>
+        <div class="checklist-item"><div class="box"></div>家属仅可更换自己头像</div>
+        <div class="checklist-item"><div class="box"></div>头像上传后云端同步，跨设备可见</div>
+        <div class="checklist-item"><div class="box"></div>抽屉侧栏头像与用户管理头像数据一致</div>
+        <div class="checklist-item"><div class="box"></div>头像上传有压缩处理（≤200px, ≤100KB）</div>
+      </div>
+
+      <div class="checklist">
+        <h4>模块3 · 品牌重塑</h4>
+        <div class="checklist-item"><div class="box"></div>页面 title 改为"二猫"</div>
+        <div class="checklist-item"><div class="box"></div>CONFIG.owner 改为"二猫"</div>
+        <div class="checklist-item"><div class="box"></div>CONFIG.slogan 改为"两只小猫，一起把日子过成糖"</div>
+        <div class="checklist-item"><div class="box"></div>登录页文案更新</div>
+        <div class="checklist-item"><div class="box"></div>首页问候语品牌名替换</div>
+        <div class="checklist-item"><div class="box"></div>抽屉底部文案更新</div>
+        <div class="checklist-item"><div class="box"></div>底部图标和 banner 主图未变动</div>
+        <div class="checklist-item"><div class="box"></div>整体配色未变动</div>
+      </div>
+
+      <div class="checklist">
+        <h4>模块4 · 设计精修</h4>
+        <div class="checklist-item"><div class="box"></div>卡片圆角统一为 16px</div>
+        <div class="checklist-item"><div class="box"></div>按钮圆角统一为 999px（胶囊形）</div>
+        <div class="checklist-item"><div class="box"></div>卡片阴影柔和化</div>
+        <div class="checklist-item"><div class="box"></div>页面切换有淡入动效</div>
+        <div class="checklist-item"><div class="box"></div>数字变化有过渡动画</div>
+        <div class="checklist-item"><div class="box"></div>首页有"在一起 X 天"情侣计时器</div>
+        <div class="checklist-item"><div class="box"></div>筛选标签管理员/家属颜色区分</div>
+        <div class="checklist-item"><div class="box"></div>软萌文案风格保留</div>
+      </div>
+
+      <div class="checklist">
+        <h4>回归测试</h4>
+        <div class="checklist-item"><div class="box"></div>存量管理员 12 条记账 + 8 任务 + 4 灵感完整</div>
+        <div class="checklist-item"><div class="box"></div>家属 2 条合并数据完整，可筛选"家属创建"</div>
+        <div class="checklist-item"><div class="box"></div>糖币分组归属不变（g1 = 140 糖币）</div>
+        <div class="checklist-item"><div class="box"></div>家属可产出糖币、不可兑换</div>
+        <div class="checklist-item"><div class="box"></div>4 模块筛选标签功能正常</div>
+        <div class="checklist-item"><div class="box"></div>记账本切换筛选统计动态更新</div>
+        <div class="checklist-item"><div class="box"></div>同组双向同步正常</div>
+        <div class="checklist-item"><div class="box"></div>跨组数据隔离</div>
+        <div class="checklist-item"><div class="box"></div>家属审批流程正常</div>
+        <div class="checklist-item"><div class="box"></div>账户上限 4、删除二次确认</div>
+        <div class="checklist-item"><div class="box"></div>刷新维持登录状态</div>
+        <div class="checklist-item"><div class="box"></div>手机端响应式正常显示</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    二猫 · 情侣共同记账与时间规划工作台<br>
+    基于现有仓库迭代 · 不新建项目 · 不覆盖存量数据
+  </div>
+
+</div>
+</body>
+</html>
