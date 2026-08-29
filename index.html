@@ -167,6 +167,7 @@
     display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .greet > div:first-child { flex: 1; min-width: 0; }
   .greet-cat { position: relative; z-index: 1; color: var(--accent); opacity: .65; flex: 0 0 auto; }
+  .greet-cat-img { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; object-fit: contain; pointer-events: none; z-index: 1; }
   .greet::before { content:""; position:absolute; inset:0; pointer-events:none;
     background: linear-gradient(100deg, var(--surface-nested) 30%, color-mix(in srgb, var(--surface-nested) 70%, transparent) 48%, transparent 70%); }
   .greet > * { position: relative; z-index: 1; }
@@ -2394,7 +2395,7 @@ function renderModule(key){
     const inc=it.filter(x=>x.type==="income").reduce((s,x)=>s+ +x.amount,0);
     const exp=it.filter(x=>x.type==="expense").reduce((s,x)=>s+ +x.amount,0);
     head=`<div class="mod-summary">
-      <img class="hero-cat-img" src="assets/stickers/cat-wave.png" alt="">
+      <img class="hero-cat-img" src="assets/stickers/cat-piggy.png" alt="">
       <div class="mini"><div class="l">预算</div><div class="v" style="color:var(--module-1)">¥${inc.toFixed(2)}</div></div>
       <div class="mini"><div class="l">支出</div><div class="v" style="color:var(--danger)">¥${exp.toFixed(2)}</div></div>
       <div class="mini"><div class="l">结余</div><div class="v">¥${(inc-exp).toFixed(2)}</div></div></div>`;
@@ -2450,7 +2451,12 @@ function renderModule(key){
     <button class="filter-tab ${_moduleFilter==='family'?'on':''}" data-filter="family">家属</button>
   </div>` : '';
 
-  $("#screen").innerHTML = `<div class="greet"><div><h1>${m.name}</h1><p>${m.desc}</p></div>
+  const greetCatMap = {
+    money: "cat-piggy.png", todo: "cat-pencil.png", note: "cat-book.png",
+    checkin: "cat-stars.png", goal: "cat-dream.png", progress: "cat-study.png", users: "cat-flag.png"
+  };
+  const greetCat = greetCatMap[key] ? `<img class="greet-cat-img" src="assets/stickers/${greetCatMap[key]}" alt="">` : "";
+  $("#screen").innerHTML = `<div class="greet"><div><h1>${m.name}</h1><p>${m.desc}</p></div>${greetCat}
       ${auth.canEdit(key) ? `<button class="add" id="btn-add">${icon("plus",16,2.2)}新建</button>` : ''}</div>
     <div style="margin-top:16px">${head}${extra}
       ${filterBar}
