@@ -1241,18 +1241,128 @@
   .jn-qbtn .jn-qicon img { width:100%; height:100%; object-fit:contain; }
   .jn-qbtn .jn-qtxt { font-size:10px; color:var(--text-secondary); font-weight:500; letter-spacing:.3px; }
 
-  /* 糖果小铺手账卡 — 低饱和背景 + 细边 + 猫咪放大 + 贴纸装饰 */
-  .jn-candy { position:relative; margin:0 2px; padding:18px; background:var(--candy-muted);
-    border:1px solid var(--border-soft); border-radius:12px; cursor:pointer; overflow:hidden; }
+  /* 糖果小铺手账卡 — 纸胶带 + 贴纸装饰 + 游戏化交互 */
+  .jn-candy { position:relative; margin:0 2px; padding:18px;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.5) 0%, transparent 40%),
+      linear-gradient(135deg, #faf2e3 0%, var(--candy-muted) 60%, #f5e7d0 100%);
+    border:1px solid #e8d5b0; border-radius:14px; cursor:pointer; overflow:hidden;
+    transition: all .35s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 2px 8px rgba(212,165,116,.08), inset 0 1px 0 rgba(255,255,255,.6);
+  }
+  .jn-candy:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(212,165,116,.18), 0 2px 6px rgba(212,165,116,.1),
+      inset 0 1px 0 rgba(255,255,255,.8);
+    border-color: #e0c896;
+  }
+  .jn-candy:hover .jn-candy-cat { transform: scale(1.05) translateY(-4px); }
+  .jn-candy:hover .jn-candy-num { text-shadow: 0 0 12px rgba(212,160,92,.3); }
+  .jn-candy:hover .candy-washi-tape { transform: rotate(-14deg) scale(1.05); }
+  .jn-candy:active { transform: translateY(-1px) scale(.99); transition-duration: .1s; }
+
+  /* 纸胶带装饰 — 左上角 */
+  .jn-candy .candy-washi-tape {
+    position:absolute; left:-12px; top:-6px; width:70px; height:24px; z-index:2;
+    background: linear-gradient(90deg, rgba(212,160,92,.7) 0%, rgba(232,200,154,.85) 50%, rgba(212,160,92,.7) 100%);
+    border-left: 2px dashed rgba(255,255,255,.4);
+    border-right: 2px dashed rgba(255,255,255,.4);
+    transform: rotate(-12deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,.06);
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .jn-candy .candy-washi-tape::before {
+    content: ""; position:absolute; inset:0;
+    background: repeating-linear-gradient(90deg, transparent 0px, transparent 8px,
+      rgba(255,255,255,.25) 8px, rgba(255,255,255,.25) 10px);
+  }
+
+  /* 小贴纸装饰 */
+  .jn-candy .candy-sticker-star {
+    position:absolute; right:18px; top:14px; width:26px; height:26px; z-index:2;
+    opacity:.85; transform: rotate(8deg);
+    animation: twinkle 2.5s ease-in-out infinite;
+    mix-blend-mode: multiply;
+  }
+  .jn-candy .candy-sticker-heart {
+    position:absolute; left:20px; bottom:12px; width:20px; height:20px; z-index:2;
+    opacity:.7; transform: rotate(-10deg);
+    animation: floatHeart 3s ease-in-out infinite;
+    mix-blend-mode: multiply;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity:.85; transform: rotate(8deg) scale(1); }
+    50% { opacity:1; transform: rotate(12deg) scale(1.1); }
+  }
+  @keyframes floatHeart {
+    0%, 100% { transform: rotate(-10deg) translateY(0); }
+    50% { transform: rotate(-6deg) translateY(-3px); }
+  }
+
   .jn-candy .jn-candy-cat { position:absolute; right:-8px; bottom:-18px; width:170px; height:170px; object-fit:contain; opacity:.92;
-    filter: drop-shadow(0 3px 8px rgba(212,165,116,.15)); }
-  .jn-candy .jn-candy-title { font-family:var(--font-journal); font-size:12px; color:var(--candy); font-weight:600; margin-bottom:3px; letter-spacing:1px; }
-  .jn-candy .jn-candy-level { font-size:10px; color:var(--text-secondary); margin-bottom:10px; letter-spacing:.5px; }
-  .jn-candy .jn-candy-num { font-size:28px; font-weight:700; color:var(--candy); font-family:var(--font-journal); letter-spacing:.5px; }
-  .jn-candy .jn-candy-num span { font-size:11px; font-weight:500; color:var(--text-secondary); margin-left:4px; }
-  .jn-candy .jn-candy-stats { display:flex; gap:16px; margin-top:14px; }
-  .jn-candy .jn-cs { font-size:9px; color:var(--text-secondary); letter-spacing:.5px; }
-  .jn-candy .jn-cs b { display:block; font-size:12px; color:var(--text); font-weight:600; margin-bottom:1px; }
+    filter: drop-shadow(0 4px 12px rgba(212,165,116,.2));
+    transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
+  .jn-candy .jn-candy-title {
+    font-family:var(--font-journal); font-size:13px; color:var(--candy); font-weight:700;
+    margin-bottom:4px; letter-spacing:1.5px;
+    position:relative; z-index:3;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  }
+  .jn-candy .jn-candy-level {
+    font-size:10px; color:var(--text-secondary); margin-bottom:10px; letter-spacing:.5px;
+    position:relative; z-index:3;
+    display:inline-flex; align-items:center; gap:5px;
+    padding: 2px 8px; background: rgba(255,255,255,.5);
+    border-radius: 999px; border: 1px solid rgba(212,160,92,.2);
+  }
+  .jn-candy .jn-candy-level::before {
+    content: ""; width:5px; height:5px; border-radius:50%;
+    background: var(--candy); box-shadow: 0 0 4px rgba(212,160,92,.5);
+  }
+  .jn-candy .jn-candy-num {
+    font-size:28px; font-weight:700; color:var(--candy); font-family:var(--font-journal);
+    letter-spacing:.5px; position:relative; z-index:3;
+    transition: text-shadow .3s ease;
+    line-height: 1.1;
+  }
+  .jn-candy .jn-candy-num span {
+    font-size:11px; font-weight:500; color:var(--text-secondary); margin-left:4px; }
+  .jn-candy .jn-candy-stats {
+    display:flex; gap:14px; margin-top:14px; position:relative; z-index:3; }
+  .jn-candy .jn-cs {
+    font-size:9px; color:var(--text-secondary); letter-spacing:.5px;
+    padding: 6px 8px; background: rgba(255,255,255,.45);
+    border-radius: 8px; border: 1px solid rgba(212,160,92,.15);
+    backdrop-filter: blur(2px);
+    min-width: 48px; text-align: center;
+    transition: all .25s ease;
+  }
+  .jn-candy .jn-cs:hover {
+    background: rgba(255,255,255,.7);
+    border-color: rgba(212,160,92,.3);
+    transform: translateY(-1px);
+  }
+  .jn-candy .jn-cs b {
+    display:block; font-size:12px; color:var(--candy); font-weight:700; margin-bottom:2px;
+    font-family: var(--font-journal);
+  }
+
+  /* 进入箭头提示 — 手账风 */
+  .jn-candy .candy-enter-hint {
+    position:absolute; right:16px; top:50%; transform: translateY(-50%);
+    z-index: 3; opacity: 0; transition: all .3s ease;
+    display:flex; align-items:center; gap:4px;
+    font-size:10px; color:var(--candy); font-weight:600; letter-spacing:.5px;
+  }
+  .jn-candy .candy-enter-hint img { width:16px; height:16px; object-fit:contain;
+    animation: slideRight 1.2s ease-in-out infinite;
+    mix-blend-mode: multiply;
+  }
+  .jn-candy:hover .candy-enter-hint { opacity: 1; right: 24px; }
+  @keyframes slideRight {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+  }
   .jn-sec .candy-decor-btn { padding:4px 12px 4px 8px; border-radius:999px; border:none;
     background:linear-gradient(135deg, var(--candy), var(--candy-light)); color:#fff; font-size:10px; font-weight:700;
     letter-spacing:.5px; cursor:pointer; box-shadow:0 2px 6px rgba(212,160,92,.3);
@@ -1405,6 +1515,9 @@
       <button class="candy-decor-btn" data-decor=""><img src="assets/stickers/candy.png" alt="">装扮贴纸</button>
     </div>
     <div class="jn-candy" data-open="game">
+      <div class="candy-washi-tape"></div>
+      <img class="candy-sticker-star" src="assets/stickers/star-sparkle.png" alt="">
+      <img class="candy-sticker-heart" src="assets/stickers/heart-soft.png" alt="">
       <img class="jn-candy-cat" src="assets/stickers/cat-piggy.png" alt="">
       <img class="placed-sticker" src="assets/stickers/shop-bow.png" alt="" style="left:80.88117340912831%;top:68.44315139878675%;transform:rotate(5.151189593592722deg)" data-sticker-idx="0" draggable="true">
       <div class="jn-candy-title">小猫糖罐</div>
@@ -1415,6 +1528,7 @@
         <div class="jn-cs"><b>3/4</b>今日任务</div>
         <div class="jn-cs"><b>1</b>藏品图鉴</div>
       </div>
+      <div class="candy-enter-hint"><span>进入</span><img src="assets/stickers/candy.png" alt=""></div>
     </div>
 
     <!-- 今日计划 -->
@@ -2156,6 +2270,9 @@ function renderHome(){
       <button class="candy-decor-btn" data-decor><img src="assets/stickers/candy.png" alt="">装扮贴纸</button>
     </div>
     <div class="jn-candy" data-open="game">
+      <div class="candy-washi-tape"></div>
+      <img class="candy-sticker-star" src="assets/stickers/star-sparkle.png" alt="">
+      <img class="candy-sticker-heart" src="assets/stickers/heart-soft.png" alt="">
       <img class="jn-candy-cat" src="assets/stickers/cat-piggy.png" alt="">
       ${renderPlacedStickers("candy")}
       <div class="jn-candy-title">小猫糖罐</div>
@@ -2166,6 +2283,7 @@ function renderHome(){
         <div class="jn-cs"><b>${doneTasks}/${todayTodos.length}</b>今日任务</div>
         <div class="jn-cs"><b>${collectCount}</b>藏品图鉴</div>
       </div>
+      <div class="candy-enter-hint"><span>进入</span><img src="assets/stickers/candy.png" alt=""></div>
     </div>
 
     <!-- 今日计划 -->
