@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数据恢复诊断工具</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f9f7f3; color: #333; }
+  h1 { color: #c95a5a; }
+  .card { background: #fff; border: 1px solid #e5e0d8; border-radius: 12px; padding: 16px; margin: 12px 0; }
+  .key-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0ebe3; }
+  .key-name { font-weight: 600; font-size: 13px; }
+  .key-status { font-size: 12px; padding: 3px 10px; border-radius: 999px; }
+  .status-found { background: #d5eede; color: #247a50; }
+  .status-empty { background: #f5f0e0; color: #a07a2a; }
+  .status-error { background: #f8eae8; color: #d4574a; }
+  .data-preview { background: #f9f7f3; border-radius: 8px; padding: 10px; font-size: 12px; margin: 8px 0; max-height: 200px; overflow-y: auto; }
+  .data-preview code { white-space: pre-wrap; word-break: break-all; }
+  button { background: #c95a5a; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; cursor: pointer; margin: 4px 0; }
+  button:hover { opacity: 0.85; }
+  button.green { background: #247a50; }
+  button.gray { background: #888; }
+  .log { background: #222; color: #0f0; font-family: monospace; padding: 10px; border-radius: 8px; font-size: 12px; max-height: 300px; overflow-y: auto; }
+  .stat { display: inline-block; margin-right: 16px; font-size: 13px; }
+  .stat b { color: #c95a5a; }
+</style>
+</head>
+<body>
+<h1>🐱 数据恢复诊断工具</h1>
+<p>扫描云端所有存储 key，找到历史数据并恢复。</p>
+
+<button onclick="scanAll()">🔍 开始扫描云端数据</button>
+<div id="scanResult"></div>
+
+<div id="recoverSection" style="display:none">
+  <h2>恢复操作</h2>
+  <div class="card">
+    <p>找到数据在 <code id="sourceKey"></code> key 下。</p>
+    <p>将迁移到：<code id="targetKeys"></code></p>
+    <button class="green" onclick="recoverData()">✅ 确认恢复数据</button>
+  </div>
+</div>
+
+<div id="logSection" style="display:none">
+  <h2>执行日志</h2>
+  <div class="log" id="logBox"></div>
+</div>
+
+<script>
+const SB_URL = "https://ksljnxlgoajbhxshqvaf.supabase.co";
+const SB_KEY = "sb_publishable_BxKV01FyPcYliI3jwSedqg_ukfbMhgk";
+let sb = null;
+let foundData = null;
+let foundKey = null;
+
+function log(msg) {
+  const box = document.getElementById("logBox");
+  box.innerHTML += msg + "\n";
+  box.scrollTop = box.scrollHeight;
+}
+
+function initSB() {
+  if(!sb && window.supabase) {
+    sb = supabase.createClient(SB_URL, SB_KEY);
+  }
+  return !!sb;
+}
+
+async function loadByKey(key) {
+  if(!initSB()) return null;
+  try {
+    const { data, error } = await sb
+      .from("workbench_data")
+      .select("id, data, storage_key, updated_at, device_id")
+      .eq("storage_key", key)
+      .order("updated_at", { ascending: false })
+      .limit(1);
+    if(error) return { error };
+    if(data && data.length > 0) return data[0];
+    return null;
+  } catch(e) {
+    return { error: e.message };
+  }
+}
+
+async function scanAll() {
+  const result = document.getElementById("scanResult");
+  result.innerHTML = "<p>扫描中...</p>";
+  
+  // 所有可能的 key
+  const keys = [
+    "cat-time-bureau-v1",           // 原始全局 key
+    "cat-time-bureau-v1-u1",        // 管理员 per-user key
+    "cat-time-bureau-v1-u2",        // 家属 per-user key
+    "cat-time-bureau-v1-g1",         // 分组1 业务 key
+    "cat-time-bureau-v1-default",   // 默认分组 key
+  ];
+  
+  let html = "";
+  let found = null;
+  let foundK = null;
+  
+  for(const key of keys) {
+    const row = await loadByKey(key);
+    if(row && row.data) {
+      const d = row.data;
+      const moneyCount = (d.money || []).length;
+      const todoCount = (d.todo || []).length;
+      const noteCount = (d.note || []).length;
+      const checkinCount = (d.checkin || []).length;
+      const progressCount = (d.progress || []).length;
+      const hasReal = moneyCount > 0 || todoCount > 0 || noteCount > 0;
+      const candyLog = d.__candyLog ? d.__candyLog.length : 0;
+      
+      html += `<div class="key-row">
+        <span class="key-name">${key}</span>
+        <span class="key-status ${hasReal ? 'status-found' : 'status-empty'}">${hasReal ? '有数据' : '空/种子'}</span>
+      </div>`;
+      
+      if(hasReal) {
+        html += `<div class="data-preview">
+          <code>记账: ${moneyCount} 条 | 任务: ${todoCount} 条 | 灵感: ${noteCount} 条 | 打卡: ${checkinCount} 条 | 目标: ${progressCount} 条
+糖币流水: ${candyLog} 条
+更新时间: ${row.updated_at}</code>
+        </div>`;
+        
+        if(!found) {
+          found = row;
+          foundK = key;
+        }
+      }
+    } else if(row && row.error) {
+      html += `<div class="key-row">
+        <span class="key-name">${key}</span>
+        <span class="key-status status-error">错误</span>
+      </div>`;
+    } else {
+      html += `<div class="key-row">
+        <span class="key-name">${key}</span>
+        <span class="key-status status-empty">无数据</span>
+      </div>`;
+    }
+  }
+  
+  result.innerHTML = `<div class="card">${html}</div>`;
+  
+  if(found) {
+    foundData = found;
+    foundKey = foundK;
+    document.getElementById("sourceKey").textContent = foundKey;
+    document.getElementById("targetKeys").textContent = "cat-time-bureau-v1-g1 (业务) + cat-time-bureau-v1-u1 (游戏)";
+    document.getElementById("recoverSection").style.display = "";
+    document.getElementById("logSection").style.display = "";
+    log("✅ 找到数据在 key: " + foundKey);
+    log("   记账 " + (found.data.money||[]).length + " 条, 任务 " + (found.data.todo||[]).length + " 条, 灵感 " + (found.data.note||[]).length + " 条");
+  } else {
+    result.innerHTML += `<div class="card"><p style="color:#c95a5a">❌ 云端没有找到任何历史数据。</p>
+    <p>可能数据在浏览器本地 localStorage 中。请打开工作台，在浏览器控制台运行：</p>
+    <pre>Object.keys(localStorage).filter(k=>k.includes('cat-time'))</pre>
+    <p>查看有哪些本地 key。</p></div>`;
+  }
+}
+
+async function recoverData() {
+  if(!foundData || !foundData.data) {
+    log("❌ 没有可恢复的数据");
+    return;
+  }
+  
+  if(!initSB()) {
+    log("❌ Supabase 初始化失败");
+    return;
+  }
+  
+  const d = foundData.data;
+  const now = new Date().toISOString();
+  const deviceId = "recovery-" + Date.now();
+  
+  // 1. 拆分业务和游戏数据
+  const bizKeys = ["money", "todo", "note", "checkin", "progress"];
+  const biz = {};
+  bizKeys.forEach(k => { biz[k] = d[k] || []; });
+  
+  const game = {};
+  for(const k in d) {
+    if(k.startsWith("__")) game[k] = d[k];
+  }
+  
+  // 2. 保存业务数据到分组 key
+  log("📦 保存业务数据到 cat-time-bureau-v1-g1...");
+  try {
+    const { error: bizErr } = await sb.from("workbench_data").upsert({
+      storage_key: "cat-time-bureau-v1-g1",
+      data: biz,
+      device_id: deviceId,
+      updated_at: now
+    }, { onConflict: "storage_key" });
+    if(bizErr) throw bizErr;
+    log("✅ 业务数据保存成功: 记账 " + (biz.money||[]).length + " 条, 任务 " + (biz.todo||[]).length + " 条");
+  } catch(e) {
+    log("❌ 业务数据保存失败: " + e.message);
+    return;
+  }
+  
+  // 3. 保存游戏数据到个人 key
+  log("📦 保存游戏数据到 cat-time-bureau-v1-u1...");
+  try {
+    const { error: gameErr } = await sb.from("workbench_data").upsert({
+      storage_key: "cat-time-bureau-v1-u1",
+      data: game,
+      device_id: deviceId,
+      updated_at: now
+    }, { onConflict: "storage_key" });
+    if(gameErr) throw gameErr;
+    log("✅ 游戏数据保存成功");
+  } catch(e) {
+    log("❌ 游戏数据保存失败: " + e.message);
+    return;
+  }
+  
+  // 4. 同时保存到本地 localStorage
+  localStorage.setItem("cat-time-bureau-v1-g1", JSON.stringify(biz));
+  localStorage.setItem("cat-time-bureau-v1-u1", JSON.stringify(game));
+  log("✅ 本地 localStorage 也已更新");
+  
+  log("\n🎉 数据恢复完成！请刷新工作台页面。");
+}
+
+// 自动开始扫描
+window.addEventListener("load", () => {
+  setTimeout(scanAll, 500);
+});
+</script>
+</body>
+</html>

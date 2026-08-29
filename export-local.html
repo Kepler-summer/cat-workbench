@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>导出本地数据（抢救用）</title>
+<style>
+  :root{--bg:#eceef2;--card:#fafbfc;--border:#dfe3e8;--text:#1a1d23;--text2:#555b66;
+        --accent:#2d7a5e;--warn:#c08a3e;--warnbg:#f9f0dd;--danger:#c05a4e;--dangerbg:#f7e6e3;--ok:#2d7a5e;--okbg:#d5ebe0;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+       background:var(--bg);color:var(--text);padding:24px;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px;margin-bottom:16px}
+  h1{font-size:19px;margin-bottom:6px}
+  .sub{font-size:13px;color:var(--text2);margin-bottom:18px}
+  .notice{background:var(--dangerbg);border:1px solid #eccec8;color:#8a3a30;
+          border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:18px}
+  .notice b{display:block;margin-bottom:4px}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:12px;
+       padding:11px 13px;background:#f0f2f5;border:1px solid var(--border);
+       border-radius:10px;margin-bottom:8px;font-size:13.5px}
+  .row .k{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;word-break:break-all}
+  .badge{padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap}
+  .b-ok{background:var(--okbg);color:var(--ok)}
+  .b-warn{background:var(--warnbg);color:var(--warn)}
+  button{width:100%;padding:13px;font-size:15px;font-weight:600;font-family:inherit;
+         border:none;border-radius:12px;cursor:pointer;background:var(--accent);color:#fff;margin-top:8px}
+  button:hover{background:#24634c}
+  button.sec{background:#f0f2f5;color:var(--text);margin-top:8px}
+  pre{background:#f0f2f5;border:1px solid var(--border);border-radius:10px;padding:12px;
+      font-size:11.5px;overflow:auto;max-height:260px;margin-top:10px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>🆘 导出本地数据</h1>
+    <div class="sub">用于抢救尚未同步到云端的近期记录</div>
+    <div class="notice">
+      <b>⚠️ 重要</b>
+      本页<b>只读</b>，不会修改、不会同步、不会删除任何数据。<br>
+      但请注意：<b>打开 index.html 会触发云端覆盖本地</b>，所以抢救期间请先不要打开工作台页面。
+    </div>
+    <div id="list">正在扫描 localStorage…</div>
+    <button id="dl">⬇️ 下载全部本地数据（JSON）</button>
+    <button id="cp" class="sec">📋 复制到剪贴板</button>
+    <pre id="preview" style="display:none"></pre>
+  </div>
+</div>
+
+<script>
+const PREFIX = 'cat-time-bureau';
+const out = [];
+let payload = null;
+
+function analyze(obj){
+  let real = 0, demo = 0, candy = 0;
+  for(const mod of ['money','todo','note','checkin','goal']){
+    for(const it of (obj[mod] || [])){
+      if(typeof it === 'object' && it && typeof it.id === 'number' && it.id > 1000000000) real++;
+      else demo++;
+    }
+  }
+  candy = (obj.__candyLog || []).length;
+  return {real, demo, candy};
+}
+
+function scan(){
+  const box = document.getElementById('list');
+  const rows = [];
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!k.startsWith(PREFIX)) continue;
+    let obj = null, size = 0;
+    const raw = localStorage.getItem(k) || '';
+    size = raw.length;
+    try { obj = JSON.parse(raw); } catch(e){}
+    const a = obj ? analyze(obj) : null;
+    out.push({key:k, size, data:obj});
+    rows.push({k, size, a});
+  }
+  if(!rows.length){
+    box.innerHTML = '<div class="row"><span>未找到任何工作台本地数据</span></div>';
+    return;
+  }
+  box.innerHTML = rows.map(r => {
+    const badge = r.a
+      ? (r.a.real > 0
+          ? `<span class="badge b-ok">真实 ${r.a.real} 条</span>`
+          : `<span class="badge b-warn">仅演示 ${r.a.demo} 条</span>`)
+      : '<span class="badge b-warn">无法解析</span>';
+    return `<div class="row">
+      <span class="k">${r.k}</span>
+      <span>${(r.size/1024).toFixed(1)} KB ${badge}</span>
+    </div>`;
+  }).join('');
+}
+
+function build(){
+  payload = {
+    exportedAt: new Date().toISOString(),
+    origin: location.origin,
+    items: out
+  };
+  return JSON.stringify(payload, null, 2);
+}
+
+document.getElementById('dl').onclick = () => {
+  const text = build();
+  const blob = new Blob([text], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cat-local-backup-' + Date.now() + '.json';
+  a.click();
+};
+
+document.getElementById('cp').onclick = async () => {
+  const text = build();
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('已复制到剪贴板，粘贴给助手即可');
+  } catch(e){
+    const p = document.getElementById('preview');
+    p.style.display = 'block';
+    p.textContent = text.slice(0, 20000);
+    alert('自动复制失败，已在下方显示，请手动复制');
+  }
+};
+
+scan();
+</script>
+</body>
+</html>
