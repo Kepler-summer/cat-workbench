@@ -1307,122 +1307,106 @@
 <div class="app">
   <div class="topbar">
     <button class="menu-btn" id="btn-menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg></button>
-    <div class="title" id="topTitle">二猫<small id="topSub">两只小猫，一起把日子过成糖</small></div>
+    <div class="title" id="topTitle">记账本<small id="topSub">收支流水 · 分类占比 · 月度小结</small></div>
     <span class="date-chip" id="dateChip"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2.5"></rect><path d="M4 9.5h16"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg> 8/29 周六</span>
   </div>
-  <div id="screen" style="opacity: 1; transform: translateY(0px);">
-    <!-- 顶部标题栏 -->
-    <div class="jn-top">
-      <div class="jn-date">8月29日<small>周六 · 今天也要开心</small></div>
-      <div class="jn-logo"><img src="assets/nav-ci-ke.png" alt="">二猫</div>
-    </div>
-
-    <!-- Hero 问候卡 + 猫咪贴纸 -->
-    <div class="jn-hero">
-      <img class="jn-hero-cat" src="assets/stickers/cat-wave.png" alt="">
-      <div class="jn-hello">下午好呀</div>
-      <div class="jn-hello-sub">下午茶时间，伸个懒腰</div>
-      <div class="jn-together js-together" title="点击设置在一起的日子">
-        在一起 116 天
-      </div>
-    </div>
-
-    <!-- 小猫一言（Hero 后第一位） -->
-    <div class="jn-sec">
-      <div class="jn-label"><span class="jn-dot"></span>小猫一言</div>
-      <div class="jn-line"></div>
-    </div>
-    <div class="jn-quote">
-      <img class="jn-quote-sticker" src="assets/stickers/star-pillow.png" alt="">
-      <img class="jn-quote-heart" src="assets/stickers/heart-soft.png" alt="">
-      
-      <div class="jn-quote-tag">今日份的猫粮</div>
-      <div class="jn-q-cn">十年生死两茫茫，不思量，自难忘。<em>江城子·乙卯正月二十日夜记梦</em></div>
-      <div class="jn-q-en">Life isn't about finding yourself, it's about creating yourself.<em>Daily Quote</em></div>
-    </div>
-
-    <!-- 快速记录 -->
-    <div class="jn-sec">
-      <div class="jn-label"><span class="jn-dot"></span>快速记录</div>
-      <div class="jn-line"></div>
-    </div>
-    <div class="jn-quick-wrap">
-      <img class="jn-quick-cat" src="assets/stickers/cat-letter.png" alt="">
-      <div class="jn-quick">
-    <div class="jn-qbtn" data-quick="money">
-      <div class="jn-qicon money"><img src="assets/stickers/qr-money.png" alt=""></div>
-      <div class="jn-qtxt">记一笔</div>
-    </div>
-    <div class="jn-qbtn" data-quick="todo">
-      <div class="jn-qicon todo"><img src="assets/stickers/qr-todo.png" alt=""></div>
-      <div class="jn-qtxt">记计划</div>
-    </div>
-    <div class="jn-qbtn" data-quick="checkin">
-      <div class="jn-qicon habit"><img src="assets/stickers/qr-checkin.png" alt=""></div>
-      <div class="jn-qtxt">打打卡</div>
-    </div>
-    <div class="jn-qbtn" data-quick="note">
-      <div class="jn-qicon note"><img src="assets/stickers/qr-note.png" alt=""></div>
-      <div class="jn-qtxt">记想法</div>
-    </div></div>
-    </div>
-
-    <!-- 糖果小铺 -->
-    <div class="jn-sec">
-      <div class="jn-label"><span class="jn-dot"></span>糖果小铺</div>
-      <div class="jn-line"></div>
-      <div class="jn-more" data-open="game">进入 →</div>
-    </div>
-    <div class="jn-candy" data-open="game">
-      <img class="jn-candy-cat" src="assets/stickers/cat-piggy.png" alt="">
-      
-      <div class="jn-candy-title">小猫糖罐</div>
-      <div class="jn-candy-level">Lv.5 成年猫</div>
-      <div class="jn-candy-num" id="homeCandyNum">245<span>糖币</span></div>
-      <div class="jn-candy-stats">
-        <div class="jn-cs"><b>+75</b>今日获得</div>
-        <div class="jn-cs"><b>1/4</b>今日任务</div>
-        <div class="jn-cs"><b>1</b>藏品图鉴</div>
-      </div>
-    </div>
-
-    <!-- 今日计划 -->
-    <div class="jn-sec">
-      <div class="jn-label"><span class="jn-dot"></span>今日计划</div>
-      <div class="jn-line"></div>
-      <div class="jn-more" data-open="todo">全部 →</div>
-    </div>
-    <div class="jn-todos-wrap">
-      <img class="jn-todos-cat" src="assets/stickers/cat-dream.png" alt="">
-      <div class="jn-todos"><div class="jn-todo " data-id="1787967910998">
-      <div class="jn-chk js-jn-chk " data-id="1787967910998"></div>
-      <div class="jn-tt">单词</div>
-      
-      
-    </div><div class="jn-todo " data-id="1787967902671">
-      <div class="jn-chk js-jn-chk " data-id="1787967902671"></div>
-      <div class="jn-tt">英语作业</div>
-      
-      
-    </div><div class="jn-todo " data-id="1787967884473">
-      <div class="jn-chk js-jn-chk " data-id="1787967884473"></div>
-      <div class="jn-tt">补逻辑</div>
-      
-      
-    </div><div class="jn-todo done" data-id="1787967870535">
-      <div class="jn-chk js-jn-chk on" data-id="1787967870535"></div>
-      <div class="jn-tt">远家！</div>
-      
-      
-    </div></div>
-      
-    </div></div>
+  <div id="screen" style="opacity: 1; transform: translateY(0px);"><div class="greet"><div><h1>记账本</h1><p>收支流水 · 分类占比 · 月度小结</p></div>
+      <button class="add" id="btn-add"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>新建</button></div>
+    <div style="margin-top:16px"><div class="mod-summary">
+      <img class="hero-cat-img" src="assets/stickers/cat-piggy.png" alt="">
+      <div class="mini"><div class="l">预算</div><div class="v" style="color:var(--module-1)">¥6000.00</div></div>
+      <div class="mini"><div class="l">支出</div><div class="v" style="color:var(--danger)">¥1471.63</div></div>
+      <div class="mini"><div class="l">结余</div><div class="v">¥4528.37</div></div></div>
+      <div class="filter-bar" data-module="money">
+    <button class="filter-tab on" data-filter="all">全部</button>
+    <button class="filter-tab " data-filter="admin">管理员</button>
+    <button class="filter-tab " data-filter="family">家属</button>
+  </div>
+      <div class="sec-title">记录</div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787977929839" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787977929839" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787977929839">
+      <div class="rname">披萨</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">餐饮</span><span style="color:var(--text-secondary);font-size:12px">2026-08-29</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥65.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787967834961" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787967834961" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787967834961">
+      <div class="rname">抹茶拿铁</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">饮品</span><span style="color:var(--text-secondary);font-size:12px">2026-08-29</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥44.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787930485664" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787930485664" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787930485664">
+      <div class="rname">机票燃油</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">交通</span><span style="color:var(--text-secondary);font-size:12px">2026-08-28</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥120.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787928909222" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787928909222" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787928909222">
+      <div class="rname">机票燃油费</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">交通</span><span style="color:var(--text-secondary);font-size:12px">2026-08-28</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥120.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787919783809" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787919783809" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787919783809">
+      <div class="rname">奶茶</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">饮品</span><span style="color:var(--text-secondary);font-size:12px">2026-08-28</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥22.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787914938487" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787914938487" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787914938487">
+      <div class="rname">充电宝（环球的太贵了！)</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">其他</span><span style="color:var(--text-secondary);font-size:12px">2026-08-28</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥15.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787907348928" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787907348928" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787907348928">
+      <div class="rname">理疗地铁来回</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">交通</span><span style="color:var(--text-secondary);font-size:12px">2026-08-28</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥10.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787907329773" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787907329773" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787907329773">
+      <div class="rname">电影活动打车</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">交通</span><span style="color:var(--text-secondary);font-size:12px">2026-08-28</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥10.50</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787889941048" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787889941048" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787889941048">
+      <div class="rname">Wages 午饭</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">餐饮</span><span style="color:var(--text-secondary);font-size:12px">2026-08-28</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥37.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787798528206" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787798528206" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787798528206">
+      <div class="rname">抹茶拿铁</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">饮品</span><span style="color:var(--text-secondary);font-size:12px">2026-08-27</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥9.90</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787745011669" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787745011669" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787745011669">
+      <div class="rname">日抛👀</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">购物</span><span style="color:var(--text-secondary);font-size:12px">2026-08-26</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥60.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787743615991" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787743615991" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787743615991">
+      <div class="rname">看手臂地铁</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">交通</span><span style="color:var(--text-secondary);font-size:12px">2026-08-26</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥10.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787712319894" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787712319894" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787712319894">
+      <div class="rname">看手臂（地铁+挂号+🚴🏻）</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">交通</span><span style="color:var(--text-secondary);font-size:12px">2026-08-25</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥26.00</div></div></div><div class="rec rec-layout-default" data-create-role="family"><div class="acts"><button class="pin-btn js-pin " data-id="1787671973021" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787671973021" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787671973021">
+      <div class="rname">午餐</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">餐饮</span><span style="color:var(--text-secondary);font-size:12px">2026-08-25</span><span class="badge family-badge">家属操作</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥8.00</div></div></div><div class="rec rec-layout-default" data-create-role="family"><div class="acts"><button class="pin-btn js-pin " data-id="1787671916452" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787671916452" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787671916452">
+      <div class="rname">晚餐</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">餐饮</span><span style="color:var(--text-secondary);font-size:12px">2026-08-25</span><span class="badge family-badge">家属操作</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥5.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787538103725" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787538103725" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787538103725">
+      <div class="rname">2杯瑞幸+小猫周边+早饭</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">餐饮</span><span style="color:var(--text-secondary);font-size:12px">2026-08-24</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥39.70</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787490257968" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787490257968" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787490257968">
+      <div class="rname">打车，停车，咖啡</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">其他</span><span style="color:var(--text-secondary);font-size:12px">2026-08-23</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥40.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="9002" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="9002" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="9002">
+      <div class="rname">抹茶拿铁 · 远家</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">饮品</span><span style="color:var(--text-secondary);font-size:12px">2026-08-23</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥40.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787456664428" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787456664428" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787456664428">
+      <div class="rname">盒马水果、饮用水、三明治补货</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">购物</span><span style="color:var(--text-secondary);font-size:12px">2026-08-23</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥49.40</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787456978647" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787456978647" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787456978647">
+      <div class="rname">菜+牛奶+虾+饮品</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">购物</span><span style="color:var(--text-secondary);font-size:12px">2026-08-22</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥48.13</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787456931104" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787456931104" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787456931104">
+      <div class="rname">打车</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">交通</span><span style="color:var(--text-secondary);font-size:12px">2026-08-22</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥30.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787456909935" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787456909935" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787456909935">
+      <div class="rname">远家喝咖啡</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">学习</span><span style="color:var(--text-secondary);font-size:12px">2026-08-22</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥40.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787456860032" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787456860032" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787456860032">
+      <div class="rname">在会喝茶</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">学习</span><span style="color:var(--text-secondary);font-size:12px">2026-08-22</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥29.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787456945615" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787456945615" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787456945615">
+      <div class="rname">哈利波特周边</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">购物</span><span style="color:var(--text-secondary);font-size:12px">2026-08-21</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥414.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787458303581" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787458303581" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787458303581">
+      <div class="rname">胡二哥药膳蹄花</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">餐饮</span><span style="color:var(--text-secondary);font-size:12px">2026-08-20</span></div></div>
+      <div class="amt exp" style="margin-left:auto">-¥179.00</div></div></div><div class="rec rec-layout-default" data-create-role="admin"><div class="acts"><button class="pin-btn js-pin " data-id="1787456820841" title="置顶"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg></button><button class="del js-del" data-id="1787456820841" title="删除"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path></svg></button></div><div class="top"><div class="body" data-edit="1787456820841">
+      <div class="rname">8月20-9月20日常花销预算</div>
+      <div class="rmeta"><span class="badge" style="background:var(--surface-nested);color:var(--text-secondary)">其他</span><span style="color:var(--text-secondary);font-size:12px">2026-08-20</span></div></div>
+      <div class="amt inc" style="margin-left:auto">+¥6000.00</div></div></div></div></div>
 </div>
 
 <!-- bottom nav -->
 <div class="nav" id="nav">
-  <div class="n active" data-nav="home"><img class="nav-img" src="assets/nav-ci-ke.png?v=2" alt="此刻"><span>此刻</span></div>
-  <div class="n" data-nav="money"><img class="nav-img" src="assets/nav-yan-huo.png?v=2" alt="烟火"><span>烟火</span></div>
+  <div class="n" data-nav="home"><img class="nav-img" src="assets/nav-ci-ke.png?v=2" alt="此刻"><span>此刻</span></div>
+  <div class="n active" data-nav="money"><img class="nav-img" src="assets/nav-yan-huo.png?v=2" alt="烟火"><span>烟火</span></div>
   <div class="n" data-nav="todo"><img class="nav-img" src="assets/nav-shi-xu.png?v=2" alt="时序"><span>时序</span></div>
   <div class="n" data-nav="note"><img class="nav-img" src="assets/nav-shi-guang.png?v=2" alt="灵光"><span>灵光</span></div>
 </div>
@@ -5310,4 +5294,5 @@ if(!auth.isLoggedIn()) {
       <div class="cp-ic"><img src="assets/nav-ci-ke.png" alt=""></div>
       <div class="cp-msg">贴纸已贴上</div>
       <div class="cp-pts">拖动可移动位置，点击可移除</div>
-      <div class="cp-tail"></div></div></body></html>
+      <div class="cp-tail"></div></div>
+</body></html>
