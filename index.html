@@ -2113,7 +2113,17 @@ function persist(){ store.save(); render();
 // === 一次性数据注入：确保三条新记录已存在于当前数据中（对已有 localStorage 数据生效） ===
 function injectSeed(){
   const seeds = {
-    money: [{ id: 9002, title: "抹茶拿铁 · 远家", type: "expense", amount: 40, category: "饮品", date: "2026-08-23" }],
+    money: [
+      { id: 9002, title: "抹茶拿铁 · 远家", type: "expense", amount: 40, category: "饮品", date: "2026-08-23" },
+      // 盒马鲜生（大源店）订单 · 2026-08-30 · 实付合计 ¥57.97
+      { id: 9005, title: "得宝 卫生湿巾 40片 · 盒马", type: "expense", amount: 6.78, category: "居家", date: "2026-08-30" },
+      { id: 9006, title: "每日鲜语 0乳糖低GI牛乳 1L · 盒马", type: "expense", amount: 17.29, category: "餐饮", date: "2026-08-30" },
+      { id: 9007, title: "盒马 羽衣甘蓝膳食恰巴塔 200g · 盒马", type: "expense", amount: 8.84, category: "餐饮", date: "2026-08-30" },
+      { id: 9008, title: "【水果荟】红千禧小番茄 约500g · 盒马", type: "expense", amount: 5.48, category: "餐饮", date: "2026-08-30" },
+      { id: 9009, title: "盒马 应急去渍湿巾 12片 · 盒马", type: "expense", amount: 6.78, category: "居家", date: "2026-08-30" },
+      { id: 9010, title: "盒马 全麦烟熏三文鱼三明治 175g · 盒马", type: "expense", amount: 11.80, category: "餐饮", date: "2026-08-30" },
+      { id: 9011, title: "盒马 · 打包费", type: "expense", amount: 1, category: "餐饮", date: "2026-08-30" },
+    ],
     note: [
       { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
       { id: 9003, title: "周日早晨 · 远家", content: "暖光台灯、透明水杯、屏幕上 09:33 的周日。木桌百叶窗，窗外绿植，一切都慢下来——和那杯抹茶拿铁一个味道。", mood: "备忘", category: "生活随笔", date: "2026-08-23", layout: "feature", image: "assets/matcha-sunday.jpg" },
