@@ -2009,6 +2009,10 @@ const store = {
   async guardAgainstOverwrite(localData){
     try {
       if(!this.sb) return true;                       // 没连云端，放行
+      // 已与云端完成合并（bootstrap 第 5 步 data=cloudData 后置位）：
+      // 此后本地 data 即云端权威副本 + 用户最新操作，直接放行，避免误拦打卡/贴纸等保存
+      if(this._cloudMerged) return true;
+      // 尚未合并时，用「真实记录计数」保护云端（防止空/演示环境顶掉真实数据）
       const localReal = this.countRealEntries(localData);
       if(localReal > 0) return true;                  // 本地有真实数据，正常同步
       const cloud = await this.loadCloud();
@@ -2123,6 +2127,8 @@ function injectSeed(){
       { id: 9009, title: "盒马 应急去渍湿巾 12片 · 盒马", type: "expense", amount: 6.78, category: "居家", date: "2026-08-30" },
       { id: 9010, title: "盒马 全麦烟熏三文鱼三明治 175g · 盒马", type: "expense", amount: 11.80, category: "餐饮", date: "2026-08-30" },
       { id: 9011, title: "盒马 · 打包费", type: "expense", amount: 1, category: "餐饮", date: "2026-08-30" },
+      // PRAMY 柏瑞美 loopy 联名 · 抖音订单 · 2026-08-30 10:21 下单
+      { id: 9012, title: "PRAMY 柏瑞美 loopy 联名 柔焦雾面（黑瓶）100ml×2 · 抖音", type: "expense", amount: 79.80, category: "购物", date: "2026-08-30" },
     ],
     note: [
       { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
@@ -4233,12 +4239,19 @@ function showTitlePopup(title) {
 }
 
 // 贴纸放置系统
+// 贴纸归属云端 data.__stickerPlacements（带 __ 前缀，随业务数据一起同步），
+// 同时保留 localStorage 作为兜底，确保刷新/重登/换设备都能还原。
 function getStickerPlacements() {
-  try { return JSON.parse(localStorage.getItem("__stickerPlacements") || "[]"); }
-  catch(e) { return []; }
+  const fromData = (typeof data !== "undefined" && data && Array.isArray(data.__stickerPlacements)) ? data.__stickerPlacements : null;
+  if(fromData && fromData.length) return fromData;
+  try { const ls = JSON.parse(localStorage.getItem("__stickerPlacements") || "[]"); if(Array.isArray(ls) && ls.length) return ls; }
+  catch(e) {}
+  return [];
 }
 function saveStickerPlacements(arr) {
-  localStorage.setItem("__stickerPlacements", JSON.stringify(arr));
+  if(typeof data !== "undefined" && data) data.__stickerPlacements = arr;
+  try { localStorage.setItem("__stickerPlacements", JSON.stringify(arr)); } catch(e) {}
+  store.save();   // 写入本地 + 云端（防抖），贴纸随业务数据同步
 }
 function placeSticker(stickerId, cardId) {
   const placements = getStickerPlacements();
@@ -5591,7 +5604,16 @@ async function bootstrap() {
   }
   if(cloudData) {
     data = cloudData;
-    const changed = injectSeed();
+    store._cloudMerged = true;   // 标记为已与云端合并，此后 guard 不再误拦保存
+    // 迁移：本机曾用独立 localStorage 存的贴纸 → 并入云端 data.__stickerPlacements
+    let stickerMigrated = false;
+    if(!Array.isArray(data.__stickerPlacements)) {
+      try {
+        const legacy = JSON.parse(localStorage.getItem("__stickerPlacements") || "[]");
+        if(Array.isArray(legacy) && legacy.length) { data.__stickerPlacements = legacy; stickerMigrated = true; }
+      } catch(e) {}
+    }
+    const changed = injectSeed() || stickerMigrated;
     await loadUserRoleMap();
     tagLegacyRecords();
     const cloudHist = candy.doHistorySettlement();
