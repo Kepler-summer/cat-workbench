@@ -81,6 +81,11 @@
     --accent-pair-1: #e8a0a0;   /* 浅珊瑚（猫一·管理员） */
     --accent-pair-2: #a0c4e8;   /* 浅天蓝（猫二·家属） */
 
+    /* ---- 恋爱色（「在一起」气泡专用）---- */
+    --love-soft: #fdf7f8;       /* 极淡暖粉底：气泡渐变起止 */
+    --love-tint: #f8ecef;       /* 暖粉中段：渐变 55% */
+    --love-ink:  #a84965;       /* 正文级深玫瑰：天数数字（4.79:1，满足 WCAG AA） */
+
     /* ---- 字体与布局 ---- */
     --font: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
     --nav-h: 72px;                   /* 底部导航栏高度 */
@@ -145,6 +150,17 @@
   .tl-title::before { content:""; width:3px; height:12px; border-radius:2px; background: var(--accent); }
   .tl-date-group { margin-bottom: 16px; }
   .tl-date-label { font-size: 13px; font-weight: 700; color: var(--module-1); margin-bottom: 8px; padding: 4px 10px; background: rgba(45,157,106,.08); border-radius: var(--radius-tile); display:inline-block; }
+  /* 记账/灵感：日期时间轴（竖线 + 圆点）—— 主色由 group 上的 --tl-color 注入，今日计划保持原样 */
+  .tl-date-group.tl-rail { position:relative; padding-left:13px; margin-bottom:14px; }
+  .tl-date-group.tl-rail::before { content:""; position:absolute; left:0; top:17px; bottom:-4px; width:2px;
+    border-radius:1px; opacity:.5;
+    background:linear-gradient(180deg, var(--tl-color,var(--border)) 0%, var(--border) 55%, transparent 100%); }
+  .tl-date-group.tl-rail::after { content:""; position:absolute; left:-3px; top:9px; width:8px; height:8px;
+    border-radius:50%; background:var(--tl-color,var(--accent));
+    box-shadow:0 0 0 2.5px var(--page-bg); }
+  .tl-date-group.tl-rail .tl-date-label { color:var(--tl-color,var(--module-1));
+    background:color-mix(in srgb, var(--tl-color,var(--module-1)) 10%, transparent); }
+  .tl-date-group.tl-rail:last-child::before { bottom:6px; }
   .tl-group { display:flex; gap:10px; margin-bottom:8px; align-items:flex-start; }
   .tl-time { flex:0 0 48px; text-align:right; padding-top:2px; }
   .tl-time .tl-h { display:block; font-size:13px; font-weight:700; color:var(--text-primary); }
@@ -738,6 +754,10 @@
   .collect-detail-close { position:absolute; top:14px; right:14px; width:28px; height:28px;
     border-radius:50%; border:none; background:var(--bg-secondary); cursor:pointer;
     display:grid; place-items:center; color:var(--text-tertiary); font-size:16px; }
+  /* 不可购买的藏品（如称号）提示 */
+  .collect-detail-tip { font-size:12px; color:var(--text-tertiary); line-height:1.6;
+    padding:8px 12px; border-radius:var(--radius-tile);
+    background:var(--bg-secondary); border:1px dashed var(--border-input); }
 
   /* ---------- COLLECTION TABS ---------- */
   .collect-sub-tabs { display:flex; gap:4px; margin-bottom:14px; background:var(--bg-secondary);
@@ -1190,6 +1210,10 @@
     --danger-muted: #f2e0e0;
     --accent-pair-1: #d49a9a;
     --accent-pair-2: #9ab5d4;
+    /* 恋爱色（手账纸感，降饱和）—— 必须在此覆写，否则会透传 :root 的偏亮值 */
+    --love-soft: #fbf4f4;
+    --love-tint: #f7ecee;
+    --love-ink:  #8f5a6e;             /* 4.87:1，满足 WCAG AA */
     --shadow-card: none;              /* 无厚重阴影 */
     --shadow-overlay: 0 4px 20px rgba(58,53,46,.08);
     --radius-card: 12px;
@@ -1225,17 +1249,61 @@
     border:1px solid var(--border-soft); border-radius:12px; overflow:hidden; min-height:120px; }
   .jn-hero .jn-hero-cat { position:absolute; right:-16px; top:-16px; width:240px; height:240px; object-fit:contain; opacity:.95; pointer-events:none;
     filter: drop-shadow(0 4px 12px rgba(58,53,46,.08)); }
-  .jn-hero .jn-hello { font-family:var(--font-journal); font-size:22px; color:var(--text); font-weight:600; line-height:1.4; margin-bottom:3px; letter-spacing:.5px; }
-  .jn-hero .jn-hello-sub { font-size:11px; color:var(--text-secondary); margin-bottom:12px; letter-spacing:.5px; }
-  /* 复用系统次要按钮规范（同 .btn.ghost）：浅底 + 强边框 + 次文本，不用主色绿 */
-  .jn-hero .jn-together { display:inline-flex; align-items:center; gap:4px; position:relative; z-index:2;
-    padding:5px 12px; background:var(--surface-nested); border:1px solid var(--border-input);
-    border-radius:20px; font-size:10px; color:var(--text-secondary); font-weight:600; cursor:pointer;
-    letter-spacing:.5px; transition:all .25s cubic-bezier(.2,.8,.25,1); }
-  .jn-hero .jn-together:hover { border-color:var(--accent-light); color:var(--text); }
+  /* 一句话问候（原 hello + sub 两行合并）：12px 下边距转交给下方的「在一起」气泡 */
+  .jn-hero .jn-hello { font-family:var(--font-journal); font-size:22px; color:var(--text); font-weight:600; line-height:1.4; margin-bottom:12px; letter-spacing:.5px; }
+  /* 「在一起」= 手账对话气泡贴纸：两行（上：双人名字 / 下：在一起天数）
+     配色全部走语义 token：描边 --border（同 .filter-tab/.collect-item 规范）、
+     正文 --love-ink、纯装饰 --accent-pair-1；不再出现任何硬编码粉色 */
+  .jn-hero .jn-together { display:inline-flex; flex-direction:column; align-items:flex-start; gap:1px;
+    position:relative; z-index:2; max-width:64%; padding:7px 14px 8px;
+    border-radius:14px 14px 14px 5px; cursor:pointer;
+    background:linear-gradient(135deg,var(--love-soft) 0%,var(--love-tint) 55%,var(--love-soft) 100%);
+    border:1px solid var(--border);
+    box-shadow:0 2px 8px color-mix(in srgb,var(--text) 8%,transparent);
+    transition:transform .25s cubic-bezier(.2,.8,.25,1), border-color .25s ease, box-shadow .25s ease; }
+  /* 左上高光 */
+  .jn-hero .jn-together::before { content:""; position:absolute; left:6px; top:5px; width:9px; height:9px;
+    border-radius:50%; background:var(--surface-card); opacity:.85; pointer-events:none; }
+  /* 左下气泡尾巴：底色接渐变末端，描边弧接 --border（须与容器同色同宽） */
+  .jn-hero .jn-together::after { content:""; position:absolute; left:9px; bottom:-5px; width:9px; height:9px;
+    border-radius:50%; background:var(--love-soft); box-shadow:-1px 1px 0 0 var(--border); pointer-events:none; }
+  /* hover：描边同色系加深到 --border-input，不做彩色发光（避免粉底绿边的色相冲突） */
+  .jn-hero .jn-together:hover { border-color:var(--border-input);
+    box-shadow:0 3px 12px color-mix(in srgb,var(--text) 12%,transparent); }
   .jn-hero .jn-together:active { transform:scale(.96); }
-  .jn-hero .jn-together-names { color:var(--text); font-weight:700; }
-  .jn-hero .jn-together-dot { opacity:.45; margin:0 3px; }
+  /* 第 1 行：双人名字 */
+  .jn-hero .jn-together-names { font-size:11px; font-weight:700; color:var(--text); letter-spacing:.5px;
+    max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.5; }
+  .jn-hero .jn-together-names.is-solo { color:var(--text-secondary); font-weight:600; }
+  /* 爱心：纯装饰，不承载文字信息，故可用低对比度的情侣色对 */
+  .jn-hero .jn-together-heart { font-style:normal; margin:0 5px; font-size:12px; color:var(--accent-pair-1);
+    display:inline-block; animation:jnHeartBeat 2.4s ease-in-out infinite; }
+  @supports ((-webkit-background-clip:text) or (background-clip:text)) {
+    .jn-hero .jn-together-heart { background:linear-gradient(180deg,var(--accent-pair-1),var(--love-ink));
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  }
+  /* 第 2 行：在一起天数 — 小字改用 --text（原 --text-secondary 在粉底上仅 4.11:1） */
+  .jn-hero .jn-together-count { font-size:10.5px; font-weight:600; letter-spacing:.6px;
+    color:var(--text); line-height:1.5; white-space:nowrap; }
+  .jn-hero .jn-together-count b { font-family:var(--font-journal); font-size:17px; font-weight:800;
+    color:var(--love-ink); margin:0 3px; letter-spacing:0; }
+  .jn-hero .jn-together-count.is-empty { color:var(--love-ink); }
+  /* 右上漂浮小泡泡 */
+  .jn-hero .jn-together-bubbles { position:absolute; right:-4px; top:-6px; pointer-events:none; }
+  .jn-hero .jn-together-bubbles i { position:absolute; border-radius:50%;
+    background:color-mix(in srgb,var(--accent-pair-1) 30%,transparent);
+    border:1px solid color-mix(in srgb,var(--accent-pair-1) 50%,transparent); }
+  .jn-hero .jn-together-bubbles i:nth-child(1) { width:9px; height:9px; right:0; top:0;
+    animation:jnBubble 3.2s ease-in-out infinite; }
+  .jn-hero .jn-together-bubbles i:nth-child(2) { width:5px; height:5px; right:14px; top:9px;
+    animation:jnBubble 3.2s ease-in-out -1.4s infinite; }
+  @keyframes jnHeartBeat { 0%,88%,100% { transform:scale(1); } 94% { transform:scale(1.18); } }
+  @keyframes jnBubble { 0%,100% { transform:translateY(0); opacity:.55; } 50% { transform:translateY(-4px); opacity:1; } }
+  /* 极窄屏：招呼语降字号，保证「喵～」一行放得下
+     （必须写在基础规则之后，否则同特异性下会被后面的 .jn-hero .jn-hello 覆盖） */
+  @media (max-width: 359px) {
+    .jn-hero .jn-hello { font-size:19px; }
+  }
   /* 手账分隔线标题 — tinytype 极细风格 */
   .jn-sec { display:flex; align-items:center; gap:10px; margin:22px 6px 10px; }
   .jn-sec .jn-line { flex:1; height:1px; background:var(--border-soft); opacity:.6; }
@@ -1459,10 +1527,11 @@
     <div class="jn-hero">
       <img class="jn-hero-cat" src="assets/stickers/cat-wave.png" alt="">
       <img class="placed-sticker" src="assets/stickers/shop-bow.png" alt="" style="left:82.99322359712214%;top:19.11249337915403%;transform:rotate(-2.537956851641699deg)" data-sticker-idx="1" draggable="true"><img class="placed-sticker" src="assets/stickers/shop-bow.png" alt="" style="left:62.3989%;top:28.7527%;transform:rotate(-5.168937989399964deg)" data-sticker-idx="3" draggable="true">
-      <div class="jn-hello">晚上好呀</div>
-      <div class="jn-hello-sub">今天辛苦啦</div>
+      <div class="jn-hello">晚上好呀，辛苦啦喵～</div>
       <div class="jn-together js-together" title="点击设置在一起的日子">
-        在一起 116 天
+        <span class="jn-together-bubbles" aria-hidden="true"><i></i><i></i></span>
+        <span class="jn-together-names is-solo">两只小猫</span>
+        <span class="jn-together-count is-empty">设置在一起的日子</span>
       </div>
     </div>
 
@@ -2129,6 +2198,8 @@ function injectSeed(){
       { id: 9011, title: "盒马 · 打包费", type: "expense", amount: 1, category: "餐饮", date: "2026-08-30" },
       // PRAMY 柏瑞美 loopy 联名 · 抖音订单 · 2026-08-30 10:21 下单
       { id: 9012, title: "PRAMY 柏瑞美 loopy 联名 柔焦雾面（黑瓶）100ml×2 · 抖音", type: "expense", amount: 79.80, category: "购物", date: "2026-08-30" },
+      // 远家咖啡 · 2026-08-30 12:36 下单
+      { id: 9013, title: "冰博客dirty · 远家", type: "expense", amount: 36, category: "饮品", date: "2026-08-30" },
     ],
     note: [
       { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
@@ -2238,8 +2309,8 @@ function renderHome(){
   const dateStr = `${now.getMonth()+1}月${now.getDate()}日`;
   const q = getDailyQuote();
   const hour = now.getHours();
-  const hi = hour<5?"夜深啦":hour<11?"早安":hour<13?"午安":hour<18?"下午好":"晚上好";
-  const hiSub = hour<5?"别熬太晚哦～":hour<11?"新的一天，一起出发":hour<13?"吃个午饭打个盹":hour<18?"下午茶时间，伸个懒腰":"今天辛苦啦";
+  // 一句话问候：时段 + 猫咪语气，句尾统一「喵～」（均 ≤10 字，22px 楷体一行放得下）
+  const greet = hour<5?"夜猫子呀，早点睡喵～":hour<11?"早安呀，伸懒腰喵～":hour<13?"午安呀，打个盹喵～":hour<18?"下午好呀，喝口茶喵～":"晚上好呀，辛苦啦喵～";
 
   // 快速记录按钮（用贴纸素材做图标）
   const quickItems = CONFIG.quickAdd.filter(q=>auth.canEdit(q.module));
@@ -2297,10 +2368,14 @@ function renderHome(){
     ? `<span class="jn-avatar"><img src="${attr(curAv)}" alt=""></span><span class="jn-uname">${esc(curName)}</span>`
     : `<span class="jn-avatar jn-avatar-txt">${curInitial}</span><span class="jn-uname">${esc(curName)}</span>`;
 
-  // 「在一起」按钮前缀：同组两名用户的名字（管理员 ♡ 家属）
-  const pairLabel = (pairNames.admin && pairNames.family)
-    ? `<span class="jn-together-names">${esc(pairNames.admin)} ♡ ${esc(pairNames.family)}</span><span class="jn-together-dot">·</span>`
-    : '';
+  // 「在一起」气泡贴纸第 1 行：两个人的名字（配对未加载时占位，保持两行高度稳定、不抖动）
+  const pairLine = (pairNames.admin && pairNames.family)
+    ? `<span class="jn-together-names">${esc(pairNames.admin)}<i class="jn-together-heart">♡</i>${esc(pairNames.family)}</span>`
+    : `<span class="jn-together-names is-solo">两只小猫</span>`;
+  // 第 2 行：在一起的天数
+  const daysLine = togetherDays
+    ? `<span class="jn-together-count">在一起<b>${togetherDays}</b>天</span>`
+    : `<span class="jn-together-count is-empty">设置在一起的日子</span>`;
 
   $("#screen").innerHTML = `
     <!-- 顶部标题栏 -->
@@ -2313,10 +2388,10 @@ function renderHome(){
     <div class="jn-hero">
       <img class="jn-hero-cat" src="assets/stickers/cat-wave.png" alt="">
       ${renderPlacedStickers("hero")}
-      <div class="jn-hello">${hi}呀</div>
-      <div class="jn-hello-sub">${hiSub}</div>
+      <div class="jn-hello">${greet}</div>
       <div class="jn-together js-together" title="点击设置在一起的日子">
-        ${pairLabel}${togetherDays?`在一起 ${togetherDays} 天`:'设置在一起的日子'}
+        <span class="jn-together-bubbles" aria-hidden="true"><i></i><i></i></span>
+        ${pairLine}${daysLine}
       </div>
     </div>
 
@@ -2591,6 +2666,13 @@ function renderInsight(){
 let _moduleFilterKey = null;
 let _moduleFilter = "all";
 
+/* 按日期分组渲染时间轴的模块类型 -> 轴线主色（取自模块自身色，保持手账配色体系一致） */
+const TIMELINE_TYPES = new Map([
+  ["todo",    "var(--module-1)"],   // 今日计划 · 活力绿（沿用现有 .tl-date-label 色）
+  ["finance", "var(--module-4)"],   // 记账本 · 青蓝
+  ["note",    "var(--module-5)"],   // 灵感备忘 · 星空紫
+]);
+
 function renderModule(key){
   const m=modOf(key);
   const allItems=data[key]||[];
@@ -2642,17 +2724,29 @@ function renderModule(key){
   }) : m.type==="finance" ? [...it].sort((a,b)=>{
     const ad=a.date||'', bd=b.date||'';
     return bd.localeCompare(ad);
+  }) : m.type==="note" ? [...it].sort((a,b)=>{
+    const ad=a.date||'', bd=b.date||'';
+    return bd.localeCompare(ad);
   }) : it;
   let body;
-  if(m.type==="todo" && renderItems.length){
+  if(TIMELINE_TYPES.has(m.type) && renderItems.length){
+    // 无日期的历史记录：今日计划归入今天（保持原行为），记账/灵感归入「更早」并排最后
+    const undated = m.type==="todo" ? t : "";
     const groups={};
-    renderItems.forEach(x=>{const d=x.date||t; if(!groups[d]) groups[d]=[]; groups[d].push(x);});
-    const dates=Object.keys(groups).sort((a,b)=>b.localeCompare(a));
+    renderItems.forEach(x=>{const d=x.date||undated; if(!groups[d]) groups[d]=[]; groups[d].push(x);});
+    const dates=Object.keys(groups).sort((a,b)=>{
+      if(a==="") return 1;
+      if(b==="") return -1;
+      return b.localeCompare(a);
+    });
+    const rail = m.type!=="todo";                     // 只有记账/灵感走带竖线圆点的时间轴
+    const tlColor = TIMELINE_TYPES.get(m.type);
     body=dates.map(d=>{
-      const isToday=d===t;
-      const label=isToday?'今天':d.replace(/-/g,'/');
+      const label = d==="" ? "更早" : (d===t ? "今天" : d.replace(/-/g,'/'));
       const items=groups[d].map(x=>recHTML(m,x)).join('');
-      return `<div class="tl-date-group"><div class="tl-date-label">${label}</div>${items}</div>`;
+      return rail
+        ? `<div class="tl-date-group tl-rail" style="--tl-color:${tlColor}"><div class="tl-date-label">${label}</div>${items}</div>`
+        : `<div class="tl-date-group"><div class="tl-date-label">${label}</div>${items}</div>`;
     }).join('');
   } else if(renderItems.length){
     body=renderItems.map(x=>recHTML(m,x)).join("");
@@ -2938,6 +3032,20 @@ function confirmDelete(key,id){
   overlay.querySelector("#c-ok").onclick=()=>{ data[key]=data[key].filter(i=>i.id!=id); persist(); close(); };
 }
 
+/* ---------- 通用二次确认弹窗（与 confirmDelete / confirmCalUncheck 同构） ---------- */
+function showConfirm(title,msg,onOk){
+  const overlay=document.createElement("div"); overlay.className="overlay";
+  overlay.innerHTML=`<div class="modal"><div class="grab"></div><h2>${esc(title)}</h2>
+    <div class="sub">${esc(msg)}</div>
+    <div class="modal-actions"><button class="btn ghost" id="sc-cancel">取消</button><button class="btn danger" id="sc-ok">确定</button></div></div>`;
+  document.body.appendChild(overlay);
+  const close=()=>overlay.remove();
+  overlay.onclick=e=>{ if(e.target===overlay) close(); };
+  overlay.querySelector("#sc-cancel").onclick=close;
+  // 先关弹窗再执行回调，避免回调内 render() 后弹窗残留
+  overlay.querySelector("#sc-ok").onclick=()=>{ close(); if(onOk) onOk(); };
+}
+
 /* ---------- change password ---------- */
 function openChangePassword(){
   const overlay=document.createElement("div"); overlay.className="overlay";
@@ -3031,26 +3139,16 @@ function buildDrawer(){
   $("#drawerName").textContent = auth.session ? auth.session.username : CONFIG.owner;
   $("#drawerSlogan").textContent = CONFIG.slogan;
   const items = [`<div class="ditem" data-go="home">${icon("home",20)}首页</div>`];
-  // family role: can view all modules
-  if(auth.isAdmin()) {
-    items.push(...CONFIG.modules.map(m=>`<div class="ditem" data-go="${m.key}">${icon(m.icon,20)}${m.name}</div>`));
-    items.push(`<div class="ditem" data-go="game">${icon("star",20)}糖果小铺</div>`);
-    items.push(`<div class="ditem" data-go="users">${icon("user",20)}用户管理</div>`);
-  } else if(auth.isFamily()) {
-    items.push(...CONFIG.modules.map(m=>`<div class="ditem" data-go="${m.key}">${icon(m.icon,20)}${m.name}</div>`));
-    items.push(`<div class="ditem" data-go="game">${icon("star",20)}糖果小铺</div>`);
-  } else {
-    // not logged in (shouldn't reach here, but fallback)
-    items.push(...CONFIG.modules.map(m=>`<div class="ditem" data-go="${m.key}">${icon(m.icon,20)}${m.name}</div>`));
-    items.push(`<div class="ditem" data-go="game">${icon("star",20)}糖果小铺</div>`);
-  }
+  // 全部角色可见：5 个业务模块（其中习惯打卡 / 长期目标为抽屉唯一入口，不可删）
+  items.push(...CONFIG.modules.map(m=>`<div class="ditem" data-go="${m.key}">${icon(m.icon,20)}${m.name}</div>`));
+  items.push(`<div class="ditem" data-go="game">${icon("star",20)}糖果小铺</div>`);
+  // 已登录即可见：用户管理（页内已含「修改密码」，故抽屉不再单独重复该入口）
+  // 注：页内的删除 / 审批 / 改组名等功能均有 admin 守卫，家属进入不会越权
   if(auth.isLoggedIn()) {
-    items.push(`<div class="ditem" id="drawerChangePw">${icon("key",20)}修改密码</div>`);
+    items.push(`<div class="ditem" data-go="users">${icon("user",20)}用户管理</div>`);
   }
   $("#drawerList").innerHTML = items.join("");
   $("#drawerList").querySelectorAll("[data-go]").forEach(el=>el.onclick=()=>go(el.dataset.go));
-  const dcp = $("#drawerChangePw");
-  if(dcp) dcp.onclick = () => { closeDrawer(); openChangePassword(); };
 }
 function openDrawer(){
   $("#drawerList").querySelectorAll(".ditem").forEach(el=>el.classList.toggle("active", el.dataset.go===view));
@@ -4368,7 +4466,12 @@ function showCollectDetail(item, category) {
   const owned = candy.hasItem(item.id);
   const count = candy.getItemCount(item.id);
   const rarityLabel = { common: "普通", rare: "稀有", epic: "珍贵", legendary: "传说" }[item.rarity] || "普通";
-  const catLabel = { toys: "玩具", outfits: "装扮", memorial: "纪念章", buff: "增益道具", level: "成长道具" }[category] || "";
+  const catLabel = { toys: "玩具", outfits: "装扮", memorial: "纪念章", buff: "增益道具", level: "成长道具", rare: "稀有藏品" }[category] || "";
+  // 与超市（原 4929 行）保持同一套定价规则：成长道具为动态定价
+  const price = LEVEL_ITEMS[item.id] ? getLevelItemPrice(item) : (item.price || item.cost || 0);
+  // 称号等不在商店索引里的东西不能购买（避免点了「去兑换」却永远找不到）
+  const buyable = !!ALL_SHOP_ITEMS[item.id];
+  const isAdmin = auth.isAdmin();
 
   const overlay = document.createElement("div");
   overlay.className = "collect-detail-overlay";
@@ -4383,7 +4486,7 @@ function showCollectDetail(item, category) {
         <span class="meta-item rarity-tag rarity-${item.rarity}">${rarityLabel}</span>
       </div>
       <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
-        ${owned ? `已获得 ×${count}` : `未获得 · ${item.price}糖币`}
+        ${owned ? `已获得 ×${count}` : (buyable ? `未获得 · ${price} 糖币` : '未解锁')}
       </div>
       ${owned
         ? `<div class="sticker-place-options">
@@ -4396,17 +4499,38 @@ function showCollectDetail(item, category) {
              </div>
              <div style="font-size:10px;color:var(--text-tertiary);margin-top:8px;">点击选中可拖动，删除需二次确认</div>
            </div>`
-        : `<button class="daily-task-btn" onclick="window.__buyFromDetail('${item.id}')">去兑换</button>`}
+        : (buyable
+            ? `<button class="daily-task-btn" ${isAdmin?'':'disabled'} onclick="window.__buyFromDetail('${item.id}')">${isAdmin?`立即兑换 · ${price} 糖币`:'家属仅可浏览'}</button>`
+            : `<div class="collect-detail-tip">${TITLES[item.id] ? `Lv.${TITLES[item.id].level} 自动解锁` : '随等级解锁'} · 不可用糖币兑换</div>`)}
     </div>`;
   document.body.appendChild(overlay);
+  overlay.dataset.category = category || "";   // 供 __buyFromDetail 原地刷新时还原子分类
   overlay.onclick = e => { if(e.target === overlay) overlay.remove(); };
 }
 
+// 原地直接兑换：不再跳转到超市 tab，购买成功后弹窗内刷新为「已拥有」视图
 window.__buyFromDetail = function(itemId) {
-  const overlay = document.querySelector(".collect-detail-overlay");
-  if(overlay) overlay.remove();
-  gameTab = "shop";
-  renderGame();
+  const it = ALL_SHOP_ITEMS[itemId];
+  if(!it) { showCatPopup("这个不能用糖币兑换喵～", "等级达标后会自动解锁", true); return; }
+  const price = LEVEL_ITEMS[it.id] ? getLevelItemPrice(it) : (it.price || it.cost || 0);
+  const ov = document.querySelector(".collect-detail-overlay");
+  const cat = ov ? (ov.dataset.category || "") : "";
+  // handleShopBuy 内部已含权限/限购/余额校验 + persist() + renderGame()
+  handleShopBuy(it, price);
+  // 购买成功（已入库）→ 原地刷新为「已拥有」；失败则弹窗保持打开（内部已弹 toast 提示）
+  const still = document.querySelector(".collect-detail-overlay");
+  if(still && candy.hasItem(itemId)) { still.remove(); showCollectDetail(it, cat); }
+};
+
+// 称号详情：按 id 查表构造对象。
+// 原写法在 inline onclick 里用模板字符串拼对象字面量，会因引号/花括号被截断成
+// `showCollectDetail({...rarity:'epic, 'titles')` 而报错，导致点称号打不开弹窗。
+window.__showTitleDetail = function(titleId){
+  const t = TITLES[titleId];
+  if(!t) return;
+  const unlocked = !!(candy.getUnlockedTitles() || {})[t.id];
+  showCollectDetail({ id:t.id, name:t.name, icon:t.icon, desc:t.desc, price:0, level:t.level,
+                      rarity: unlocked ? "epic" : "common" }, "titles");
 };
 
 window.__placeSticker = function(stickerId, cardId) {
@@ -4761,7 +4885,7 @@ function renderGame() {
       const unlocked = !!unlockedTitles[t.id];
       return `
         <div class="collect-item rarity-${unlocked ? 'epic' : 'common'} ${unlocked ? 'owned' : 'locked'}"
-             onclick="showCollectDetail({id:'${t.id}',name:'${t.name}',icon:'${t.icon}',desc:'${t.desc}',price:0,rarity:'${unlocked?'epic':'common}'}, 'titles')">
+             onclick="window.__showTitleDetail('${t.id}')">
           <div class="collect-icon"><img src="assets/stickers/star-glossy.png" alt="${t.name}"></div>
           <div class="collect-name">${t.name}</div>
           ${unlocked ? `<div class="collect-count">已解锁</div>` : `<div class="collect-price">Lv.${t.level}</div>`}
