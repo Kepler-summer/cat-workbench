@@ -92,7 +92,7 @@
     --love-ink:  #a84965;       /* 正文级深玫瑰：天数数字（4.79:1，满足 WCAG AA） */
 
     /* ---- 字体与布局 ---- */
-    --font: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --font: "Times New Roman", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
     --nav-h: 72px;                   /* 底部导航栏高度 */
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -101,7 +101,7 @@
   html, body { height: 100%; }
   body {
     background: var(--page-bg);
-    color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.55;
+    color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.55;
     -webkit-font-smoothing: antialiased; letter-spacing: .01em;
     max-width: 520px; margin: 0 auto; position: relative;
     min-height: 100vh; overflow-x: hidden;
@@ -1321,7 +1321,7 @@
     --font-journal: "Kaiti SC", "STKaiti", "楷体", "Ma Shan Zheng", cursive;
     --font-hand: "ZCOOL KuaiLe", "Ma Shan Zheng", "Kaiti SC", "STKaiti", "楷体", cursive;   /* 手写中文 */
     --font-hand-en: "Caveat", "ZCOOL KuaiLe", "Kaiti SC", cursive;                          /* 手写英文 */
-    --font-sans-light: "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;      /* 细线黑体（配 weight 300） */
+    --font-sans-light: "Times New Roman", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;      /* 细线黑体：中文 PingFang + 英文/数字 Times New Roman（配 weight 300） */
   }
   body.journal-theme::before {
     background-image:
@@ -1346,22 +1346,22 @@
   .jn-hero { position:relative; padding:0; text-align:center; overflow:hidden; background:transparent; }
   .jn-hero-layout { display:flex; flex-direction:column; gap:10px; margin:0 0 16px; }
   /* 右上角文字块：二猫 + slogan（楷体），下面在一起行（苹方细体） */
-  .jn-hero-top { display:flex; flex-direction:column; align-items:flex-end; gap:3px; text-align:right; }
-  .jn-hero .jn-brand-title { font-family:var(--font-journal); font-size:18px; font-weight:700; color:var(--text); letter-spacing:3px; line-height:1.3; }
-  .jn-hero .jn-brand-slogan { font-family:var(--font-journal); font-size:12px; font-weight:400; color:var(--text); letter-spacing:1.5px; line-height:1.5; }
+  .jn-hero-top { display:flex; flex-direction:column; align-items:flex-end; gap:0; text-align:right; }
+  .jn-hero .jn-brand-title { font-family:var(--font-journal); font-size:20px; font-weight:500; color:var(--text); letter-spacing:3px; line-height:1.28; }
+  .jn-hero .jn-brand-slogan { font-family:var(--font-journal); font-size:14px; font-weight:400; color:var(--text); letter-spacing:1.5px; line-height:1.5; margin-top:8px; }
   /* 在一起：整行统一深棕细黑体，爱心用豆沙红棕 */
-  .jn-hero .jn-together { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:5px; margin:2px 0 0;
-    cursor:pointer; transition:transform .2s ease; font-family:var(--font-sans-light); font-weight:300; }
+  .jn-hero .jn-together { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:5px; margin:6px 0 0;
+    cursor:pointer; transition:transform .2s ease; font-family:var(--font-sans-light); font-weight:400; }
   .jn-hero .jn-together:hover { transform:translateY(-1px); }
   .jn-hero .jn-together:active { transform:scale(.98); }
-  .jn-hero .jn-together-names { font-size:12px; font-weight:300; color:var(--text); letter-spacing:.3px;
-    max-width:100%; line-height:1.5; white-space:normal; word-break:keep-all; }
-  .jn-hero .jn-together-names.is-solo { color:var(--text); }
+  .jn-hero .jn-together-names { font-size:13px; font-weight:400; color:var(--text-secondary); letter-spacing:.3px;
+    max-width:100%; line-height:1.4; white-space:normal; word-break:keep-all; }
+  .jn-hero .jn-together-names.is-solo { color:var(--text-secondary); }
   .jn-hero .jn-together-heart { font-style:normal; margin:0 4px; font-size:13px;
     color:var(--jn-accent); display:inline-block; animation:jnHeartBeat 2.4s ease-in-out infinite; }
-  .jn-hero .jn-together-count { font-size:12px; font-weight:300; letter-spacing:.3px; color:var(--text); white-space:nowrap; }
-  .jn-hero .jn-together-count b { font-size:12px; font-weight:300; margin:0 1px; color:var(--text); }
-  .jn-hero .jn-together-count.is-empty { color:var(--text); }
+  .jn-hero .jn-together-count { font-size:13px; font-weight:400; letter-spacing:.3px; color:var(--text-secondary); white-space:nowrap; line-height:1.4; }
+  .jn-hero .jn-together-count b { font-size:13px; font-weight:400; margin:0 1px; color:var(--text-secondary); }
+  .jn-hero .jn-together-count.is-empty { color:var(--text-secondary); }
   /* 中间：小猫插图水平居中 */
   .jn-hero-cats { display:flex; justify-content:center; align-items:center; margin:8px 0; }
   .jn-hero-cats .jn-hero-cat { width:146px; height:146px; object-fit:contain; opacity:1; pointer-events:none;
@@ -1369,24 +1369,59 @@
     transform:rotate(-4deg); }
   /* 左下角：小猫一言（较小字），标签用焦糖色 */
   .jn-hero .jn-hero-quote { margin:0; text-align:left; }
-  .jn-hero .jn-quote-tag { font-family:var(--font-sans-light); font-size:11px; color:var(--candy);
+  .jn-hero .jn-quote-tag { font-family:var(--font-sans-light); font-size:13px; color:var(--candy);
     font-weight:300; margin-bottom:4px; letter-spacing:1px; display:flex; align-items:center; justify-content:flex-start; gap:5px; }
-  .jn-hero .jn-quote-tag::before { content:""; display:inline-block; width:4px; height:11px; background:var(--candy); border-radius:2px; }
+  .jn-hero .jn-quote-tag::before { content:""; display:inline-block; width:4px; height:12px; background:var(--candy); border-radius:2px; }
   .jn-hero .jn-q-cn { display:none; }
-  .jn-hero .jn-q-en { display:inline-block; font-family:var(--font-hand-en); font-size:11px; color:var(--text); line-height:1.7; margin:0; letter-spacing:.2px; }
+  .jn-hero .jn-q-en { display:inline-block; font-family:var(--font-hand-en); font-size:14px; color:var(--text); line-height:1.7; margin:0; letter-spacing:.2px; }
   .jn-hero .jn-q-en em { display:none; }
   @keyframes jnHeartBeat { 0%,88%,100% { transform:scale(1); } 94% { transform:scale(1.18); } }
   @media (max-width: 359px) {
     .jn-welcome-card { margin:-72px -16px 16px; padding:72px 16px 18px; }
     .jn-hero-cats .jn-hero-cat { width:126px; height:126px; }
-    .jn-hero .jn-brand-title { font-size:16px; letter-spacing:2px; }
+  }
+  /* 平板端 768-1200px：Hero 分级放大（移动基准 20/14/13 → 24/15/14） */
+  @media (min-width: 768px) and (max-width: 1200px) {
+    .jn-hero .jn-brand-title { font-size:24px; }
+    .jn-hero .jn-brand-slogan { font-size:15px; margin-top:9px; }
+    .jn-hero .jn-together { margin-top:7px; }
+    .jn-hero .jn-together-names,
+    .jn-hero .jn-together-count,
+    .jn-hero .jn-together-count b { font-size:14px; }
+    body .jn-qbtn .jn-qtxt { font-size:12.5px; }
+    body .jn-sec .jn-label { font-size:14px; }
+    /* 小猫一言分级（移动 13/14 → 平板 14/15） */
+    .jn-hero .jn-quote-tag { font-size:14px; }
+    .jn-hero .jn-q-en { font-size:15px; }
+    .jn-quote .jn-quote-tag { font-size:14px; }
+    .jn-quote .jn-q-cn { font-size:15px; }
+    .jn-quote .jn-q-en { font-size:15px; }
+  }
+  /* 桌面端 >1200px：Hero 再放大（28/16/15），与左侧猫咪视觉权重平衡 */
+  @media (min-width: 1200px) {
+    body { font-size:15px; }
+    .jn-hero .jn-brand-title { font-size:28px; }
+    .jn-hero .jn-brand-slogan { font-size:16px; margin-top:10px; }
+    .jn-hero .jn-together { margin-top:8px; }
+    .jn-hero .jn-together-names,
+    .jn-hero .jn-together-count,
+    .jn-hero .jn-together-count b { font-size:15px; }
+    body .jn-qbtn .jn-qtxt { font-size:13px; }
+    body .jn-sec .jn-label { font-size:14px; }
+    body .jn-todo .jn-tt { font-size:14px; }
+    /* 小猫一言分级（→ 桌面 15/16），与 slogan 视觉权重平衡 */
+    .jn-hero .jn-quote-tag { font-size:15px; }
+    .jn-hero .jn-q-en { font-size:16px; }
+    .jn-quote .jn-quote-tag { font-size:15px; }
+    .jn-quote .jn-q-cn { font-size:16px; }
+    .jn-quote .jn-q-en { font-size:16px; }
   }
 
   .jn-sec { display:flex; align-items:center; justify-content:space-between; margin:28px 0 12px; }
   .jn-sec .jn-label { font-family:var(--font-journal); font-size:13px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:6px; letter-spacing:1.5px; }
   .jn-sec .jn-label .jn-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); }
   .jn-sec .jn-line { display:none; }
-  .jn-sec .jn-more { font-size:10px; color:var(--text-tertiary); cursor:pointer; letter-spacing:.5px; transition:color .15s; }
+  .jn-sec .jn-more { font-size:11px; color:var(--text-tertiary); cursor:pointer; letter-spacing:.5px; transition:color .15s; }
   .jn-sec .jn-more:hover { color:var(--text-secondary); }
 
   /* 快速记录：透明无框，图标深棕，hover 出现点缀色圆底 */
@@ -1435,7 +1470,7 @@
   .jn-candy .jn-candy-num { font-family:var(--font-journal); font-size:34px; font-weight:700; color:var(--candy); line-height:1; position:relative; z-index:2; }
   .jn-candy .jn-candy-num span { font-size:12px; color:var(--candy); margin-left:4px; font-weight:500; }
   .jn-candy .jn-candy-stats { display:flex; gap:12px; margin-top:18px; position:relative; z-index:2; }
-  .jn-candy .jn-cs { font-size:9px; color:var(--text-secondary); letter-spacing:.5px; padding:6px 10px; background:rgba(255,253,247,.65); border-radius:10px; text-align:center; min-width:52px; transition:all .2s; }
+  .jn-candy .jn-cs { font-size:11px; color:var(--text-secondary); letter-spacing:.5px; padding:6px 10px; background:rgba(255,253,247,.65); border-radius:10px; text-align:center; min-width:52px; transition:all .2s; }
   .jn-candy .jn-cs:hover { background:rgba(255,253,247,.9); transform:translateY(-1px); }
   .jn-candy .jn-cs b { display:block; font-size:12px; color:var(--candy); font-weight:700; margin-bottom:2px; font-family:var(--font-journal); }
 
@@ -1469,17 +1504,17 @@
   .jn-todo .jn-chk.on { background:var(--accent); border-color:var(--accent); }
   .jn-todo .jn-chk.on::after { content:""; width:8px; height:8px; border-radius:50%; background:#fff; }
   .jn-todo .jn-tt { flex:1; font-size:13px; color:var(--text); font-weight:500; line-height:1.5; }
-  .jn-todo .jn-tp { font-size:9px; color:var(--text-tertiary); flex-shrink:0; letter-spacing:.5px; }
-  .jn-todo .jn-tag { font-size:8px; padding:2px 6px; border-radius:10px; background:var(--bg-secondary); color:var(--text-secondary); flex-shrink:0; letter-spacing:.3px; }
+  .jn-todo .jn-tp { font-size:12px; color:var(--text-tertiary); flex-shrink:0; letter-spacing:.5px; }
+  .jn-todo .jn-tag { font-size:12px; padding:2px 8px; border-radius:10px; background:var(--bg-secondary); color:var(--text-secondary); flex-shrink:0; letter-spacing:.3px; }
   .jn-todo-empty { padding:18px; text-align:center; font-size:11px; color:var(--text-tertiary); background:transparent; border:1px dashed var(--border); border-radius:12px; letter-spacing:.5px; }
 
   .jn-quote { position:relative; margin:0 4px; padding:22px 20px; background:var(--surface-card); border:1px solid var(--border-soft); border-radius:var(--radius-card); box-shadow:var(--shadow-card); min-height:130px; }
-  .jn-quote .jn-quote-tag { font-family:var(--font-journal); font-size:12px; color:var(--accent); font-weight:700; margin-bottom:12px; letter-spacing:1.5px; display:flex; align-items:center; gap:6px; }
-  .jn-quote .jn-quote-tag::before { content:""; width:4px; height:14px; background:var(--accent); border-radius:2px; }
+  .jn-quote .jn-quote-tag { font-family:var(--font-journal); font-size:13px; color:var(--accent); font-weight:700; margin-bottom:12px; letter-spacing:1.5px; display:flex; align-items:center; gap:6px; }
+  .jn-quote .jn-quote-tag::before { content:""; width:4px; height:13px; background:var(--accent); border-radius:2px; }
   .jn-quote .jn-q-cn { font-family:var(--font-journal); font-size:14px; color:var(--text); line-height:1.9; margin-bottom:8px; letter-spacing:.5px; max-width:78%; }
-  .jn-quote .jn-q-cn em { font-size:9px; color:var(--text-tertiary); margin-left:5px; font-style:normal; font-family:var(--font); letter-spacing:.3px; }
-  .jn-quote .jn-q-en { font-size:11px; color:var(--text-secondary); line-height:1.7; letter-spacing:.3px; max-width:78%; }
-  .jn-quote .jn-q-en em { font-size:8px; color:var(--text-tertiary); margin-left:3px; font-style:italic; }
+  .jn-quote .jn-q-cn em { font-size:11px; color:var(--text-tertiary); margin-left:5px; font-style:normal; font-family:var(--font); letter-spacing:.3px; }
+  .jn-quote .jn-q-en { font-size:14px; color:var(--text-secondary); line-height:1.7; letter-spacing:.3px; max-width:78%; }
+  .jn-quote .jn-q-en em { font-size:11px; color:var(--text-tertiary); margin-left:3px; font-style:italic; }
   .jn-quote .jn-quote-sticker { position:absolute; right:-10px; bottom:-12px; width:100px; height:100px; opacity:.55; pointer-events:none;
     filter: drop-shadow(0 3px 8px rgba(0,0,0,.08)); }
   .jn-quote .jn-quote-heart { display:none; }
@@ -2194,6 +2229,11 @@ function injectSeed(){
       { id: 9012, title: "PRAMY 柏瑞美 loopy 联名 柔焦雾面（黑瓶）100ml×2 · 抖音", type: "expense", amount: 79.80, category: "购物", date: "2026-08-30" },
       // 远家咖啡 · 2026-08-30 12:36 下单
       { id: 9013, title: "冰博客dirty · 远家", type: "expense", amount: 36, category: "饮品", date: "2026-08-30" },
+      // 远家咖啡 · 2026-08-30 晚 · 抹茶拿铁（热·换燕麦奶）
+      { id: 9014, title: "抹茶拿铁（热·燕麦奶）· 远家", type: "expense", amount: 44, category: "饮品", date: "2026-08-30" },
+      // 健身配套 · 2026-08-31 晚
+      { id: 9015, title: "健身停车 · 速停车", type: "expense", amount: 6, category: "交通", date: "2026-08-31" },
+      { id: 9016, title: "健身饮品 · 智能货柜", type: "expense", amount: 5.50, category: "饮品", date: "2026-08-31" },
     ],
     note: [
       { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
@@ -5785,6 +5825,16 @@ async function renderAuth(mode = "login") {
    ============================================================ */
 async function bootstrap() {
   store.initSupabase();
+
+  // WorkBuddy 内嵌模式（URL 带 ?wb=1）：未登录时自动以无尽夏(admin, groupId=1)进入，
+  // 避免内置浏览器无登录态而显示初始/种子数据。手机端正常打开不带此参数，不受影响。
+  try {
+    const _wb = new URLSearchParams(location.search).get("wb");
+    if(_wb === "1" && !localStorage.getItem("__cat_session")) {
+      auth.saveSession({ userId: 1, username: "无尽夏", role: "admin", groupId: 1 });
+      console.log("🔧 WorkBuddy 模式：自动以无尽夏身份进入");
+    }
+  } catch(e) { console.warn("wb auto-login skipped:", e); }
 
   // 1. check session
   if(!auth.restore()) {
