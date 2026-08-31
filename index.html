@@ -5793,6 +5793,21 @@ async function bootstrap() {
     return;
   }
 
+  // 1.2 会话自愈：旧版本保存的登录态没有 groupId，会导致业务数据一直读到 -default（旧默认数据）
+  //     这里按 userId 回查用户表补齐 groupId，避免"明明登录了却看到初始账号数据"
+  try {
+    if(auth.session && !auth.session.groupId && auth.session.userId && store.sb) {
+      const { data: rows } = await store.sb
+        .from("workbench_users").select("id, group_id").eq("id", auth.session.userId).limit(1);
+      const u = rows && rows[0];
+      if(u && u.group_id) {
+        auth.session.groupId = u.group_id;
+        auth.saveSession(auth.session);
+        console.log("🔧 会话补齐 groupId:", u.group_id);
+      }
+    }
+  } catch(e) { console.warn("session groupId repair skipped:", e); }
+
   // 1.5 legacy migration
   try { await auth.migrateLegacyUsers(); } catch(e) { console.warn("Legacy migration skipped:", e); }
 
