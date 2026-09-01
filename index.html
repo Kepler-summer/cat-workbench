@@ -1254,12 +1254,13 @@
   .jn-wk-title { font-family:var(--font); font-size:14.5px; font-weight:500; color:#3D3226;
     line-height:1.5; overflow-wrap:anywhere; word-break:break-word;
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .jn-wk-sum { font-size:12.5px; color:#9C8B7A; line-height:1.55; margin-top:3px;
-    display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
+  .jn-wk-sum { font-size:12.5px; color:#9C8B7A; line-height:1.6; margin-top:4px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
     overflow-wrap:anywhere; word-break:break-word; }
   .jn-wk-meta { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:5px; }
-  .jn-wk-thumb { flex:0 0 54px; width:54px; height:40px; object-fit:cover; border-radius:8px;
-    border:1px solid #E8DFD0; box-shadow:0 2px 5px rgba(92,74,58,.08); margin-top:2px; }
+  .jn-wk-thumb { flex:0 0 58px; width:58px; height:46px; object-fit:cover; border-radius:2px;
+    background:#fff; padding:3px 3px 9px; border:1px solid #E8DFD0;
+    box-shadow:0 2px 5px rgba(92,74,58,.10); margin-top:2px; transform:rotate(-1.2deg); }
   .jn-wk-cat { flex:0 0 16px; width:16px; height:16px; object-fit:contain; margin-top:3px;
     filter:drop-shadow(1px 1px 2px rgba(92,74,58,.10)); }
   .jn-wk-tag { flex:0 0 auto; font-size:10.5px; color:#9C8B7A; background:#F0E8DC; border-radius:5px; padding:1px 7px; }
@@ -1283,6 +1284,7 @@
   @keyframes ndFade { from{opacity:0} to{opacity:1} }
   .nd-sheet { position:relative; display:flex; flex-direction:column; width:100%; height:100%;
     background-color:#F9F5EC; transform-origin:left center;
+    box-shadow: inset -8px 0 10px -8px rgba(61,50,38,.12);
     animation:ndFlip .5s cubic-bezier(.36,.06,.2,1) both; }
   @media (min-width:720px){
     .nd-overlay { align-items:center; padding:30px 18px; }
@@ -1351,11 +1353,59 @@
     display:grid; place-items:center; cursor:pointer; transition:transform .12s ease; }
   .nd-act:active { transform:scale(.94); }
   .nd-act[data-nd="back"] svg { transform:rotate(180deg); }
-  @media (max-width:359px){
-    .nd-page { padding:12px 16px 20px 22px; }
-    .nd-title { font-size:20px; }
-  }
-
+  /* ===== 详情页编辑态（手账沉浸式：透明输入 + 多图 + 藏品贴纸） ===== */
+  .nd-editing-tag { font-size:10.5px; color:#C08A4E; letter-spacing:1px; }
+  .nd-editseg { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:9px; }
+  .nd-seg { display:flex; flex-wrap:wrap; gap:6px; }
+  .nd-seg .opt { border:1px solid #E0D5C5; background:rgba(255,253,247,.85); color:#9C8B7A;
+    font-size:11.5px; padding:3px 11px; border-radius:999px; cursor:pointer; }
+  .nd-seg .opt.on { background:#E4D6BE; border-color:#D8CBB4; color:#5C4A3A; font-weight:600; }
+  .nd-date-in { font-family:var(--font); font-size:12px; color:#5C4A3A; background:rgba(240,232,220,.85);
+    border:1px solid #E0D5C5; border-radius:6px; padding:3px 6px; outline:none; }
+  .nd-title-in { width:100%; font-family:var(--font-journal); font-size:23px; font-weight:700; color:#3D3226;
+    background:transparent; border:none; border-bottom:1px dashed #DCD2BE; padding:2px 0 6px; outline:none; }
+  .nd-title-in::placeholder { color:#C4B8A5; }
+  .nd-ta { width:100%; min-height:180px; font-family:var(--font); font-size:15.5px; line-height:2.0;
+    color:#3D3226; background:transparent; border:none; outline:none; resize:none; padding:0; display:block; }
+  .nd-ta::placeholder { color:#C4B8A5; }
+  .nd-imgs { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0 4px; }
+  .nd-img-cell { position:relative; background:#fff; padding:3px 3px 9px; border:1px solid #E8DFD0;
+    border-radius:2px; box-shadow:0 2px 5px rgba(92,74,58,.09); }
+  .nd-img-cell img { display:block; width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:1px; }
+  .nd-img-del { position:absolute; top:-7px; right:-7px; width:20px; height:20px; border-radius:50%;
+    border:none; background:#3D3226; color:#FBF8F1; font-size:12px; line-height:1; cursor:pointer; }
+  .nd-img-add { aspect-ratio:1/1; border:1px dashed #D8CBB4; border-radius:6px; background:rgba(255,253,247,.6);
+    color:#9C8B7A; font-size:12px; cursor:pointer; }
+  .nd-tools { display:flex; align-items:center; gap:10px; margin-top:16px; }
+  .nd-tool { display:inline-flex; align-items:center; gap:4px; border:1px solid #D8CBB4;
+    background:rgba(255,253,247,.85); color:#5C4A3A; font-size:12px; padding:5px 13px;
+    border-radius:999px; cursor:pointer; }
+  .nd-tools .nd-tip { font-size:10.5px; color:#B8A99A; }
+  .nd-btn { border:1px solid #D8CBB4; background:#F0E8DC; color:#5C4A3A; font-size:13px; font-weight:600;
+    padding:9px 24px; border-radius:999px; cursor:pointer; }
+  .nd-btn:active { transform:scale(.96); }
+  .nd-btn-primary { background:#5C4A3A; border-color:#5C4A3A; color:#FBF8F1; }
+  /* 贴纸层：查看态纯展示，编辑态可拖拽/缩放 */
+  .nd-page > .nd-stickers { position:absolute; inset:0; z-index:2; pointer-events:none; }
+  .ndstk { position:absolute; width:52px; height:52px; pointer-events:none; }
+  .ndstk img { width:100%; height:100%; object-fit:contain; filter:drop-shadow(2px 3px 4px rgba(92,74,58,.14)); }
+  .ndstk-edit { pointer-events:auto; cursor:grab; touch-action:none; user-select:none; }
+  .ndstk-edit.sel { outline:1.5px dashed #C08A4E; outline-offset:3px; border-radius:6px; }
+  .ndstk-tools { position:absolute; left:50%; transform:translateX(-50%); bottom:78px; z-index:80;
+    display:flex; gap:6px; background:#3D3226; border-radius:999px; padding:6px 10px;
+    box-shadow:0 3px 12px rgba(61,50,38,.3); }
+  .ndstk-tools[hidden] { display:none; }
+  .ndstk-tools button { border:none; background:transparent; color:#F0E8DC; font-size:13px; padding:4px 11px;
+    border-radius:999px; cursor:pointer; }
+  .ndstk-tools button:active { background:rgba(255,255,255,.12); }
+  /* 藏品贴纸面板 */
+  .nd-panel { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; max-height:46vh; overflow-y:auto;
+    padding:4px 2px; }
+  .nd-pnl-it { display:flex; flex-direction:column; align-items:center; gap:4px; border:1px solid var(--border);
+    background:var(--surface-card); border-radius:10px; padding:10px 4px; cursor:pointer; font-size:10.5px;
+    color:var(--text-secondary); }
+  .nd-pnl-it img { width:34px; height:34px; object-fit:contain; }
+  .nd-pnl-it:active { background:#F3EDDE; }
   /* ============================================================
      灵感备忘 · 扉页栏目卡（图标 + 名称 + 说明 + 贴纸式新建按钮 + 猫咪）
      ============================================================ */
@@ -2882,7 +2932,7 @@ function wireHome(todoKey){
     gameTab = "collection";
     go("game");
   });
-  $("#screen").querySelectorAll("[data-quick]").forEach(el=>el.onclick=()=>{ go(el.dataset.quick); openEditor(el.dataset.quick,null); });
+  $("#screen").querySelectorAll("[data-quick]").forEach(el=>el.onclick=()=>{ go(el.dataset.quick); const qm=modOf(el.dataset.quick); if(qm && qm.type==='note'){ openNoteDetail(el.dataset.quick, null, true); } else { openEditor(el.dataset.quick,null); } });
   // 在一起计时器：点击编辑日期
   const tg=$("#screen").querySelector(".js-together");
   if(tg) tg.onclick=()=>{
@@ -3382,7 +3432,8 @@ function jnWeekEntryHTML(m, x){
   const del = canEdit ? `<button class="del js-del" data-id="${x.id}" title="\u5220\u9664">${icon("trash",13)}</button>` : '';
   const cat = noteCatPNG(x.category, x.mood, Number(x.id)||0);
   const body = (x.content || x.note || '').trim();
-  const sum = body ? body.split(/\n/)[0] : '';
+  const flat = body.replace(/\n+/g, ' ').trim();
+  const sum = flat ? (flat.length > 64 ? flat.slice(0, 64) + '\u2026' : flat) : '';
   const tags = [x.category, x.mood].filter(Boolean).slice(0,1).map(s=>`<span class="jn-wk-tag">${esc(s)}</span>`).join('');
   return `<div class="jn-wk-entry" data-note-open="${x.id}" data-note-key="${attr(m.key)}">`
     + `<span class="jn-wk-dot"></span>`
@@ -3459,120 +3510,283 @@ function noteRenderContent(x){
   return escd.split(/\n/).map(l => l.trim() ? `<p class="nd-p">${l}</p>` : '').join('');
 }
 
-function noteDetailHTML(key, x, canEdit){
+function notePicsOf(x){
+  if(Array.isArray(x.images) && x.images.length) return x.images;
+  return x.image ? [x.image] : [];
+}
+function noteStickersHTML(x, editing){
+  const list = Array.isArray(x.stickers) ? x.stickers : [];
+  if(!list.length) return "";
+  return list.map((s,i)=>{
+    return `<div class="ndstk ${editing?'ndstk-edit':''}" data-si="${i}" style="left:${s.x}%;top:${s.y}%;transform:translate(-50%,-50%) rotate(${s.rot||0}deg) scale(${s.scale||1})"><img src="${shopIcon(s.item)}" alt="" draggable="false"></div>`;
+  }).join("");
+}
+function noteDetailHTML(key, x, canEdit, editing){
+  const m = modOf(key);
   const cat = noteCatPNG(x.category, x.mood, Number(x.id)||0);
   const decoSrc = cat.src || 'assets/stickers/cat-wave.png';
   const d = x.date ? String(x.date) : '';
   const mon = d ? Number(d.slice(5,7)) : (new Date().getMonth() + 1);
   const MEN = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
-  const tag = x.category ? `<span class="nd-tag">${esc(x.category)}</span>` : '';
   const dateHtml = d ? `<span class="nd-date"><b>${Number(d.slice(5,7))}/${Number(d.slice(8,10))}</b><i>${MEN[mon-1]} ${esc(d.slice(0,4))}</i></span>` : '';
-  const pic = x.image ? `<img class="nd-pic" src="${attr(x.image)}" alt="">` : '';
-  return `<div class="nd-sheet">`
-    + `<div class="nd-top">`
-      + `<button type="button" class="nd-tb" data-nd="back" title="\u8fd4\u56de">${icon("chevron",16,2)}</button>`
-      + (canEdit ? `<button type="button" class="nd-tb ${x.pinned?'on':''}" data-nd="pin" title="\u6536\u85cf">${icon("star",16)}</button>` : '')
-    + `</div>`
+  let head, body, topRight, actions;
+  if(editing){
+    head = `<div class="nd-editseg"><div class="seg nd-seg" id="nd-f-cat">${(m.categories||[]).map(c=>`<div class="opt ${c===x.category?'on':''}" data-v="${attr(c)}">${esc(c)}</div>`).join('')}</div>
+        <input type="date" class="nd-date-in" id="nd-f-date" value="${attr(d || isoToday())}"></div>
+      <div class="nd-editseg"><div class="seg nd-seg" id="nd-f-mood">${(m.moods||['\u7075\u611f','\u590d\u76d8','\u8d44\u8baf','\u5907\u5fd8']).map(md=>`<div class="opt ${md===x.mood?'on':''}" data-v="${attr(md)}">${esc(md)}</div>`).join('')}</div></div>
+      <input class="nd-title-in" id="nd-f-title" value="${attr(x.title || '')}" placeholder="\u7ed9\u8fd9\u6761\u8d77\u4e2a\u540d">
+      <hr class="nd-rule">`;
+    body = `<textarea class="nd-ta" id="nd-f-content" placeholder="\u5199\u70b9\u4ec0\u4e48\u2026">${esc(x.content || '')}</textarea>
+      <div class="nd-imgs" id="nd-imgs"></div>
+      <input type="file" id="nd-file" accept="image/*" multiple hidden>
+      <div class="nd-tools"><button type="button" class="nd-tool" data-nd="stickers">${icon("star",12)} \u8d34\u7eb8</button><span class="nd-tip">\u70b9\u8d34\u7eb8\u53ef\u9009\u4e2d\uff0c\u62d6\u52a8\u6362\u4f4d\u3001\u653e\u5927\u7f29\u5c0f</span></div>`;
+    topRight = `<span class="nd-editing-tag">\u7f16\u8f91\u4e2d</span>`;
+    actions = `<button type="button" class="nd-btn" data-nd="cancel">\u53d6\u6d88</button>
+      <button type="button" class="nd-btn nd-btn-primary" data-nd="save">\u4fdd\u5b58</button>`;
+  } else {
+    const tag = x.category ? `<span class="nd-tag">${esc(x.category)}</span>` : '';
+    head = `<div class="nd-meta">${tag}${dateHtml}</div>
+      <h2 class="nd-title">${esc(x.title || 'Notes')}</h2>
+      <hr class="nd-rule">`;
+    body = `<div class="nd-content" id="nd-content">${noteRenderContent(x)}${notePicsOf(x).map(p=>`<img class="nd-pic" src="${attr(p)}" alt="">`).join('')}</div>`;
+    topRight = (canEdit ? `<button type="button" class="nd-tb ${x.pinned?'on':''}" data-nd="pin" title="\u6536\u85cf">${icon("star",16)}</button>` : '');
+    actions = (canEdit ? `<button type="button" class="nd-act" data-nd="edit" title="\u7f16\u8f91">${icon("pen",18)}</button>
+      <button type="button" class="nd-act" data-nd="del" title="\u5220\u9664">${icon("trash",18)}</button>` : '')
+      + `<button type="button" class="nd-act" data-nd="back" title="\u8fd4\u56de">${icon("chevron",18)}</button>`;
+  }
+  return `<div class="nd-sheet ${editing?'nd-editing':''}">`
+    + `<div class="nd-top"><button type="button" class="nd-tb" data-nd="back" title="\u8fd4\u56de">${icon("chevron",16,2)}</button>${topRight}</div>`
     + `<div class="nd-scroll"><div class="nd-page">`
-      + `<div class="nd-meta">${tag}${dateHtml}</div>`
-      + `<h2 class="nd-title">${esc(x.title || 'Notes')}</h2>`
-      + `<hr class="nd-rule">`
-      + `<div class="nd-content">${noteRenderContent(x)}${pic}</div>`
+      + `<div class="nd-stickers" id="nd-stickers">${noteStickersHTML(x, editing)}</div>`
+      + head + body
       + `<div class="nd-foot"><span class="nd-mark">\u4e8c\u732b \u00b7 \u7075\u611f\u5907\u5fd8</span><img src="${decoSrc}" alt=""></div>`
     + `</div></div>`
-    + `<div class="nd-actions">`
-      + (canEdit ? `<button type="button" class="nd-act" data-nd="edit" title="\u7f16\u8f91">${icon("pen",18)}</button>`
-                 + `<button type="button" class="nd-act" data-nd="del" title="\u5220\u9664">${icon("trash",18)}</button>` : '')
-      + `<button type="button" class="nd-act" data-nd="back" title="\u8fd4\u56de">${icon("chevron",18)}</button>`
-    + `</div></div>`;
+    + `<div class="nd-actions">${actions}</div>`
+    + (editing ? `<div class="ndstk-tools" id="ndstk-tools" hidden><button type="button" data-stk="small">\uff0d</button><button type="button" data-stk="big">\uff0b</button><button type="button" data-stk="rot">\u21bb</button><button type="button" data-stk="del">\u79fb\u9664</button></div>` : '')
+    + `</div>`;
 }
 
-function openNoteDetail(key, id){
-  const rec = (data[key]||[]).find(i=>i.id==id); if(!rec) return;
+function openNoteDetail(key, id, editing){
+  const m = modOf(key);
+  let rec;
+  if(id == null){
+    rec = newItem(m);
+    rec.date = isoToday();
+    rec.category = (m.categories && m.categories[0]) || '\u5176\u4ed6';
+    rec.mood = '';
+    if(!Array.isArray(rec.images)) rec.images = [];
+    if(!Array.isArray(rec.stickers)) rec.stickers = [];
+  } else {
+    rec = (data[key]||[]).find(i=>i.id==id); if(!rec) return;
+  }
   const canEdit = (typeof auth !== "undefined" && auth.canEdit) ? auth.canEdit(key) : true;
+  const isEdit = !!(editing && canEdit);
   const overlay = document.createElement("div");
   overlay.className = "nd-overlay";
   overlay.setAttribute("role", "dialog");
-  overlay.innerHTML = noteDetailHTML(key, rec, canEdit);
+  overlay.innerHTML = noteDetailHTML(key, rec, canEdit, isEdit);
   document.body.appendChild(overlay);
-  const content = overlay.querySelector(".nd-content");
+  let onSel = ()=>{};
   const close = ()=>{ overlay.remove(); document.removeEventListener("selectionchange", onSel); };
   overlay.addEventListener("click", e=>{ if(e.target===overlay) close(); });
-
   const back = overlay.querySelector("[data-nd='back']"); if(back) back.onclick = close;
-  const edit = overlay.querySelector("[data-nd='edit']");
-  if(edit) edit.onclick = ()=>{ close(); openEditor(key, rec); };
-  const del = overlay.querySelector("[data-nd='del']");
-  if(del) del.onclick = ()=>{ confirmDelete(key, id); close(); };
-  const pin = overlay.querySelector("[data-nd='pin']");
-  if(pin) pin.onclick = ()=>{
-    togglePin(key, id);
-    const cur = (data[key]||[]).find(i=>i.id==id);
-    pin.classList.toggle("on", !!(cur && cur.pinned));
-  };
 
-  /* 划重点：选中文字 -> 浮层（浅黄/浅粉/浅绿 + 取消高亮）
-     鼠标：拖拽松开 mouseup 触发；移动端：长按选择 selectionchange / touchend 触发 */
-  const chip = document.createElement("div");
-  chip.className = "nd-hlchip";
-  chip.innerHTML = `<button type="button" class="sw sw-y" data-c="y" title="\u6d45\u9ec4"></button>`
-    + `<button type="button" class="sw sw-p" data-c="p" title="\u6d45\u7c89"></button>`
-    + `<button type="button" class="sw sw-g" data-c="g" title="\u6d45\u7eff"></button>`
-    + `<button type="button" class="nd-hl-off">\u53d6\u6d88\u9ad8\u4eae</button>`;
-  overlay.appendChild(chip);
-  const offBtn = chip.querySelector(".nd-hl-off");
-  let selText = "";
-  const norm = h => (typeof h === 'string') ? { t:h, c:'y' } : h;
-  const hideChip = ()=>{ chip.classList.remove("on"); selText = ""; offBtn.style.display = "none"; };
-  const curHls = ()=>{ const r=(data[key]||[]).find(i=>i.id==id); return r && Array.isArray(r.highlights) ? r.highlights.map(norm) : []; };
-  const rerender = ()=>{
-    const fresh = (data[key]||[]).find(ii=>ii.id==id);
-    if(content) content.innerHTML = noteRenderContent(fresh)
-      + (fresh.image ? `<img class="nd-pic" src="${attr(fresh.image)}" alt="">` : '');
-  };
-  const showChip = ()=>{
-    const sel = window.getSelection();
-    if(!sel || sel.rangeCount === 0) return hideChip();
-    const txt = String(sel).trim();
-    if(!txt || txt.length > 80 || !content) return hideChip();
-    const range = sel.getRangeAt(0);
-    if(!content.contains(range.commonAncestorContainer)) return hideChip();
-    const rect = range.getBoundingClientRect();
-    if(!rect || (rect.width === 0 && rect.height === 0)) return hideChip();
-    const or = overlay.getBoundingClientRect();
-    selText = txt;
-    offBtn.style.display = curHls().some(h => h.t === txt) ? "" : "none";
-    chip.classList.add("on");
-    chip.style.left = Math.max(10, Math.min(or.width - 150, rect.left - or.left + rect.width/2 - 70)) + "px";
-    chip.style.top = Math.max(8, rect.top - or.top - 44) + "px";
-  };
-  const onSel = ()=>{ const s=window.getSelection(); (s && String(s).trim()) ? showChip() : hideChip(); };
-  document.addEventListener("selectionchange", onSel);
-  if(content){
-    content.addEventListener("mouseup", showChip);
-    content.addEventListener("touchend", ()=>setTimeout(showChip, 60));
+  if(isEdit){
+    /* ================= 编辑态（手账沉浸式：直接在页面上写） ================= */
+    let curCat = rec.category || (m.categories && m.categories[0]) || '\u5176\u4ed6';
+    let curMood = rec.mood || '';
+    overlay.querySelectorAll("#nd-f-cat .opt").forEach(o=>o.onclick=()=>{
+      overlay.querySelectorAll("#nd-f-cat .opt").forEach(x=>x.classList.remove("on"));
+      o.classList.add("on"); curCat = o.dataset.v;
+    });
+    overlay.querySelectorAll("#nd-f-mood .opt").forEach(o=>o.onclick=()=>{
+      const segEl = o.parentElement; const wasOn = o.classList.contains("on");
+      segEl.querySelectorAll(".opt").forEach(x=>x.classList.remove("on"));
+      if(wasOn){ curMood = ""; } else { o.classList.add("on"); curMood = o.dataset.v; }
+    });
+    const ta = overlay.querySelector("#nd-f-content");
+    const autoH = ()=>{ ta.style.height = "auto"; ta.style.height = Math.max(170, ta.scrollHeight + 4) + "px"; };
+    ta.addEventListener("input", autoH); setTimeout(autoH, 60);
+
+    /* 多图上传（自动压缩，上限 9 张） */
+    let imgs = notePicsOf(rec).slice();
+    const renderImgs = ()=>{
+      const box = overlay.querySelector("#nd-imgs");
+      box.innerHTML = imgs.map((p,i)=>`<div class="nd-img-cell"><img src="${attr(p)}" alt=""><button type="button" class="nd-img-del" data-pi="${i}">\u00d7</button></div>`).join("")
+        + `<button type="button" class="nd-img-add" id="nd-add-img">\uff0b \u56fe\u7247</button>`;
+      box.querySelector("#nd-add-img").onclick = ()=>overlay.querySelector("#nd-file").click();
+      box.querySelectorAll(".nd-img-del").forEach(b=>b.onclick = ()=>{ imgs.splice(+b.dataset.pi, 1); renderImgs(); });
+    };
+    renderImgs();
+    overlay.querySelector("#nd-file").onchange = e=>{
+      const fs = [...(e.target.files||[])].slice(0, 9 - imgs.length);
+      if(!fs.length){ alert("\u6700\u591a 9 \u5f20\u56fe\u7247\u54e6"); e.target.value=""; return; }
+      let done = 0;
+      fs.forEach(f=>{
+        if(f.size > 6*1024*1024){ done++; return; }
+        compressImageToDataURL(f, out=>{ if(out && imgs.length < 9) imgs.push(out); if(++done === fs.length) renderImgs(); });
+      });
+      e.target.value = "";
+    };
+
+    /* 藏品贴纸：贴入 / 拖拽 / 缩放 / 旋转 / 二次确认移除（只属于本条笔记，不动藏品库存） */
+    const stkLayer = overlay.querySelector("#nd-stickers");
+    const tools = overlay.querySelector("#ndstk-tools");
+    let selIdx = null;
+    const stks = ()=>{ if(!Array.isArray(rec.stickers)) rec.stickers = []; return rec.stickers; };
+    const renderStk = ()=>{ stkLayer.innerHTML = noteStickersHTML(rec, true); wireStk(); };
+    const selectStk = i=>{
+      selIdx = i;
+      stkLayer.querySelectorAll(".ndstk").forEach(el=>el.classList.toggle("sel", +el.dataset.si === i));
+      tools.hidden = (i == null);
+    };
+    const wireStk = ()=>{
+      stkLayer.querySelectorAll(".ndstk").forEach(el=>{
+        el.addEventListener("pointerdown", ev=>{
+          ev.preventDefault();
+          selectStk(+el.dataset.si);
+          const s = stks()[+el.dataset.si]; if(!s) return;
+          const pageR = overlay.querySelector(".nd-page").getBoundingClientRect();
+          const move = mv=>{
+            const nx = Math.min(97, Math.max(3, ((mv.clientX - pageR.left) / pageR.width) * 100));
+            const ny = Math.min(96, Math.max(3, ((mv.clientY - pageR.top) / pageR.height) * 100));
+            s.x = Math.round(nx * 10) / 10; s.y = Math.round(ny * 10) / 10;
+            el.style.left = s.x + "%"; el.style.top = s.y + "%";
+          };
+          const up = ()=>{ window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+          window.addEventListener("pointermove", move);
+          window.addEventListener("pointerup", up);
+        });
+      });
+    };
+    renderStk();
+    tools.querySelectorAll("button").forEach(b=>b.onclick = e=>{
+      e.stopPropagation();
+      if(selIdx == null) return;
+      const s = stks()[selIdx]; if(!s) return;
+      if(b.dataset.stk === "big") s.scale = Math.min(2.5, (s.scale || 1) + 0.15);
+      else if(b.dataset.stk === "small") s.scale = Math.max(0.4, (s.scale || 1) - 0.15);
+      else if(b.dataset.stk === "rot") s.rot = Math.round(((s.rot || 0) + 8) % 360);
+      else if(b.dataset.stk === "del"){
+        const nm = (ALL_SHOP_ITEMS[s.item] || {}).name || "\u8be5\u8d34\u7eb8";
+        showConfirm("\u79fb\u9664\u8d34\u7eb8", `\u786e\u8ba4\u79fb\u9664\u300c${nm}\u300d\u5417\uff1f`, ()=>{
+          stks().splice(selIdx, 1); selIdx = null; tools.hidden = true; renderStk();
+        });
+        return;
+      }
+      renderStk(); selectStk(selIdx);
+    });
+    overlay.querySelector("[data-nd='stickers']").onclick = e=>{
+      e.stopPropagation();
+      let owned = [];
+      try { owned = Object.keys(ALL_SHOP_ITEMS).filter(k2=>{ try { return candy.hasItem(k2); } catch(err){ return false; } }); } catch(err){}
+      const pnl = document.createElement("div");
+      pnl.className = "overlay"; pnl.style.zIndex = "70";
+      pnl.innerHTML = `<div class="modal"><div class="grab"></div><h2>\u6211\u7684\u85cf\u54c1\u8d34\u7eb8</h2>
+        <div class="sub">\u70b9\u9009\u8d34\u5230\u9875\u9762\u4efb\u610f\u4f4d\u7f6e\uff0c\u53ef\u62d6\u52a8\u3001\u7f29\u653e\uff1b\u53ea\u8d34\u5728\u672c\u6761\u7b14\u8bb0\u91cc\uff0c\u4e0d\u5f71\u54cd\u85cf\u54c1\u5e93\u5b58</div>
+        <div class="nd-panel">${owned.length ? owned.map(k2=>`<button type="button" class="nd-pnl-it" data-item="${attr(k2)}"><img src="${shopIcon(k2)}" alt="">${esc((ALL_SHOP_ITEMS[k2]||{}).name || k2)}</button>`).join("") : '<div class="empty" style="padding:24px">\u8fd8\u6ca1\u6709\u53ef\u7528\u7684\u85cf\u54c1\u8d34\u7eb8\uff0c\u53bb\u7cd6\u679c\u5c0f\u94fa\u901b\u901b\u5427</div>'}</div>
+        <div class="modal-actions"><button class="btn ghost" id="pnl-close">\u5173\u95ed</button></div></div>`;
+      document.body.appendChild(pnl);
+      pnl.onclick = ev=>{ if(ev.target === pnl) pnl.remove(); };
+      pnl.querySelector("#pnl-close").onclick = ()=>pnl.remove();
+      pnl.querySelectorAll(".nd-pnl-it").forEach(b2=>b2.onclick = ()=>{
+        stks().push({ item: b2.dataset.item, x: 50, y: 38, rot: Math.round(-6 + Math.random()*12), scale: 1 });
+        pnl.remove(); renderStk();
+      });
+    };
+    /* 保存 / 取消 */
+    overlay.querySelector("[data-nd='save']").onclick = ()=>{
+      rec.title = (overlay.querySelector("#nd-f-title").value || "").trim() || "\u672a\u547d\u540d";
+      rec.content = (overlay.querySelector("#nd-f-content").value || "").trim();
+      rec.category = curCat; rec.mood = curMood;
+      rec.date = (overlay.querySelector("#nd-f-date").value || "").trim() || isoToday();
+      rec.images = imgs;
+      if(id == null){
+        (data[key] = data[key] || []).unshift(rec);
+        rec.createUserId = auth.session ? auth.session.userId : 0;
+        rec.createRole = auth.session ? auth.session.role : "admin";
+        rec.createdBy = auth.isFamily() ? "family" : "admin";
+      }
+      persist();
+      overlay.remove(); document.removeEventListener("selectionchange", onSel);
+      openNoteDetail(key, rec.id, false);
+    };
+    overlay.querySelector("[data-nd='cancel']").onclick = ()=>{
+      overlay.remove(); document.removeEventListener("selectionchange", onSel);
+      if(id != null) openNoteDetail(key, id, false);
+    };
+  } else {
+    /* ================= 查看态 ================= */
+    const content = overlay.querySelector(".nd-content");
+    const del = overlay.querySelector("[data-nd='del']");
+    if(del) del.onclick = ()=>{ confirmDelete(key, id); close(); };
+    const edit = overlay.querySelector("[data-nd='edit']");
+    if(edit) edit.onclick = ()=>{ close(); openNoteDetail(key, id, true); };
+    const pin = overlay.querySelector("[data-nd='pin']");
+    if(pin) pin.onclick = ()=>{
+      togglePin(key, id);
+      const cur = (data[key]||[]).find(i=>i.id==id);
+      pin.classList.toggle("on", !!(cur && cur.pinned));
+    };
+    /* 划重点（查看态）：三色浮层 + 取消高亮 */
+    const chip = document.createElement("div");
+    chip.className = "nd-hlchip";
+    chip.innerHTML = `<button type="button" class="sw sw-y" data-c="y" title="\u6d45\u9ec4"></button>`
+      + `<button type="button" class="sw sw-p" data-c="p" title="\u6d45\u7c89"></button>`
+      + `<button type="button" class="sw sw-g" data-c="g" title="\u6d45\u7eff"></button>`
+      + `<button type="button" class="nd-hl-off">\u53d6\u6d88\u9ad8\u4eae</button>`;
+    overlay.appendChild(chip);
+    const offBtn = chip.querySelector(".nd-hl-off");
+    let selText = "";
+    const norm = h => (typeof h === 'string') ? { t:h, c:'y' } : h;
+    const hideChip = ()=>{ chip.classList.remove("on"); selText = ""; offBtn.style.display = "none"; };
+    const curHls = ()=>{ const r=(data[key]||[]).find(i=>i.id==id); return r && Array.isArray(r.highlights) ? r.highlights.map(norm) : []; };
+    const rerender = ()=>{
+      const fresh = (data[key]||[]).find(ii=>ii.id==id);
+      if(content) content.innerHTML = noteRenderContent(fresh) + notePicsOf(fresh).map(p=>`<img class="nd-pic" src="${attr(p)}" alt="">`).join("");
+    };
+    const showChip = ()=>{
+      const sel = window.getSelection();
+      if(!sel || sel.rangeCount === 0) return hideChip();
+      const txt = String(sel).trim();
+      if(!txt || txt.length > 80 || !content) return hideChip();
+      const range = sel.getRangeAt(0);
+      if(!content.contains(range.commonAncestorContainer)) return hideChip();
+      const rect = range.getBoundingClientRect();
+      if(!rect || (rect.width === 0 && rect.height === 0)) return hideChip();
+      const or = overlay.getBoundingClientRect();
+      selText = txt;
+      offBtn.style.display = curHls().some(h => h.t === txt) ? "" : "none";
+      chip.classList.add("on");
+      chip.style.left = Math.max(10, Math.min(or.width - 150, rect.left - or.left + rect.width/2 - 70)) + "px";
+      chip.style.top = Math.max(8, rect.top - or.top - 44) + "px";
+    };
+    onSel = ()=>{ const s=window.getSelection(); (s && String(s).trim()) ? showChip() : hideChip(); };
+    document.addEventListener("selectionchange", onSel);
+    if(content){
+      content.addEventListener("mouseup", showChip);
+      content.addEventListener("touchend", ()=>setTimeout(showChip, 60));
+    }
+    chip.addEventListener("mousedown", e=>e.preventDefault());
+    const applyHl = c=>{
+      if(!selText) return;
+      const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
+      const hls = curHls();
+      const i = hls.findIndex(h=>h.t===selText);
+      if(i >= 0) hls[i].c = c; else hls.push({ t:selText, c:c });
+      r.highlights = hls;
+      persist(); rerender(); hideChip();
+    };
+    chip.querySelectorAll(".sw").forEach(sw => sw.onclick = e=>{ e.stopPropagation(); applyHl(sw.dataset.c); });
+    offBtn.onclick = e=>{
+      e.stopPropagation();
+      if(!selText) return;
+      const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
+      r.highlights = curHls().filter(h=>h.t!==selText);
+      persist(); rerender(); hideChip();
+    };
+    overlay.addEventListener("mousedown", e=>{ if(!chip.contains(e.target) && !(content && content.contains(e.target))) hideChip(); });
   }
-  chip.addEventListener("mousedown", e=>e.preventDefault());   /* 保留选区 */
-  const applyHl = c=>{
-    if(!selText) return;
-    const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
-    const hls = curHls();
-    const i = hls.findIndex(h=>h.t===selText);
-    if(i >= 0) hls[i].c = c; else hls.push({ t:selText, c:c });
-    r.highlights = hls;
-    persist(); rerender(); hideChip();
-  };
-  chip.querySelectorAll(".sw").forEach(sw => sw.onclick = e=>{ e.stopPropagation(); applyHl(sw.dataset.c); });
-  offBtn.onclick = e=>{
-    e.stopPropagation();
-    if(!selText) return;
-    const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
-    r.highlights = curHls().filter(h=>h.t!==selText);
-    persist(); rerender(); hideChip();
-  };
-  /* 点击/触摸 chip 之外才收起浮层；content 内 mousedown 是新一次选择，不收起。
-     不能用 click 收起：拖拽结束也会派发 click，会把 mouseup 刚弹出的浮层立刻收掉（鼠标端失效根因） */
-  overlay.addEventListener("mousedown", e=>{ if(!chip.contains(e.target) && !(content && content.contains(e.target))) hideChip(); });
 }
 
 function streak(log){
@@ -3595,7 +3809,7 @@ function wireModule(key){
   $("#screen").querySelectorAll("[data-edit]").forEach(el=>el.onclick=()=>openEditor(key,(data[key]).find(i=>i.id==el.dataset.edit)));
   $("#screen").querySelectorAll(".js-del").forEach(el=>el.onclick=e=>{ e.stopPropagation(); confirmDelete(key, el.dataset.id); });
   $("#screen").querySelectorAll(".js-pin").forEach(el=>el.onclick=e=>{ e.stopPropagation(); togglePin(key, el.dataset.id); });
-  const add=$("#btn-add"); if(add) add.onclick=()=>openEditor(key,null);
+  const add=$("#btn-add"); if(add) add.onclick=()=>{ const am=modOf(key); if(am && am.type==='note'){ openNoteDetail(key, null, true); } else { openEditor(key,null); } };
   if(m.type==="checkin") wireCalendar(key, data[key]||[]);
   // 记账三张小票入口
   $("#screen").querySelectorAll(".jn-receipt-open").forEach(el=>el.onclick=()=>openReceipt(el.dataset.receipt));
@@ -3848,7 +4062,7 @@ function render(){
   if(view==="home"){ $("#topTitle").childNodes[0].textContent=""; }
   else if(view==="game"){ $("#topTitle").childNodes[0].textContent="糖果小铺"; }
   else if(view==="users"){ $("#topTitle").childNodes[0].textContent="用户管理"; }
-  else { const m=modOf(view); $("#topTitle").childNodes[0].textContent=(m && m.type==='note') ? "" : (m?m.name:"我的工作台"); }
+  else { const m=modOf(view); $("#topTitle").childNodes[0].textContent=m?m.name:"我的工作台"; }
   $(".app").classList.toggle("home-view", view === "home");
   // 日期：首页只显示 M/D，其它视图显示 M/D 周x
   const nowDate = new Date();
