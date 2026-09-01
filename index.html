@@ -1223,6 +1223,46 @@
   .tl-date-group.tl-rail-note .tl-date-label .tl-md { display:block; font-size:16px; font-weight:700; color:#5C4A3A; letter-spacing:.5px; }
 
   /* ============================================================
+     灵感备忘 · 头部迷你日历 / 心情 / 悬浮新建
+     ============================================================ */
+  .jn-cal { padding: 14px 12px 12px; background: #FBF8F1; border: 1px solid #E8DFD0; border-radius: 14px; margin-bottom: 10px; }
+  .jn-cal-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .jn-cal-my { font-family: var(--font-journal); font-size: 18px; font-weight: 700; color: #3D3226; }
+  .jn-cal-count { font-size: 11px; color: #9C8B7A; }
+  .jn-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+  .jn-cal-wd { font-size: 10px; color: #B8A99A; letter-spacing: 1px; padding: 4px 0; }
+  .jn-cal-day { position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #5C4A3A; border-radius: 50%; cursor: pointer; transition: background .15s; }
+  .jn-cal-day:hover { background: rgba(92,74,58,.06); }
+  .jn-cal-day.today { background: rgba(200,170,130,.18); font-weight: 600; }
+  .jn-cal-day.sel { background: rgba(122,154,126,.20); color: #3D3226; font-weight: 600; }
+  .jn-cal-day.other { color: transparent; pointer-events: none; }
+  .jn-cal-day .mood-corner { position: absolute; right: 2px; bottom: 2px; width: 14px; height: 14px; object-fit: contain; pointer-events: none; }
+  /* 心情选择面板 */
+  .jn-mood-pnl { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center;
+    background: rgba(61,50,38,.35); animation: ndFade .2s ease both; }
+  .jn-mood-sheet { width: 100%; max-width: 420px; background: #FBF8F1; border-radius: 20px 20px 0 0;
+    padding: 18px 18px calc(18px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 24px rgba(61,50,38,.18); }
+  .jn-mood-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .jn-mood-hd h3 { font-family: var(--font-journal); font-size: 18px; margin: 0; color: #3D3226; }
+  .jn-mood-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .jn-mood-it { display: flex; flex-direction: column; align-items: center; gap: 6px; border: 1px solid #E8DFD0;
+    background: #fff; border-radius: 14px; padding: 14px 6px; cursor: pointer; transition: transform .12s, border-color .15s, background .15s; }
+  .jn-mood-it:active { transform: scale(.96); }
+  .jn-mood-it.on { border-color: #7A9A7E; background: #F3F7F1; }
+  .jn-mood-it img { width: 44px; height: 44px; object-fit: contain; }
+  .jn-mood-it span { font-size: 11px; color: #5C4A3A; }
+  .jn-mood-clear { display: block; width: 100%; margin-top: 14px; padding: 10px; border: 1px dashed #D8CBB4;
+    background: transparent; border-radius: 999px; color: #9C8B7A; font-size: 12px; cursor: pointer; }
+  /* 悬浮新建 */
+  .jn-fab { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 40;
+    width: 52px; height: 52px; border-radius: 50%; border: 1px solid #D8CBB4; background: #FBF8F1;
+    color: #5C4A3A; display: grid; place-items: center; box-shadow: 0 3px 10px rgba(61,50,38,.12);
+    cursor: pointer; transition: transform .12s, box-shadow .15s; }
+  .jn-fab:active { transform: scale(.92); box-shadow: 0 1px 5px rgba(61,50,38,.10); }
+  @media (min-width: 720px){ .jn-fab { right: 26px; bottom: 26px; } }
+
+  /* ============================================================
      灵感备忘 · weeks 时间轴（真实手账本 weeks 版式：日期左栏 + 圆点条目，无胶带/回形针）
      ============================================================ */
   .jn-weeks { margin-top: 4px; padding: 16px 14px 22px;
@@ -1284,17 +1324,30 @@
   @keyframes ndFade { from{opacity:0} to{opacity:1} }
   .nd-sheet { position:relative; display:flex; flex-direction:column; width:100%; height:100%;
     background-color:#F9F5EC; transform-origin:left center;
-    box-shadow: inset -8px 0 10px -8px rgba(61,50,38,.12);
-    animation:ndFlip .5s cubic-bezier(.36,.06,.2,1) both; }
+    animation:ndFlip .5s cubic-bezier(.36,.06,.2,1) both;
+    box-shadow:
+      1px 0 0 #EDE6D5, 2px 0 0 #E6DDC8, 3px 0 0 #E0D5C0,
+      8px 4px 24px rgba(61,50,38,.16),
+      inset -8px 0 10px -8px rgba(61,50,38,.12); }
+  .nd-sheet::before { content:""; position:absolute; left:-12px; top:-6px; bottom:-6px; width:12px; z-index:3;
+    background:linear-gradient(90deg, #6E8C72, #7A9A7E 60%, #6E8C72);
+    border-radius:4px 0 0 4px; box-shadow:inset -3px 0 5px rgba(0,0,0,.18); }
+  .nd-sheet::after { content:""; position:absolute; right:-10px; top:-4px; bottom:-4px; width:10px; z-index:3;
+    background:linear-gradient(90deg, #7A9A7E, #86A48A);
+    border-radius:0 4px 4px 0; box-shadow:inset 2px 0 4px rgba(0,0,0,.12); }
   @media (min-width:720px){
-    .nd-overlay { align-items:center; padding:30px 18px; }
-    .nd-sheet { height:88vh; max-width:640px; border-radius:16px; overflow:hidden;
-      box-shadow:2px 0 0 #EFE7D8, 4px 0 0 #E6DCC8, -14px 10px 44px rgba(61,50,38,.20); }
+    .nd-overlay { align-items:center; padding:30px 24px 30px 30px; }
+    .nd-sheet { height:88vh; max-width:620px; border-radius:0 16px 16px 0; overflow:hidden;
+      box-shadow:
+        1px 0 0 #EDE6D5, 2px 0 0 #E6DDC8, 3px 0 0 #E0D5C0, 4px 0 0 #D9CDB8,
+        14px 10px 44px rgba(61,50,38,.20); }
+  }
+  @media (max-width:719px){
+    .nd-overlay { padding:0 16px 0 12px; align-items:center; }
+    .nd-sheet { width:100%; height:94vh; border-radius:0 12px 12px 0; }
   }
   @media (prefers-reduced-motion: reduce){ .nd-sheet, .nd-overlay { animation:none; } }
-  /* 书脊：左侧装订暗带 */
-  .nd-sheet::before { content:""; position:absolute; left:0; top:0; bottom:0; width:14px; z-index:3; pointer-events:none;
-    background:linear-gradient(90deg, rgba(61,50,38,.15), rgba(61,50,38,.04) 55%, transparent); }
+
   .nd-top { flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
     padding:12px 16px 6px 22px; }
   .nd-tb { width:36px; height:36px; border-radius:50%; border:none; background:transparent; color:#8A7A6A;
@@ -1353,6 +1406,8 @@
     display:grid; place-items:center; cursor:pointer; transition:transform .12s ease; }
   .nd-act:active { transform:scale(.94); }
   .nd-act[data-nd="back"] svg { transform:rotate(180deg); }
+  .nd-top [data-nd="back"] svg { transform:rotate(180deg); }
+  .nd-actions [data-nd="back"] { display:none; }
   /* ===== 详情页编辑态（手账沉浸式：透明输入 + 多图 + 藏品贴纸） ===== */
   .nd-editing-tag { font-size:10.5px; color:#C08A4E; letter-spacing:1px; }
   .nd-editseg { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:9px; }
@@ -3073,9 +3128,8 @@ function renderModule(key, append){
     const p=avgProgress(it);
     head=headHero(m, `${p.value}%`, `平均进度 · ${it.length} 项`, p.value);
   } else if(m.type==="note"){
-    const todayN=it.filter(x=>x.date===t).length;
-    head=headHero(m, `${it.length}`, `条记录 · 今日 ${todayN} 条`, null);
-  }
+  head = noteCalendarHTML(key, it);
+}
   if(m.type==="checkin") extra=renderCalendar(m,it);
   const renderItems = m.type==="todo" ? [...it].sort((a,b)=>{
     const ad=a.date||t, bd=b.date||t;
@@ -3158,12 +3212,7 @@ function renderModule(key, append){
   /* 扉页栏目卡（灵感页先行，后续全局复用）：图标 + 名称 + 说明 + 贴纸式新建按钮 + 猫咪；顶栏标题置空避免重复 */
   let greetHtml;
   if (m.type === 'note') {
-    greetHtml = `<div class="greet jn-fd">
-      <img class="jn-fd-ic" src="assets/stickers/cat-pencil.png" alt="">
-      <div class="jn-fd-tx"><h1 class="jn-fd-name">${m.name}</h1><p class="jn-fd-desc">\u8bb0\u5f55\u7075\u611f\u3001\u8bfb\u4e66\u7b14\u8bb0\u548c\u65e5\u5e38\u89c2\u5bdf</p></div>
-      ${auth.canEdit(key) ? `<button class="jn-fd-add" id="btn-add">${icon("pen",13,2)}\u65b0\u5efa</button>` : ''}
-      <img class="jn-fd-cat" src="assets/stickers/cat-letter.png" alt="">
-    </div>`;
+    greetHtml = ''; // \u7075\u611f\u9875\u53bb\u6807\u9898\u5361\uff0c\u907f\u514d\u4e0e\u9876\u90e8\u680f\u91cd\u590d
   } else {
     greetHtml = `<div class="greet"><div><h1>${m.name}</h1>${greetSub}</div>${greetCat}
       ${auth.canEdit(key) ? `<button class="add" id="btn-add">${icon("plus",16,2.2)}新建</button>` : ''}</div>`;
@@ -3172,6 +3221,9 @@ function renderModule(key, append){
     <div style="margin-top:16px">${head}${extra}
       ${filterBar}
       <div class="sec-title">记录</div>${body}</div>`;
+  if(m.type === 'note' && auth.canEdit(key)){
+    $("#screen").insertAdjacentHTML('beforeend', `<button class="jn-fab" id="btn-add">${icon('plus',22,2.2)}</button>`);
+  }
 
   // 列表懒加载：首屏 30 条，滚动到底的哨兵触发再追加 30 条（避免一次性渲染大量带图记录）
   const sentinel = document.getElementById("loadMoreSentinel");
@@ -3510,6 +3562,71 @@ function noteRenderContent(x){
   return escd.split(/\n/).map(l => l.trim() ? `<p class="nd-p">${l}</p>` : '').join('');
 }
 
+const NOTE_MOODS = [
+  {key:'happy', name:'\u5f00\u5fc3', src:'assets/stickers/mood-happy.png'},
+  {key:'calm',  name:'\u5e73\u9759', src:'assets/stickers/mood-calm.png'},
+  {key:'sleepy',name:'\u56f0',    src:'assets/stickers/mood-sleepy.png'},
+  {key:'love',  name:'\u559c\u6b22', src:'assets/stickers/mood-love.png'},
+  {key:'sad',   name:'\u96be\u8fc7', src:'assets/stickers/mood-sad.png'},
+  {key:'meh',   name:'\u4e00\u822c', src:'assets/stickers/mood-meh.png'},
+];
+let _noteSelDate = '';
+function noteMoods(){ return NOTE_MOODS; }
+function noteCalendarHTML(key, items){
+  const today = isoToday();
+  const d = new Date();
+  const y = d.getFullYear(), m = d.getMonth();
+  const first = new Date(y, m, 1);
+  const last = new Date(y, m+1, 0);
+  const startDay = first.getDay();
+  const daysInMonth = last.getDate();
+  const MEN = ['\u4e00\u6708','\u4e8c\u6708','\u4e09\u6708','\u56db\u6708','\u4e94\u6708','\u516d\u6708','\u4e03\u6708','\u516b\u6708','\u4e5d\u6708','\u5341\u6708','\u5341\u4e00\u6708','\u5341\u4e8c\u6708'];
+  const WDS = ['\u65e5','\u4e00','\u4e8c','\u4e09','\u56db','\u4e94','\u516d'];
+  const moods = (data.__noteMoods || {});
+  let grid = WDS.map(wd => `<div class="jn-cal-wd">${wd}</div>`).join('');
+  for(let i=0;i<startDay;i++) grid += `<div class="jn-cal-day other"></div>`;
+  for(let day=1; day<=daysInMonth; day++){
+    const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isToday = ds === today;
+    const mood = moods[ds];
+    const cls = ['jn-cal-day', isToday?'today':'', ds===_noteSelDate?'sel':''].filter(Boolean).join(' ');
+    grid += `<div class="${cls}" data-cal-d="${ds}">${day}${mood?`<img class="mood-corner" src="${mood.src}" alt="">`:''}</div>`;
+  }
+  const count = items.length;
+  const todayN = items.filter(x=>x.date===today).length;
+  return `<div class="jn-cal" data-module="${attr(key)}">
+    <div class="jn-cal-hd"><div class="jn-cal-my">${y} · ${MEN[m]}</div><div class="jn-cal-count">${count} \u6761\u8bb0\u5f55 · \u4eca\u65e5 ${todayN} \u6761</div></div>
+    <div class="jn-cal-grid">${grid}</div>
+  </div>`;
+}
+function setNoteMood(date, mood){
+  if(!data.__noteMoods) data.__noteMoods = {};
+  if(mood) data.__noteMoods[date] = {key:mood.key, src:mood.src, name:mood.name};
+  else delete data.__noteMoods[date];
+  persist();
+}
+function openMoodPicker(key, date){
+  _noteSelDate = date;
+  const moods = noteMoods();
+  const cur = (data.__noteMoods || {})[date];
+  const overlay = document.createElement('div');
+  overlay.className = 'jn-mood-pnl';
+  overlay.innerHTML = `<div class="jn-mood-sheet">
+    <div class="jn-mood-hd"><h3>${date.slice(5).replace('-','/')} \u7684\u5fc3\u60c5</h3><button type="button" class="nd-tb" id="mood-close">${icon('close',18,2)}</button></div>
+    <div class="jn-mood-grid">${moods.map(md => `<button type="button" class="jn-mood-it ${cur && cur.key===md.key?'on':''}" data-key="${md.key}"><img src="${md.src}" alt=""><span>${md.name}</span></button>`).join('')}</div>
+    ${cur?`<button type="button" class="jn-mood-clear" id="mood-clear">\u6e05\u9664\u5fc3\u60c5</button>`:''}
+  </div>`;
+  document.body.appendChild(overlay);
+  const close = () => { overlay.remove(); };
+  overlay.onclick = e => { if(e.target===overlay) close(); };
+  overlay.querySelector('#mood-close').onclick = close;
+  const clearBtn = overlay.querySelector('#mood-clear');
+  if(clearBtn) clearBtn.onclick = () => { setNoteMood(date, null); close(); renderModule(key, true); };
+  overlay.querySelectorAll('.jn-mood-it').forEach(btn => {
+    btn.onclick = () => { const md = moods.find(m=>m.key===btn.dataset.key); setNoteMood(date, md); close(); renderModule(key, true); };
+  });
+}
+
 function notePicsOf(x){
   if(Array.isArray(x.images) && x.images.length) return x.images;
   return x.image ? [x.image] : [];
@@ -3551,8 +3668,7 @@ function noteDetailHTML(key, x, canEdit, editing){
     body = `<div class="nd-content" id="nd-content">${noteRenderContent(x)}${notePicsOf(x).map(p=>`<img class="nd-pic" src="${attr(p)}" alt="">`).join('')}</div>`;
     topRight = (canEdit ? `<button type="button" class="nd-tb ${x.pinned?'on':''}" data-nd="pin" title="\u6536\u85cf">${icon("star",16)}</button>` : '');
     actions = (canEdit ? `<button type="button" class="nd-act" data-nd="edit" title="\u7f16\u8f91">${icon("pen",18)}</button>
-      <button type="button" class="nd-act" data-nd="del" title="\u5220\u9664">${icon("trash",18)}</button>` : '')
-      + `<button type="button" class="nd-act" data-nd="back" title="\u8fd4\u56de">${icon("chevron",18)}</button>`;
+      <button type="button" class="nd-act" data-nd="del" title="\u5220\u9664">${icon("trash",18)}</button>` : '');
   }
   return `<div class="nd-sheet ${editing?'nd-editing':''}">`
     + `<div class="nd-top"><button type="button" class="nd-tb" data-nd="back" title="\u8fd4\u56de">${icon("chevron",16,2)}</button>${topRight}</div>`
@@ -3810,6 +3926,12 @@ function wireModule(key){
   $("#screen").querySelectorAll(".js-del").forEach(el=>el.onclick=e=>{ e.stopPropagation(); confirmDelete(key, el.dataset.id); });
   $("#screen").querySelectorAll(".js-pin").forEach(el=>el.onclick=e=>{ e.stopPropagation(); togglePin(key, el.dataset.id); });
   const add=$("#btn-add"); if(add) add.onclick=()=>{ const am=modOf(key); if(am && am.type==='note'){ openNoteDetail(key, null, true); } else { openEditor(key,null); } };
+  if(m.type==="note"){
+    $("#screen").querySelectorAll(".jn-cal-day[data-cal-d]").forEach(el=>{
+      el.onclick = () => openMoodPicker(key, el.dataset.calD);
+    });
+  }
+
   if(m.type==="checkin") wireCalendar(key, data[key]||[]);
   // 记账三张小票入口
   $("#screen").querySelectorAll(".jn-receipt-open").forEach(el=>el.onclick=()=>openReceipt(el.dataset.receipt));
