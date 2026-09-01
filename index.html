@@ -1246,16 +1246,24 @@
   .jn-wk-en  { font-size:10px; color:#B8A99A; letter-spacing:1.5px; margin-top:2px; }
   .jn-wk-entries { flex:1; min-width:0; display:flex; flex-direction:column; gap:9px; padding-top:3px; }
   /* 条目：橙点 + 微型分类猫 + 标题 + 分类字 + 收藏/删除 */
-  .jn-wk-entry { display:flex; align-items:flex-start; gap:8px; cursor:pointer; padding:3px 4px; margin:-1px -4px; border-radius:8px; }
+  .jn-wk-entry { display:flex; align-items:flex-start; gap:9px; cursor:pointer; padding:4px 5px; margin:-2px -5px; border-radius:10px; }
   .jn-wk-entry:active { background:rgba(92,74,58,.05); }
+  .jn-wk-entry + .jn-wk-entry { border-top:1px dashed #EFE7D8; border-radius:0 0 10px 10px; padding-top:10px; margin-top:10px; }
   .jn-wk-dot { flex:0 0 7px; width:7px; height:7px; border-radius:50%; background:#D98E5F; margin-top:8px; }
-  .jn-wk-cat { flex:0 0 18px; width:18px; height:18px; object-fit:contain; margin-top:3px;
-    filter:drop-shadow(1px 1px 2px rgba(92,74,58,.10)); }
-  .jn-wk-title { flex:1 1 auto; min-width:0; font-family:var(--font); font-size:14.5px; font-weight:500; color:#3D3226;
+  .jn-wk-main { flex:1 1 auto; min-width:0; }
+  .jn-wk-title { font-family:var(--font); font-size:14.5px; font-weight:500; color:#3D3226;
     line-height:1.5; overflow-wrap:anywhere; word-break:break-word;
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .jn-wk-tag { flex:0 0 auto; font-size:10.5px; color:#9C8B7A; background:#F0E8DC; border-radius:5px; padding:1px 7px; margin-top:3px; }
-  .jn-wk-fam { flex:0 0 auto; font-size:10.5px; color:#9C8B7A; margin-top:4px; }
+  .jn-wk-sum { font-size:12.5px; color:#9C8B7A; line-height:1.55; margin-top:3px;
+    display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
+    overflow-wrap:anywhere; word-break:break-word; }
+  .jn-wk-meta { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:5px; }
+  .jn-wk-thumb { flex:0 0 54px; width:54px; height:40px; object-fit:cover; border-radius:8px;
+    border:1px solid #E8DFD0; box-shadow:0 2px 5px rgba(92,74,58,.08); margin-top:2px; }
+  .jn-wk-cat { flex:0 0 16px; width:16px; height:16px; object-fit:contain; margin-top:3px;
+    filter:drop-shadow(1px 1px 2px rgba(92,74,58,.10)); }
+  .jn-wk-tag { flex:0 0 auto; font-size:10.5px; color:#9C8B7A; background:#F0E8DC; border-radius:5px; padding:1px 7px; }
+  .jn-wk-fam { flex:0 0 auto; font-size:10.5px; color:#9C8B7A; }
   .jn-wk-acts { flex:0 0 auto; display:flex; gap:2px; margin-left:2px; }
   .jn-wk-acts button { border:none; background:transparent; color:#B8A99A; cursor:pointer;
     width:22px; height:22px; border-radius:6px; display:grid; place-items:center; }
@@ -1268,63 +1276,108 @@
   }
 
   /* ============================================================
-     灵感备忘 · 详情内页（点状线手账内页：无胶带 / 无回形针 / 翻页动效）
+     灵感备忘 · 详情内页（手账本翻开质感：书脊 + 页缘纸叠 + 低密度点阵）
      ============================================================ */
   .nd-overlay { position:fixed; inset:0; z-index:60; display:flex; align-items:stretch; justify-content:center;
-    background:rgba(61,50,38,.32); perspective:1800px; animation:ndFade .3s ease both; }
+    background:rgba(61,50,38,.34); perspective:1800px; animation:ndFade .3s ease both; }
   @keyframes ndFade { from{opacity:0} to{opacity:1} }
   .nd-sheet { position:relative; display:flex; flex-direction:column; width:100%; height:100%;
-    background:#F7F4EC; box-shadow:-8px 0 32px rgba(61,50,38,.14);
-    transform-origin:left center; animation:ndFlip .5s cubic-bezier(.36,.06,.2,1) both; }
-  @keyframes ndFlip { from{transform:rotateY(-72deg); opacity:.2} to{transform:rotateY(0); opacity:1} }
-  @media (prefers-reduced-motion: reduce){ .nd-sheet, .nd-overlay { animation:none; } }
+    background-color:#F9F5EC; transform-origin:left center;
+    animation:ndFlip .5s cubic-bezier(.36,.06,.2,1) both; }
   @media (min-width:720px){
-    .nd-overlay { align-items:center; padding:32px 16px; }
-    .nd-sheet { height:88vh; max-width:640px; border-radius:18px; overflow:hidden;
-      box-shadow:-10px 6px 40px rgba(61,50,38,.18); }
+    .nd-overlay { align-items:center; padding:30px 18px; }
+    .nd-sheet { height:88vh; max-width:640px; border-radius:16px; overflow:hidden;
+      box-shadow:2px 0 0 #EFE7D8, 4px 0 0 #E6DCC8, -14px 10px 44px rgba(61,50,38,.20); }
   }
-  .nd-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:30px 22px 22px; }
-  /* 点状线底纹内页 */
-  .nd-paper { position:relative; background:#FBF8F1; border-radius:14px; padding:26px 20px 20px;
-    background-image:radial-gradient(circle, #D5CBB8 1px, transparent 1.4px);
-    background-size:18px 18px; }
-  .nd-head { display:flex; align-items:flex-end; justify-content:space-between; gap:10px;
-    padding-bottom:14px; margin-bottom:20px; border-bottom:1px solid #E4DBC8; }
-  .nd-title { font-family:var(--font-journal); font-size:26px; font-weight:700; color:#3D3226;
-    line-height:1.3; margin:0; overflow-wrap:anywhere; word-break:break-word; }
-  .nd-month { flex:0 0 auto; font-size:11px; color:#B8A99A; letter-spacing:1px;
-    display:flex; align-items:baseline; gap:6px; }
-  .nd-month b { font-family:var(--font-journal); font-size:24px; font-weight:700; color:#3D3226; letter-spacing:0; }
-  .nd-item-date { font-size:12px; color:#B8A99A; letter-spacing:.5px; margin:0 0 8px 2px; }
-  .nd-item-body { padding-left:18px; }
-  .nd-content { font-family:var(--font); font-size:15.5px; line-height:1.95; color:#3D3226; text-align:left;
+  @media (prefers-reduced-motion: reduce){ .nd-sheet, .nd-overlay { animation:none; } }
+  /* 书脊：左侧装订暗带 */
+  .nd-sheet::before { content:""; position:absolute; left:0; top:0; bottom:0; width:14px; z-index:3; pointer-events:none;
+    background:linear-gradient(90deg, rgba(61,50,38,.15), rgba(61,50,38,.04) 55%, transparent); }
+  .nd-top { flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+    padding:12px 16px 6px 22px; }
+  .nd-tb { width:36px; height:36px; border-radius:50%; border:none; background:transparent; color:#8A7A6A;
+    display:grid; place-items:center; cursor:pointer; transition:background .15s, transform .12s; }
+  .nd-tb:active { transform:scale(.92); background:rgba(92,74,58,.07); }
+  .nd-tb.on { color:#C08A4E; }
+  .nd-tb.on svg { fill:currentColor; }
+  .nd-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  /* 内页：低密度浅点阵，整页连续（不再是内嵌白卡） */
+  .nd-page { position:relative; min-height:100%; padding:14px 24px 26px 28px;
+    background-image:radial-gradient(circle, rgba(150,130,100,.16) 1px, transparent 1.4px);
+    background-size:24px 24px; }
+  /* 靠书脊的页面弧形阴影 */
+  .nd-page::before { content:""; position:absolute; left:0; top:0; bottom:0; width:46px; pointer-events:none;
+    background:linear-gradient(90deg, rgba(61,50,38,.07), transparent); }
+  .nd-page > * { position:relative; z-index:1; }
+  .nd-meta { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .nd-tag { font-size:11.5px; color:#9C8B7A; background:rgba(240,232,220,.85); border-radius:6px; padding:2px 9px; }
+  .nd-date { text-align:right; line-height:1.15; }
+  .nd-date b { font-family:var(--font-journal); font-size:19px; font-weight:700; color:#3D3226; }
+  .nd-date i { display:block; font-style:normal; font-size:9.5px; color:#B8A99A; letter-spacing:1.5px; text-transform:uppercase; }
+  .nd-title { font-family:var(--font-journal); font-size:23px; font-weight:700; color:#3D3226;
+    line-height:1.35; margin:0 0 6px; overflow-wrap:anywhere; word-break:break-word; }
+  .nd-rule { border:none; border-top:1px dashed #DCD2BE; margin:12px 0 16px; }
+  .nd-content { font-family:var(--font); font-size:15.5px; line-height:2.0; color:#3D3226; text-align:left;
     -webkit-user-select:text; user-select:text; }
-  .nd-p { margin:0 0 14px; }
-  .nd-pic { display:block; width:min(78%, 300px); margin:6px 0 14px; border-radius:8px;
-    box-shadow:0 2px 8px rgba(61,50,38,.08); }
-  /* 荧光笔划重点（低饱和暖黄） */
-  .jn-hl { background:linear-gradient(180deg, transparent 8%, rgba(246,214,116,.55) 8%, rgba(246,214,116,.55) 88%, transparent 88%);
-    color:inherit; padding:0 1px; border-radius:2px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
-  /* 划重点浮动按钮 */
-  .nd-hlchip { position:absolute; z-index:70; border:none; background:#3D3226; color:#FBF8F1;
-    font-size:12px; padding:6px 12px; border-radius:999px; cursor:pointer;
-    box-shadow:0 3px 10px rgba(61,50,38,.25); display:none; }
-  .nd-hlchip.on { display:block; }
-  /* 页脚水印 + 小猫 */
-  .nd-foot { display:flex; align-items:flex-end; justify-content:space-between; margin-top:8px; padding-top:14px; }
-  .nd-foot .nd-mark { font-size:11px; color:#C4B8A5; letter-spacing:1.5px; }
-  .nd-foot img { width:44px; height:44px; object-fit:contain; opacity:.85;
+  .nd-p { margin:0 0 16px; }
+  .nd-pic { display:block; width:min(82%, 320px); margin:8px 0 18px; border-radius:8px;
+    border:1px solid #E8DFD0; box-shadow:0 2px 8px rgba(61,50,38,.07); }
+  /* 划重点：低饱和三色（黄/粉/绿），柔边不遮字 */
+  .jn-hl { color:inherit; padding:0 1px; border-radius:3px;
+    box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+  .jn-hl-y { background:linear-gradient(180deg, transparent 12%, rgba(246,214,116,.45) 12%, rgba(246,214,116,.45) 86%, transparent 86%); }
+  .jn-hl-p { background:linear-gradient(180deg, transparent 12%, rgba(238,168,168,.40) 12%, rgba(238,168,168,.40) 86%, transparent 86%); }
+  .jn-hl-g { background:linear-gradient(180deg, transparent 12%, rgba(166,206,166,.42) 12%, rgba(166,206,166,.42) 86%, transparent 86%); }
+  /* 划重点浮层：三色点 + 取消 */
+  .nd-hlchip { position:absolute; z-index:70; display:none; align-items:center; gap:6px;
+    background:#3D3226; border-radius:999px; padding:6px 10px;
+    box-shadow:0 3px 12px rgba(61,50,38,.28); }
+  .nd-hlchip.on { display:flex; }
+  .nd-hlchip .sw { width:18px; height:18px; border-radius:50%; border:1.5px solid rgba(255,253,247,.55); cursor:pointer; padding:0; }
+  .nd-hlchip .sw-y { background:#F0D08A; }
+  .nd-hlchip .sw-p { background:#E8A8A8; }
+  .nd-hlchip .sw-g { background:#A4CCA4; }
+  .nd-hlchip .nd-hl-off { border:none; background:transparent; color:#F0E8DC; font-size:11.5px; cursor:pointer; padding:2px 4px; }
+  /* 页脚 */
+  .nd-foot { display:flex; align-items:flex-end; justify-content:space-between; margin-top:26px; padding-top:16px; }
+  .nd-foot .nd-mark { font-size:10.5px; color:#C4B8A5; letter-spacing:1.5px; }
+  .nd-foot img { width:46px; height:46px; object-fit:contain; opacity:.88;
     filter:drop-shadow(1px 2px 3px rgba(61,50,38,.10)); }
-  /* 操作栏：返回 / 收藏 / 编辑 / 删除 */
+  /* 底部操作：编辑 / 删除 / 返回 */
   .nd-actions { flex:0 0 auto; display:flex; align-items:center; justify-content:center; gap:20px;
-    padding:12px 20px calc(12px + env(safe-area-inset-bottom)); background:#F7F4EC;
-    border-top:1px solid #E4DBC8; }
+    padding:12px 20px calc(12px + env(safe-area-inset-bottom)); background:#F9F5EC;
+    border-top:1px solid #E8DFD0; }
   .nd-act { width:44px; height:44px; border-radius:50%; border:none; background:#F0E8DC; color:#5C4A3A;
     display:grid; place-items:center; cursor:pointer; transition:transform .12s ease; }
   .nd-act:active { transform:scale(.94); }
-  .nd-act.on { background:#E4D6BE; }
-  .nd-act.on svg { fill:currentColor; }
   .nd-act[data-nd="back"] svg { transform:rotate(180deg); }
+  @media (max-width:359px){
+    .nd-page { padding:12px 16px 20px 22px; }
+    .nd-title { font-size:20px; }
+  }
+
+  /* ============================================================
+     灵感备忘 · 扉页栏目卡（图标 + 名称 + 说明 + 贴纸式新建按钮 + 猫咪）
+     ============================================================ */
+  .greet.jn-fd { overflow:visible; min-height:0; padding:16px 14px 18px; gap:11px; align-items:center;
+    background-color:#FBF8F1;
+    background-image:
+      linear-gradient(rgba(140,120,95,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(140,120,95,.045) 1px, transparent 1px);
+    background-size:18px 18px;
+    border:1px dashed #E0D5C5; border-radius:14px; box-shadow:0 2px 6px rgba(92,74,58,.05); }
+  .greet.jn-fd .jn-fd-ic { width:38px; height:38px; object-fit:contain; flex:0 0 auto;
+    filter:drop-shadow(1px 2px 3px rgba(92,74,58,.10)); }
+  .greet.jn-fd .jn-fd-tx { flex:1; min-width:0; }
+  .jn-fd-name { font-family:var(--font-journal); font-size:21px; font-weight:700; color:#3D3226; line-height:1.25; margin:0; }
+  .jn-fd-desc { font-size:12px; color:#9C8B7A; margin:4px 0 0; line-height:1.5; }
+  .jn-fd-add { flex:0 0 auto; display:inline-flex; align-items:center; gap:5px;
+    border:1px solid #D8CBB4; background:rgba(255,253,247,.85); color:#5C4A3A;
+    font-size:12.5px; font-weight:600; padding:7px 14px; border-radius:999px; cursor:pointer;
+    transition:transform .12s ease, background .15s; }
+  .jn-fd-add:active { transform:scale(.96); background:#F3EDDE; }
+  .jn-fd-cat { position:absolute; right:14px; bottom:-10px; width:52px; height:auto; opacity:.92;
+    filter:drop-shadow(2px 3px 4px rgba(92,74,58,.12)); pointer-events:none; transform:rotate(4deg); }
 
   /* ---------- bottom nav ---------- */
   .nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: 100%; max-width: 520px; height: var(--nav-h);
@@ -3052,10 +3105,20 @@ function renderModule(key, append){
   const greetSub = m.type === "finance"
     ? `<div class="receipt-chips"><button type="button" class="r-chip jn-receipt-open" data-receipt="flow">收支流水</button><span class="dot">·</span><button type="button" class="r-chip jn-receipt-open" data-receipt="cat">分类占比</button><span class="dot">·</span><button type="button" class="r-chip jn-receipt-open" data-receipt="month">月度小结</button></div>`
     : `<p>${m.desc}</p>`;
-  /* 扉页化（灵感页先行，后续全局复用）：顶栏已保留主标题，首屏卡不再重复 */
-  const frontispiece = m.type === 'note';
-  $("#screen").innerHTML = `<div class="greet"><div>${frontispiece ? '' : `<h1>${m.name}</h1>`}${greetSub}</div>${greetCat}
-      ${auth.canEdit(key) ? `<button class="add" id="btn-add">${icon("plus",16,2.2)}新建</button>` : ''}</div>
+  /* 扉页栏目卡（灵感页先行，后续全局复用）：图标 + 名称 + 说明 + 贴纸式新建按钮 + 猫咪；顶栏标题置空避免重复 */
+  let greetHtml;
+  if (m.type === 'note') {
+    greetHtml = `<div class="greet jn-fd">
+      <img class="jn-fd-ic" src="assets/stickers/cat-pencil.png" alt="">
+      <div class="jn-fd-tx"><h1 class="jn-fd-name">${m.name}</h1><p class="jn-fd-desc">\u8bb0\u5f55\u7075\u611f\u3001\u8bfb\u4e66\u7b14\u8bb0\u548c\u65e5\u5e38\u89c2\u5bdf</p></div>
+      ${auth.canEdit(key) ? `<button class="jn-fd-add" id="btn-add">${icon("pen",13,2)}\u65b0\u5efa</button>` : ''}
+      <img class="jn-fd-cat" src="assets/stickers/cat-letter.png" alt="">
+    </div>`;
+  } else {
+    greetHtml = `<div class="greet"><div><h1>${m.name}</h1>${greetSub}</div>${greetCat}
+      ${auth.canEdit(key) ? `<button class="add" id="btn-add">${icon("plus",16,2.2)}新建</button>` : ''}</div>`;
+  }
+  $("#screen").innerHTML = `${greetHtml}
     <div style="margin-top:16px">${head}${extra}
       ${filterBar}
       <div class="sec-title">记录</div>${body}</div>`;
@@ -3318,11 +3381,18 @@ function jnWeekEntryHTML(m, x){
   const pin = canEdit ? `<button class="pin-btn js-pin ${x.pinned?'on':''}" data-id="${x.id}" title="\u6536\u85cf">${icon("star",13)}</button>` : '';
   const del = canEdit ? `<button class="del js-del" data-id="${x.id}" title="\u5220\u9664">${icon("trash",13)}</button>` : '';
   const cat = noteCatPNG(x.category, x.mood, Number(x.id)||0);
-  const catIcon = cat.src ? `<img class="jn-wk-cat" src="${cat.src}" alt="">` : '';
+  const body = (x.content || x.note || '').trim();
+  const sum = body ? body.split(/\n/)[0] : '';
   const tags = [x.category, x.mood].filter(Boolean).slice(0,1).map(s=>`<span class="jn-wk-tag">${esc(s)}</span>`).join('');
   return `<div class="jn-wk-entry" data-note-open="${x.id}" data-note-key="${attr(m.key)}">`
-    + `<span class="jn-wk-dot"></span>${catIcon}`
-    + `<span class="jn-wk-title">${esc(x.title || '\u65e0\u6807\u9898')}</span>${tags}${familyTag}`
+    + `<span class="jn-wk-dot"></span>`
+    + `<div class="jn-wk-main">`
+      + `<div class="jn-wk-title">${esc(x.title || '\u65e0\u6807\u9898')}</div>`
+      + (sum ? `<div class="jn-wk-sum">${esc(sum)}</div>` : '')
+      + `<div class="jn-wk-meta">${tags}${familyTag}</div>`
+    + `</div>`
+    + (x.image ? `<img class="jn-wk-thumb" src="${attr(x.image)}" alt="" loading="lazy">` : '')
+    + (cat.src ? `<img class="jn-wk-cat" src="${cat.src}" alt="">` : '')
     + `<span class="jn-wk-acts">${pin}${del}</span></div>`;
 }
 
@@ -3379,10 +3449,12 @@ function togglePin(key, id){
 function noteRenderContent(x){
   const raw = String(x.content || x.note || '');
   let escd = esc(raw);
-  const hls = Array.isArray(x.highlights) ? x.highlights : [];
+  const hls = (Array.isArray(x.highlights) ? x.highlights : [])
+    .map(h => (typeof h === 'string') ? { t:h, c:'y' } : h);   /* 兼容旧版纯字符串标记 */
   hls.forEach(h => {
-    const he = esc(String(h));
-    if (he) escd = escd.split(he).join('<mark class="jn-hl">' + he + '</mark>');
+    const he = esc(String(h.t || ''));
+    if (!he) return;
+    escd = escd.split(he).join(`<mark class="jn-hl jn-hl-${h.c || 'y'}">${he}</mark>`);
   });
   return escd.split(/\n/).map(l => l.trim() ? `<p class="nd-p">${l}</p>` : '').join('');
 }
@@ -3391,22 +3463,27 @@ function noteDetailHTML(key, x, canEdit){
   const cat = noteCatPNG(x.category, x.mood, Number(x.id)||0);
   const decoSrc = cat.src || 'assets/stickers/cat-wave.png';
   const d = x.date ? String(x.date) : '';
-  const itemDate = d ? `${Number(d.slice(5,7))}/${Number(d.slice(8,10))}` : '';
   const mon = d ? Number(d.slice(5,7)) : (new Date().getMonth() + 1);
+  const MEN = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const tag = x.category ? `<span class="nd-tag">${esc(x.category)}</span>` : '';
+  const dateHtml = d ? `<span class="nd-date"><b>${Number(d.slice(5,7))}/${Number(d.slice(8,10))}</b><i>${MEN[mon-1]} ${esc(d.slice(0,4))}</i></span>` : '';
   const pic = x.image ? `<img class="nd-pic" src="${attr(x.image)}" alt="">` : '';
   return `<div class="nd-sheet">`
-    + `<div class="nd-scroll"><div class="nd-paper">`
-      + `<div class="nd-head"><h2 class="nd-title">${esc(x.title || 'Notes')}</h2>`
-        + `<div class="nd-month"><span>month</span> / <b>${mon}</b></div></div>`
-      + (itemDate ? `<div class="nd-item-date">${esc(itemDate)}</div>` : '')
-      + `<div class="nd-item-body"><div class="nd-content">${noteRenderContent(x)}${pic}</div></div>`
+    + `<div class="nd-top">`
+      + `<button type="button" class="nd-tb" data-nd="back" title="\u8fd4\u56de">${icon("chevron",16,2)}</button>`
+      + (canEdit ? `<button type="button" class="nd-tb ${x.pinned?'on':''}" data-nd="pin" title="\u6536\u85cf">${icon("star",16)}</button>` : '')
+    + `</div>`
+    + `<div class="nd-scroll"><div class="nd-page">`
+      + `<div class="nd-meta">${tag}${dateHtml}</div>`
+      + `<h2 class="nd-title">${esc(x.title || 'Notes')}</h2>`
+      + `<hr class="nd-rule">`
+      + `<div class="nd-content">${noteRenderContent(x)}${pic}</div>`
       + `<div class="nd-foot"><span class="nd-mark">\u4e8c\u732b \u00b7 \u7075\u611f\u5907\u5fd8</span><img src="${decoSrc}" alt=""></div>`
     + `</div></div>`
     + `<div class="nd-actions">`
-      + `<button type="button" class="nd-act" data-nd="back" title="\u8fd4\u56de">${icon("chevron",18)}</button>`
-      + (canEdit ? `<button type="button" class="nd-act ${x.pinned?'on':''}" data-nd="pin" title="\u6536\u85cf">${icon("star",18)}</button>`
-                 + `<button type="button" class="nd-act" data-nd="edit" title="\u7f16\u8f91">${icon("pen",18)}</button>`
+      + (canEdit ? `<button type="button" class="nd-act" data-nd="edit" title="\u7f16\u8f91">${icon("pen",18)}</button>`
                  + `<button type="button" class="nd-act" data-nd="del" title="\u5220\u9664">${icon("trash",18)}</button>` : '')
+      + `<button type="button" class="nd-act" data-nd="back" title="\u8fd4\u56de">${icon("chevron",18)}</button>`
     + `</div></div>`;
 }
 
@@ -3423,13 +3500,10 @@ function openNoteDetail(key, id){
   overlay.addEventListener("click", e=>{ if(e.target===overlay) close(); });
 
   const back = overlay.querySelector("[data-nd='back']"); if(back) back.onclick = close;
-  /* 编辑：复用现有编辑器（openEditor），关闭详情后打开 */
   const edit = overlay.querySelector("[data-nd='edit']");
   if(edit) edit.onclick = ()=>{ close(); openEditor(key, rec); };
-  /* 删除：复用现有 confirmDelete（其 overlay 后 append，同 z-index 自然盖在详情页之上） */
   const del = overlay.querySelector("[data-nd='del']");
   if(del) del.onclick = ()=>{ confirmDelete(key, id); close(); };
-  /* 收藏：复用 togglePin；详情页在 body 中，不受 persist() 重渲染 #screen 影响 */
   const pin = overlay.querySelector("[data-nd='pin']");
   if(pin) pin.onclick = ()=>{
     togglePin(key, id);
@@ -3437,42 +3511,68 @@ function openNoteDetail(key, id){
     pin.classList.toggle("on", !!(cur && cur.pinned));
   };
 
-  /* 荧光笔划重点：选中文字 -> 浮动「划重点」-> 加入/移除 highlights */
-  const chip = document.createElement("button");
-  chip.type = "button"; chip.className = "nd-hlchip"; chip.textContent = "\u5212\u91cd\u70b9";
+  /* 划重点：选中文字 -> 浮层（浅黄/浅粉/浅绿 + 取消高亮）
+     鼠标：拖拽松开 mouseup 触发；移动端：长按选择 selectionchange / touchend 触发 */
+  const chip = document.createElement("div");
+  chip.className = "nd-hlchip";
+  chip.innerHTML = `<button type="button" class="sw sw-y" data-c="y" title="\u6d45\u9ec4"></button>`
+    + `<button type="button" class="sw sw-p" data-c="p" title="\u6d45\u7c89"></button>`
+    + `<button type="button" class="sw sw-g" data-c="g" title="\u6d45\u7eff"></button>`
+    + `<button type="button" class="nd-hl-off">\u53d6\u6d88\u9ad8\u4eae</button>`;
   overlay.appendChild(chip);
+  const offBtn = chip.querySelector(".nd-hl-off");
   let selText = "";
-  const hideChip = ()=>{ chip.classList.remove("on"); selText = ""; };
-  const onSel = ()=>{
-    const sel = window.getSelection();
-    const txt = sel ? String(sel).trim() : "";
-    if(!txt || txt.length > 80 || !content){ hideChip(); return; }
-    const range = sel.getRangeAt(0);
-    if(!content.contains(range.commonAncestorContainer)){ hideChip(); return; }
-    const rect = range.getBoundingClientRect();
-    const or = overlay.getBoundingClientRect();
-    selText = txt;
-    chip.classList.add("on");
-    chip.style.left = Math.max(10, Math.min(or.width - 90, rect.left - or.left + rect.width/2 - 34)) + "px";
-    chip.style.top = Math.max(8, rect.top - or.top - 38) + "px";
-  };
-  document.addEventListener("selectionchange", onSel);
-  chip.addEventListener("mousedown", e=>e.preventDefault());   /* 保留选区 */
-  chip.onclick = e=>{
-    e.stopPropagation();
-    if(!selText) return;
-    const cur = (data[key]||[]).find(i=>i.id==id); if(!cur) return;
-    const hls = Array.isArray(cur.highlights) ? cur.highlights : [];
-    const i = hls.indexOf(selText);
-    if(i >= 0) hls.splice(i,1); else hls.push(selText);
-    cur.highlights = hls;
-    persist();
+  const norm = h => (typeof h === 'string') ? { t:h, c:'y' } : h;
+  const hideChip = ()=>{ chip.classList.remove("on"); selText = ""; offBtn.style.display = "none"; };
+  const curHls = ()=>{ const r=(data[key]||[]).find(i=>i.id==id); return r && Array.isArray(r.highlights) ? r.highlights.map(norm) : []; };
+  const rerender = ()=>{
     const fresh = (data[key]||[]).find(ii=>ii.id==id);
     if(content) content.innerHTML = noteRenderContent(fresh)
       + (fresh.image ? `<img class="nd-pic" src="${attr(fresh.image)}" alt="">` : '');
-    hideChip();
   };
-  overlay.addEventListener("click", e=>{ if(e.target !== chip) hideChip(); });
+  const showChip = ()=>{
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount === 0) return hideChip();
+    const txt = String(sel).trim();
+    if(!txt || txt.length > 80 || !content) return hideChip();
+    const range = sel.getRangeAt(0);
+    if(!content.contains(range.commonAncestorContainer)) return hideChip();
+    const rect = range.getBoundingClientRect();
+    if(!rect || (rect.width === 0 && rect.height === 0)) return hideChip();
+    const or = overlay.getBoundingClientRect();
+    selText = txt;
+    offBtn.style.display = curHls().some(h => h.t === txt) ? "" : "none";
+    chip.classList.add("on");
+    chip.style.left = Math.max(10, Math.min(or.width - 150, rect.left - or.left + rect.width/2 - 70)) + "px";
+    chip.style.top = Math.max(8, rect.top - or.top - 44) + "px";
+  };
+  const onSel = ()=>{ const s=window.getSelection(); (s && String(s).trim()) ? showChip() : hideChip(); };
+  document.addEventListener("selectionchange", onSel);
+  if(content){
+    content.addEventListener("mouseup", showChip);
+    content.addEventListener("touchend", ()=>setTimeout(showChip, 60));
+  }
+  chip.addEventListener("mousedown", e=>e.preventDefault());   /* 保留选区 */
+  const applyHl = c=>{
+    if(!selText) return;
+    const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
+    const hls = curHls();
+    const i = hls.findIndex(h=>h.t===selText);
+    if(i >= 0) hls[i].c = c; else hls.push({ t:selText, c:c });
+    r.highlights = hls;
+    persist(); rerender(); hideChip();
+  };
+  chip.querySelectorAll(".sw").forEach(sw => sw.onclick = e=>{ e.stopPropagation(); applyHl(sw.dataset.c); });
+  offBtn.onclick = e=>{
+    e.stopPropagation();
+    if(!selText) return;
+    const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
+    r.highlights = curHls().filter(h=>h.t!==selText);
+    persist(); rerender(); hideChip();
+  };
+  /* 点击/触摸 chip 之外才收起浮层；content 内 mousedown 是新一次选择，不收起。
+     不能用 click 收起：拖拽结束也会派发 click，会把 mouseup 刚弹出的浮层立刻收掉（鼠标端失效根因） */
+  overlay.addEventListener("mousedown", e=>{ if(!chip.contains(e.target) && !(content && content.contains(e.target))) hideChip(); });
 }
 
 function streak(log){
@@ -3748,7 +3848,7 @@ function render(){
   if(view==="home"){ $("#topTitle").childNodes[0].textContent=""; }
   else if(view==="game"){ $("#topTitle").childNodes[0].textContent="糖果小铺"; }
   else if(view==="users"){ $("#topTitle").childNodes[0].textContent="用户管理"; }
-  else { const m=modOf(view); $("#topTitle").childNodes[0].textContent=m?m.name:"我的工作台"; }
+  else { const m=modOf(view); $("#topTitle").childNodes[0].textContent=(m && m.type==='note') ? "" : (m?m.name:"我的工作台"); }
   $(".app").classList.toggle("home-view", view === "home");
   // 日期：首页只显示 M/D，其它视图显示 M/D 周x
   const nowDate = new Date();
