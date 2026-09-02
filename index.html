@@ -1257,12 +1257,12 @@
   .jn-mood-clear { display: block; width: 100%; margin-top: 14px; padding: 10px; border: 1px dashed #D8CBB4;
     background: transparent; border-radius: 999px; color: #9C8B7A; font-size: 12px; cursor: pointer; }
   /* 悬浮新建 */
-  .jn-fab { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 40;
+  .jn-fab { position: fixed; right: 18px; bottom: calc(var(--nav-h) + 16px + env(safe-area-inset-bottom)); z-index: 40;
     width: 52px; height: 52px; border-radius: 50%; border: 1px solid #D8CBB4; background: #FBF8F1;
     color: #5C4A3A; display: grid; place-items: center; box-shadow: 0 3px 10px rgba(61,50,38,.12);
     cursor: pointer; transition: transform .12s, box-shadow .15s; }
   .jn-fab:active { transform: scale(.92); box-shadow: 0 1px 5px rgba(61,50,38,.10); }
-  @media (min-width: 720px){ .jn-fab { right: 26px; bottom: 26px; } }
+  @media (min-width: 720px){ .jn-fab { right: 26px; bottom: calc(var(--nav-h) + 20px + env(safe-area-inset-bottom)); } }
 
   /* ============================================================
      灵感备忘 · weeks 时间轴（真实手账本 weeks 版式：日期左栏 + 圆点条目，无胶带/回形针）
@@ -3227,8 +3227,11 @@ function renderModule(key, append){
     <div style="margin-top:16px">${head}${extra}
       ${filterBar}
       <div class="sec-title">记录</div>${body}</div>`;
+  // FAB 必须挂到 body：#screen 带 transform（页面切换动画 translateY(8px)->0），会成为
+  // position:fixed 的包含块，使 FAB 相对 #screen 定位而跟随滚动，不再固定在视口底部
+  document.querySelectorAll('body > .jn-fab').forEach(el => el.remove());
   if(m.type === 'note' && auth.canEdit(key)){
-    $("#screen").insertAdjacentHTML('beforeend', `<button class="jn-fab" id="btn-add">${icon('plus',22,2.2)}</button>`);
+    document.body.insertAdjacentHTML('beforeend', `<button class="jn-fab" id="btn-add">${icon('plus',22,2.2)}</button>`);
   }
 
   // 列表懒加载：首屏 30 条，滚动到底的哨兵触发再追加 30 条（避免一次性渲染大量带图记录）
@@ -4205,6 +4208,7 @@ function render(){
     el.classList.toggle("active", view === k);
   });
   // render body
+  document.querySelectorAll('body > .jn-fab').forEach(el => el.remove()); // 切走时清掉悬浮按钮
   if(view==="home") renderHome();
   else if(view==="game") renderGame();
   else if(view==="users") renderUsers();
