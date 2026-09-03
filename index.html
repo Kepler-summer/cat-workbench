@@ -1337,50 +1337,44 @@
     background:rgba(61,50,38,.34); perspective:1800px; animation:ndFade .3s ease both; }
   @keyframes ndFade { from{opacity:0} to{opacity:1} }
   @keyframes ndFlip { from{ transform: rotateY(-26deg); opacity:0; } to{ transform: rotateY(0deg); opacity:1; } }
-  .nd-sheet { position:relative; display:flex; flex-direction:column; width:100%; height:100%;
-    background-color:#F9F5EC; transform-origin:left center;
-    animation:ndFlip .5s cubic-bezier(.36,.06,.2,1) both;
+  /* 外层透视容器：包裹单页，左页用伪元素做 3D 翻开 */
+  .nd-book { position:relative; z-index:0; width:100%; max-width:620px;
+    perspective:1200px; transform-style:preserve-3d; transform-origin:left center;
+    animation:ndFlip .55s cubic-bezier(.36,.06,.2,1) both; }
+  /* 左页：向前翻开的米黄书页（真实 rotateY 立体感，不依赖 box-shadow） */
+  .nd-book::before { content:""; position:absolute; top:10px; bottom:10px; left:-24px; width:24px;
+    background:linear-gradient(110deg, #D9CCB4 0%, #ECE2CD 45%, #F5EDDE 100%);
+    border-radius:10px 0 0 10px; transform-origin:right center; transform:rotateY(-30deg);
+    box-shadow:-4px 3px 10px rgba(61,50,38,.20); z-index:0; }
+  .nd-sheet { position:relative; z-index:1; display:flex; flex-direction:column; width:100%; height:100%;
+    background-color:#F9F5EC;
     border-radius:0 14px 14px 0;
     box-shadow:
-      /* 左：前一页米黄书页（多页叠加 + 负 y 偏移填满顶部空隙） */
-      -1px 0 0 #F0E7D4, -2px 0 0 #EAE0CB, -3px 0 0 #E4D9C2, -4px 0 0 #DED2B9, -5px 0 0 #D8D2B0, -6px 0 0 #D2CBA7,
-      -1px -1px 0 #F0E7D4, -2px -2px 0 #EAE0CB, -3px -3px 0 #E4D9C2, -4px -4px 0 #DED2B9,
-      -1px  1px 0 #F0E7D4, -2px  2px 0 #EAE0CB, -3px  3px 0 #E4D9C2, -4px  4px 0 #DED2B9,
-      -7px 3px 12px rgba(61,50,38,.07),
       /* 右：内页厚度 */
       1px 0 0 #F4EDDD, 2px 0 0 #EFE6D3, 3px 0 0 #E9DEC8, 4px 0 0 #E3D7BE, 5px 0 0 #DDD0B5,
       /* 右：低饱和浅绿封皮边缘 */
       6px 0 0 #A9BFA8, 7px 0 0 #93AE97, 8px 0 0 #7A9A7E, 9px 0 0 #6E8C72,
-      /* 顶/底：书脊边缘（米黄） */
-      0 -1px 0 #F0E7D4, 0 -2px 0 #EAE0CB, 0 -3px 0 #E4D9C2,
-      0 1px 0 #F0E7D4, 0 2px 0 #EAE0CB, 0 3px 0 #E4D9C2,
       /* 柔和外阴影 */
       16px 12px 34px rgba(61,50,38,.15),
       inset -10px 0 14px -10px rgba(61,50,38,.10); }
   @media (min-width:720px){
-    .nd-overlay { align-items:center; padding:30px 24px 30px 30px; }
-    .nd-sheet { height:88vh; max-width:620px; border-radius:0 16px 16px 0; overflow:hidden;
+    .nd-overlay { align-items:center; padding:30px 24px 30px 46px; }
+    .nd-sheet { height:88vh; border-radius:0 16px 16px 0; overflow:hidden;
       box-shadow:
-        /* 左：前一页米黄书页（多页叠加 + 负 y 填满顶部空隙） */
-        -1px 0 0 #F0E7D4, -2px 0 0 #EAE0CB, -3px 0 0 #E4D9C2, -4px 0 0 #DED2B9,
-        -1px -2px 0 #F0E7D4, -2px -3px 0 #EAE0CB, -3px -4px 0 #E4D9C2,
-        -9px 4px 16px rgba(61,50,38,.08),
         /* 右：内页厚度 */
         1px 0 0 #F4EDDD, 2px 0 0 #EFE6D3, 3px 0 0 #E9DEC8, 4px 0 0 #E3D7BE, 5px 0 0 #DDD0B5,
         /* 右：低饱和浅绿封皮边缘 */
         6px 0 0 #A9BFA8, 7px 0 0 #93AE97, 8px 0 0 #7A9A7E, 9px 0 0 #6E8C72,
-        /* 顶/底：书脊边缘 */
-        0 -1px 0 #F0E7D4, 0 -2px 0 #EAE0CB, 0 -3px 0 #E4D9C2,
-        0 1px 0 #F0E7D4, 0 2px 0 #EAE0CB, 0 3px 0 #E4D9C2,
         /* 柔和外阴影 */
         20px 16px 54px rgba(61,50,38,.16),
         inset -12px 0 16px -12px rgba(61,50,38,.10); }
   }
   @media (max-width:719px){
-    .nd-overlay { padding:0 16px 0 12px; align-items:center; }
+    .nd-overlay { padding:0 16px 0 30px; align-items:center; }
     .nd-sheet { width:100%; height:94vh; border-radius:0 12px 12px 0; }
+    .nd-book::before { left:-22px; width:22px; top:8px; bottom:8px; }
   }
-  @media (prefers-reduced-motion: reduce){ .nd-sheet, .nd-overlay { animation:none; } }
+  @media (prefers-reduced-motion: reduce){ .nd-book, .nd-overlay { animation:none; } }
 
   .nd-top { flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
     padding:12px 16px 6px 22px; }
@@ -3778,7 +3772,7 @@ function openNoteDetail(key, id, editing){
   const overlay = document.createElement("div");
   overlay.className = "nd-overlay";
   overlay.setAttribute("role", "dialog");
-  overlay.innerHTML = noteDetailHTML(key, rec, canEdit, isEdit);
+  overlay.innerHTML = '<div class="nd-book">' + noteDetailHTML(key, rec, canEdit, isEdit) + '</div>';
   document.body.appendChild(overlay);
   let onSel = ()=>{};
   const close = ()=>{ overlay.remove(); document.removeEventListener("selectionchange", onSel); };
