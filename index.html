@@ -1227,18 +1227,18 @@
      ============================================================ */
   .jn-cal { padding: 16px 14px 14px; background: #FBF7EF; border: 1px solid #ECE3D3; border-radius: 16px; margin-bottom: 12px; }
   .jn-cal-hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
-  .jn-cal-my { font-family: var(--font-journal); font-size: 19px; font-weight: 500; color: #6B5B49; letter-spacing: 1px; }
-  .jn-cal-count { font-family: var(--font-journal); font-size: 11px; color: #BBAE99; letter-spacing: 1px; }
+  .jn-cal-my { font-family: var(--font-journal); font-size: 19px; font-weight: 500; color: #3D3226; letter-spacing: 1px; }
+  .jn-cal-count { font-family: var(--font-journal); font-size: 11px; color: #9A8B7A; letter-spacing: 1px; }
   .jn-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
-  .jn-cal-wd { font-family: var(--font-journal); font-size: 11px; color: #A99B88; letter-spacing: 2px; padding: 6px 0 8px; }
+  .jn-cal-wd { font-family: var(--font-journal); font-size: 11px; color: #6B5E4D; letter-spacing: 2px; padding: 6px 0 8px; }
   .jn-cal-day { position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-journal); font-size: 14px; font-weight: 400; color: #4A3F33; border-radius: 50%; cursor: pointer; transition: background .15s; }
-  .jn-cal-day:hover { background: rgba(92,74,58,.05); }
-  .jn-cal-day.today { background: rgba(196,168,128,.16); color: #5C4A3A; font-weight: 500; }
-  .jn-cal-day.sel { background: rgba(122,154,126,.14); color: #4E5E50; font-weight: 500; }
-  .jn-cal-day.sel::after { content:""; position:absolute; inset:3px; border-radius:50%; border:1px dashed rgba(122,154,126,.7); }
+    font-family: var(--font-journal); font-size: 14px; font-weight: 500; color: #2E2620; border-radius: 50%; cursor: pointer; transition: background .15s; }
+  .jn-cal-day:hover { background: rgba(92,74,58,.06); }
+  .jn-cal-day.today { background: rgba(196,168,128,.22); color: #3D3226; font-weight: 600; }
+  .jn-cal-day.sel { background: rgba(122,154,126,.18); color: #3D3226; font-weight: 600; }
+  .jn-cal-day.sel::after { content:""; position:absolute; inset:3px; border-radius:50%; border:1px dashed rgba(122,154,126,.8); }
   .jn-cal-day.other { color: transparent; pointer-events: none; }
-  .jn-cal-day.future { pointer-events: none; opacity: 0.32; color: #B8A99A; }
+  .jn-cal-day.future { pointer-events: none; opacity: 0.48; color: #9A8B7A; }
   .jn-cal-day.has-mood { border-radius: 12px; }
   .jn-cal-day .mood-corner { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; pointer-events:none; }
   /* 心情选择面板 */
