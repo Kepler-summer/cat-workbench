@@ -1336,31 +1336,22 @@
   .nd-overlay { position:fixed; inset:0; z-index:60; display:flex; align-items:stretch; justify-content:center;
     background:rgba(61,50,38,.34); perspective:1800px; animation:ndFade .3s ease both; }
   @keyframes ndFade { from{opacity:0} to{opacity:1} }
-  @keyframes ndFlip { from{ transform: rotateY(-10deg); opacity:0; } to{ transform: rotateY(0deg); opacity:1; } }
+  @keyframes ndFlip { from{ opacity:0; transform: translateY(10px) scale(.992); } to{ opacity:1; transform: translateY(0) scale(1); } }
   /* 外层透视容器：摊开的对开书本，左侧空白页 + 中间装订线 */
   .nd-book { position:relative; z-index:0; width:100%; max-width:620px;
-    perspective:1200px; transform-style:preserve-3d; transform-origin:left center;
-    animation:ndFlip .55s cubic-bezier(.36,.06,.2,1) both; }
-  /* 左页：平铺的空白米黄纸张 */
-  .nd-book::before { content:""; position:absolute; top:0; bottom:0; left:-28px; width:28px;
-    background:linear-gradient(90deg, #EDE6D6 0%, #F6F1E2 100%);
-    border-radius:12px 0 0 12px;
-    box-shadow:
-      inset -4px 0 6px -2px rgba(61,50,38,.14),
-      -2px 0 8px rgba(61,50,38,.10);
-    z-index:0; }
-  /* 中间装订线（左页与右页交界处） */
-  .nd-book::after { content:""; position:absolute; top:0; bottom:0; left:0; width:1px;
-    background:rgba(61,50,38,.20);
-    box-shadow:1px 0 0 rgba(255,253,247,.45);
-    z-index:2; pointer-events:none; }
+    transform-origin:left center; animation:ndFlip .5s ease both; }
+  /* 左页：平铺的空白米黄纸张，直角，与右页严丝合缝（无圆角、无空隙） */
+  .nd-book::before { content:""; position:absolute; top:0; bottom:0; left:-30px; width:30px;
+    background:#EFE8D8; z-index:0; }
+  /* 中间书脊装订线：细直实线，无圆角 */
+  .nd-book::after { content:""; position:absolute; top:0; bottom:0; left:0; width:2px;
+    background:rgba(61,50,38,.18); z-index:2; pointer-events:none; }
   .nd-sheet { position:relative; z-index:1; display:flex; flex-direction:column; width:100%; height:100%;
-    background-color:#F9F5EC;
-    border-radius:0 14px 14px 0;
+    background-color:#F9F5EC; border-radius:0 10px 10px 0;
     box-shadow:
-      /* 左：书脊凹陷阴影 */
-      inset 8px 0 10px -8px rgba(61,50,38,.12),
-      /* 右：内页厚度 */
+      /* 左：书脊极淡凹陷，连接左页 */
+      inset 6px 0 8px -6px rgba(61,50,38,.10),
+      /* 右：内页厚度（米黄系） */
       1px 0 0 #F4EDDD, 2px 0 0 #EFE6D3, 3px 0 0 #E9DEC8, 4px 0 0 #E3D7BE, 5px 0 0 #DDD0B5,
       /* 右：低饱和浅绿封皮边缘 */
       6px 0 0 #A9BFA8, 7px 0 0 #93AE97, 8px 0 0 #7A9A7E, 9px 0 0 #6E8C72,
@@ -1369,23 +1360,13 @@
       inset -10px 0 14px -10px rgba(61,50,38,.10); }
   @media (min-width:720px){
     .nd-overlay { align-items:center; padding:30px 24px 30px 54px; }
-    .nd-book::before { left:-40px; width:40px; border-radius:14px 0 0 14px; }
-    .nd-sheet { height:88vh; border-radius:0 16px 16px 0; overflow:hidden;
-      box-shadow:
-        /* 左：书脊凹陷阴影 */
-        inset 10px 0 12px -10px rgba(61,50,38,.12),
-        /* 右：内页厚度 */
-        1px 0 0 #F4EDDD, 2px 0 0 #EFE6D3, 3px 0 0 #E9DEC8, 4px 0 0 #E3D7BE, 5px 0 0 #DDD0B5,
-        /* 右：低饱和浅绿封皮边缘 */
-        6px 0 0 #A9BFA8, 7px 0 0 #93AE97, 8px 0 0 #7A9A7E, 9px 0 0 #6E8C72,
-        /* 柔和外阴影 */
-        20px 16px 54px rgba(61,50,38,.16),
-        inset -12px 0 16px -12px rgba(61,50,38,.10); }
+    .nd-book::before { left:-40px; width:40px; }
+    .nd-sheet { height:88vh; border-radius:0 12px 12px 0; overflow:hidden; }
   }
   @media (max-width:719px){
-    .nd-overlay { padding:0 16px 0 32px; align-items:center; }
-    .nd-sheet { width:100%; height:94vh; border-radius:0 12px 12px 0; }
-    .nd-book::before { left:-26px; width:26px; border-radius:10px 0 0 10px; }
+    .nd-overlay { padding:0 16px 0 36px; align-items:center; }
+    .nd-sheet { width:100%; height:94vh; border-radius:0 10px 10px 0; }
+    .nd-book::before { left:-28px; width:28px; }
   }
   @media (prefers-reduced-motion: reduce){ .nd-book, .nd-overlay { animation:none; } }
 
