@@ -146,8 +146,9 @@
   .sec-title .more { margin-left:auto; font-size: 12px; color: var(--text-secondary); font-weight: 500; cursor: pointer; display:inline-flex; align-items:center; gap:2px; }
 
   /* 记录区筛选条：浅棕色圆角纸条，紧贴列表顶部（归属列表；月份只在日历标题，不在此重复） */
-  .rec-bar { margin:14px 0 8px; padding:6px 12px 5px; display:flex; align-items:center;
+  .rec-bar { margin:6px 0 12px; padding:6px 12px 5px; display:flex; align-items:center;
     background-color:#EDE3D3; border:1px solid #DCD0BA; border-radius:10px; }
+  .rec-bar.in-tl { margin:2px 0 12px; }
   .rec-bar .filter-bar { margin:0; flex:1 1 auto; flex-wrap:wrap; }
   /* 筛选标签：日系手账文字标签式（未选中无背景无边框，选中浅底+纤细下划线） */
   .filter-tab { border:none; background:transparent; color:#6B5E4D;
@@ -1373,28 +1374,27 @@
   /* 中间书脊装订线：细直实线，位于左右页交界 */
   .nd-book::after { content:""; position:absolute; top:0; bottom:0; left:30px; width:2px;
     background:rgba(61,50,38,.18); z-index:2; pointer-events:none; }
-  /* 真实翻页动效：旧页克隆为"翻页纸"绕书脊 3D 翻起（带纸背 + 动态投影），新页自书脊翻落 */
-  .nd-leaf { position:absolute; top:0; left:0; width:100%; height:100%; z-index:40;
-    pointer-events:none; transform-style:preserve-3d; }
-  .nd-leaf.leaf-l { transform-origin:left center; animation:ndLeafL .5s cubic-bezier(.45,.05,.35,1) both; }
-  .nd-leaf.leaf-r { transform-origin:right center; animation:ndLeafR .5s cubic-bezier(.45,.05,.35,1) both; }
+  /* 真实翻页动效：翻页纸从书脊（左右页交界）绕轴 3D 翻转，overlay 原地换内容，无闪断 */
+  .nd-leaf { position:absolute; top:0; left:30px; width:calc(100% - 30px); height:100%; z-index:40;
+    pointer-events:none; transform-style:preserve-3d; transform-origin:left center; }
+  @media (min-width:720px){ .nd-leaf { left:40px; width:calc(100% - 40px); } }
+  .nd-leaf.leaf-l { animation:ndLeafL .5s cubic-bezier(.45,.05,.35,1) both; }
+  .nd-leaf.leaf-back { background:#F9F5EC; border-radius:0 14px 14px 0;
+    animation:ndLeafBack .38s cubic-bezier(.4,.08,.35,1) both; }
   /* 纸背面（米色），翻过 90° 后可见 */
   .nd-leaf::after { content:""; position:absolute; inset:0; background:#F3EDE0;
     border-radius:0 14px 14px 0; transform:rotateY(180deg); backface-visibility:hidden; }
   .nd-leaf .nd-sheet { backface-visibility:hidden; }
-  @keyframes ndLeafL {  /* 向左翻起（绕书脊）：右侧点击 -> 更早的笔记 */
+  .nd-leaf.bye { animation:ndLeafBye .34s ease both; }
+  @keyframes ndLeafL {  /* 右侧点击 -> 更早：右页绕书脊向左翻起，越过 90° 露出已替换的新页 */
     0%   { transform:perspective(1500px) rotateY(0deg); box-shadow:-2px 0 8px rgba(61,50,38,.06); }
     55%  { box-shadow:-20px 8px 26px rgba(61,50,38,.22); }
-    100% { transform:perspective(1500px) rotateY(-158deg); box-shadow:-28px 12px 30px rgba(61,50,38,.14); } }
-  @keyframes ndLeafR {  /* 向右翻回（绕右缘）：左侧点击 -> 更新的笔记 */
-    0%   { transform:perspective(1500px) rotateY(0deg); box-shadow:2px 0 8px rgba(61,50,38,.06); }
-    55%  { box-shadow:20px 8px 26px rgba(61,50,38,.22); }
-    100% { transform:perspective(1500px) rotateY(158deg); box-shadow:28px 12px 30px rgba(61,50,38,.14); } }
-  /* 新页接力：只翻右页（左页不动），自书脊立起翻落，两段式重力曲线 */
-  @keyframes ndFlipIn { from { transform:perspective(1500px) rotateY(-96deg); opacity:.5; } to { transform:rotateY(0deg); opacity:1; } }
-  .nd-sheet.nd-flip-in { transform-origin:left center; animation:ndFlipIn .48s cubic-bezier(.3,.12,.32,1) .04s both; }
-  @keyframes ndFlipInR { from { transform:perspective(1500px) rotateY(96deg); opacity:.5; } to { transform:rotateY(0deg); opacity:1; } }
-  .nd-sheet.nd-flip-in-r { transform-origin:right center; animation:ndFlipInR .48s cubic-bezier(.3,.12,.32,1) .04s both; }
+    100% { transform:perspective(1500px) rotateY(-170deg); box-shadow:-30px 12px 30px rgba(61,50,38,.12); } }
+  @keyframes ndLeafBack {  /* 左侧点击 -> 更新：纸从左页绕书脊翻回盖住右页，盖住瞬间换内容 */
+    0%   { transform:perspective(1500px) rotateY(-170deg); box-shadow:26px 12px 30px rgba(61,50,38,.14); }
+    60%  { box-shadow:18px 8px 24px rgba(61,50,38,.20); }
+    100% { transform:perspective(1500px) rotateY(0deg); box-shadow:0 0 0 rgba(61,50,38,0); } }
+  @keyframes ndLeafBye { to { opacity:0; } }
   /* 隐形翻页触发区：右侧=更新、左侧=更旧（避开顶栏/底栏，不显示任何控件） */
   .nd-turn { position:absolute; top:56px; bottom:84px; z-index:30; cursor:pointer; }
   .nd-turn.r { right:0; width:34%; }
@@ -3228,6 +3228,14 @@ function renderModule(key, append){
   const listWin = _listWindow[key] || 30;
   const listTotal = renderItems.length;
   const listVis = renderItems.slice(0, listWin);
+  // 筛选标签 HTML（上移到时间轴生成前：note 模块要插到月份条之后）
+  const showFilter = hasFilter;
+  const filterBar = showFilter ? `<div class="filter-bar" data-module="${key}">
+    <button class="filter-tab ${_moduleFilter==='all'?'on':''}" data-filter="all">全部</button>
+    ${m.type==='note' ? `<button class="filter-tab ${_moduleFilter==='fav'?'on':''}" data-filter="fav">\u6536\u85cf</button>` : ''}
+    <button class="filter-tab ${_moduleFilter==='admin'?'on':''}" data-filter="admin">管理员</button>
+    <button class="filter-tab ${_moduleFilter==='family'?'on':''}" data-filter="family">家属</button>
+  </div>` : '';
   if(TIMELINE_TYPES.has(m.type) && listVis.length){
     // 无日期的历史记录：今日计划归入今天（保持原行为），记账/灵感归入「更早」并排最后
     const undated = m.type==="todo" ? t : "";
@@ -3244,12 +3252,14 @@ function renderModule(key, append){
       /* weeks 手账时间轴：月份扉页行 + 一日一行（日期左栏 + 圆点条目，参考真实 weeks 手账） */
       const MEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       let lastMon = '';
+      let barDone = false;   /* 筛选条只插在第一个月份条之后 */
       const rows = dates.map(d=>{
         const mm = d ? d.slice(0,7) : '';
         let mh = '';
         if(mm && mm !== lastMon){
           lastMon = mm;
           mh = `<div class="jn-wk-month"><span class="jn-wk-mon">${Number(mm.slice(5,7))}</span><span class="jn-wk-yy">${esc(mm.slice(0,4))}</span><span class="jn-wk-en">${MEN[Number(mm.slice(5,7))-1]}</span></div>`;
+          if(!barDone){ mh += `<div class="rec-bar in-tl">${filterBar}</div>`; barDone = true; }
         }
         const items = groups[d].map(x=>jnWeekEntryHTML(m,x)).join('');
         return mh + `<div class="jn-wk-row"><div class="jn-wk-day">${jnDayCol(d)}</div><div class="jn-wk-entries">${items}</div></div>`;
@@ -3271,14 +3281,10 @@ function renderModule(key, append){
   } else {
     body=`<div class="empty"><span class="e"><img src="assets/nav-ci-ke.png" style="width:28px;height:28px;object-fit:contain;border-radius:50%" alt=""/></span><div>小猫还在打盹，点上方「新建」添加第一条记录吧</div></div>`;
   }
-  // 筛选标签：全部 / 管理员创建 / 家属创建
-  const showFilter = hasFilter;
-  const filterBar = showFilter ? `<div class="filter-bar" data-module="${key}">
-    <button class="filter-tab ${_moduleFilter==='all'?'on':''}" data-filter="all">全部</button>
-    ${m.type==='note' ? `<button class="filter-tab ${_moduleFilter==='fav'?'on':''}" data-filter="fav">\u6536\u85cf</button>` : ''}
-    <button class="filter-tab ${_moduleFilter==='admin'?'on':''}" data-filter="admin">管理员</button>
-    <button class="filter-tab ${_moduleFilter==='family'?'on':''}" data-filter="family">家属</button>
-  </div>` : '';
+  // 记录区头部：note 有记录时筛选条已插到时间轴月份条后，这里只兜底（空列表/其他模块）
+  const recordHead = (showFilter && !(m.type==='note' && listVis.length))
+    ? `<div class="rec-bar">${filterBar}</div>`
+    : (m.type==='note' ? '' : `<div class="sec-title">\u8bb0\u5f55</div>`);
 
   const greetCatMap = {
     money: "cat-flag.png", todo: "cat-pencil.png", note: "cat-letter.png",
@@ -3296,8 +3302,7 @@ function renderModule(key, append){
     greetHtml = `<div class="greet"><div><h1>${m.name}</h1>${greetSub}</div>${greetCat}
       ${auth.canEdit(key) ? `<button class="add" id="btn-add">${icon("plus",16,2.2)}新建</button>` : ''}</div>`;
   }
-  /* 记录区筛选条：归属列表顶部（不含月份，月份只在日历标题） */
-  const recordHead = showFilter ? `<div class="rec-bar">${filterBar}</div>` : `<div class="sec-title">\u8bb0\u5f55</div>`;
+  /* recordHead 已在上方定义（筛选条已插到时间轴月份条后，这里仅引用） */
   $("#screen").innerHTML = `${greetHtml}
     <div style="margin-top:16px">${head}${extra}
       ${recordHead}${body}</div>`;
@@ -3854,7 +3859,6 @@ function openNoteDetail(key, id, editing, flipIn){
   overlay.setAttribute("role", "dialog");
   overlay.innerHTML = '<div class="nd-book">' + noteDetailHTML(key, rec, canEdit, isEdit) + '</div>';
   document.body.appendChild(overlay);
-  if(flipIn){ const b = overlay.querySelector('.nd-sheet'); if(b) b.classList.add(flipIn==='prev' ? 'nd-flip-in-r' : 'nd-flip-in'); }
   let onSel = ()=>{};
   const close = ()=>{ overlay.remove(); document.removeEventListener("selectionchange", onSel); };
   overlay.addEventListener("click", e=>{ if(e.target===overlay) close(); });
@@ -3985,115 +3989,146 @@ function openNoteDetail(key, id, editing, flipIn){
       if(id != null) openNoteDetail(key, id, false);
     };
   } else {
-    /* ================= 查看态 ================= */
-    const content = overlay.querySelector(".nd-content");
-    /* 翻页：右侧=更新的笔记、左侧=更旧的笔记（隐形触发区 + 方向化翻页动效，无可见控件） */
-    const ordered = (data[key]||[]).slice().sort((a,b)=>{
-      const ad=a.date||'', bd=b.date||'';
-      return ad!==bd ? bd.localeCompare(ad) : (b.id||0)-(a.id||0);
-    });
-    const curIdx = ordered.findIndex(i=>i.id==id);
-    const mkTurn = (side, targetIdx, borderMsg)=>{
-      const book = overlay.querySelector('.nd-book');
-      if(!book) return;
-      const tz = document.createElement('div');
-      tz.className = 'nd-turn ' + side;
-      tz.onclick = ()=>{
-        const sel = window.getSelection ? window.getSelection() : null;
-        if(sel && !sel.isCollapsed) return;   /* 划重点选字中，不翻页 */
-        if(targetIdx < 0 || targetIdx >= ordered.length){
-          showCatPopup(borderMsg, '', false);
-          return;
-        }
-        /* 真实翻页纸：克隆当前右页绕书脊 3D 翻起（带纸背+动态投影），250ms 后接力新页自书脊翻落 */
+    /* ================= 查看态（bindView 可重入：翻页时原地换内容，不重建 overlay） ================= */
+    let flipping = false;
+    function bindView(noteId){
+      /* 清理上一条笔记的触发区 / 划重点浮层 / 选区监听 */
+      overlay.querySelectorAll('.nd-turn').forEach(e=>e.remove());
+      const oldChip = overlay.querySelector('.nd-hlchip'); if(oldChip) oldChip.remove();
+      document.removeEventListener("selectionchange", onSel);
+      id = noteId;
+      const sheet = overlay.querySelector('.nd-sheet');
+      const content = overlay.querySelector('.nd-content');
+      /* 翻页：右侧=更早、左侧=更新（隐形触发区，翻页纸动画） */
+      const ordered = (data[key]||[]).slice().sort((a,b)=>{
+        const ad=a.date||'', bd=b.date||'';
+        return ad!==bd ? bd.localeCompare(ad) : (b.id||0)-(a.id||0);
+      });
+      const curIdx = ordered.findIndex(i=>i.id==noteId);
+      const mkTurn = (side, targetIdx, borderMsg)=>{
         const book = overlay.querySelector('.nd-book');
-        const sheet = overlay.querySelector('.nd-sheet');
-        if(book && sheet){
-          const leaf = document.createElement('div');
-          leaf.className = 'nd-leaf ' + (side==='r' ? 'leaf-l' : 'leaf-r');
-          leaf.innerHTML = sheet.outerHTML;
-          book.appendChild(leaf);
-          sheet.style.visibility = 'hidden';
-        }
-        setTimeout(()=>{
-          overlay.remove(); document.removeEventListener("selectionchange", onSel);
-          openNoteDetail(key, ordered[targetIdx].id, false, side==='r' ? 'next' : 'prev');
-        }, 250);
+        if(!book) return;
+        const tz = document.createElement('div');
+        tz.className = 'nd-turn ' + side;
+        tz.onclick = ()=>{
+          if(flipping) return;
+          const sel = window.getSelection ? window.getSelection() : null;
+          if(sel && !sel.isCollapsed) return;   /* 划重点选字中，不翻页 */
+          if(targetIdx < 0 || targetIdx >= ordered.length){
+            showCatPopup(borderMsg, '', false);
+            return;
+          }
+          flipping = true;
+          flipTo(ordered[targetIdx].id, side==='r' ? 'next' : 'prev');
+        };
+        book.appendChild(tz);
       };
-      book.appendChild(tz);
-    };
-    if(ordered.length && curIdx >= 0){
-      mkTurn('r', curIdx+1, '\u5df2\u7ecf\u662f\u6700\u65e9\u4e00\u6761\u5566\u55b5\uff5e');
-      mkTurn('l', curIdx-1, '\u5df2\u7ecf\u662f\u6700\u65b0\u4e00\u6761\u5566\u55b5\uff5e');
+      if(ordered.length && curIdx >= 0){
+        mkTurn('r', curIdx+1, '\u5df2\u7ecf\u662f\u6700\u65e9\u4e00\u6761\u5566\u55b5\uff5e');
+        mkTurn('l', curIdx-1, '\u5df2\u7ecf\u662f\u6700\u65b0\u4e00\u6761\u5566\u55b5\uff5e');
+      }
+      /* 操作按钮 */
+      const del = overlay.querySelector("[data-nd='del']");
+      if(del) del.onclick = ()=>{ confirmDelete(key, id); close(); };
+      const edit = overlay.querySelector("[data-nd='edit']");
+      if(edit) edit.onclick = ()=>{ close(); openNoteDetail(key, id, true); };
+      const pin = overlay.querySelector("[data-nd='pin']");
+      if(pin) pin.onclick = ()=>{
+        togglePin(key, id);
+        const cur = (data[key]||[]).find(i=>i.id==id);
+        pin.classList.toggle("on", !!(cur && cur.pinned));
+      };
+      /* 划重点（查看态）：三色浮层 + 取消高亮 */
+      const chip = document.createElement("div");
+      chip.className = "nd-hlchip";
+      chip.innerHTML = `<button type="button" class="sw sw-y" data-c="y" title="\u6d45\u9ec4"></button>`
+        + `<button type="button" class="sw sw-p" data-c="p" title="\u6d45\u7c89"></button>`
+        + `<button type="button" class="sw sw-g" data-c="g" title="\u6d45\u7eff"></button>`
+        + `<button type="button" class="nd-hl-off">\u53d6\u6d88\u9ad8\u4eae</button>`;
+      overlay.appendChild(chip);
+      const offBtn = chip.querySelector(".nd-hl-off");
+      let selText = "";
+      const norm = h => (typeof h === 'string') ? { t:h, c:'y' } : h;
+      const hideChip = ()=>{ chip.classList.remove("on"); selText = ""; offBtn.style.display = "none"; };
+      const curHls = ()=>{ const r=(data[key]||[]).find(i=>i.id==id); return r && Array.isArray(r.highlights) ? r.highlights.map(norm) : []; };
+      const rerender = ()=>{
+        const fresh = (data[key]||[]).find(ii=>ii.id==id);
+        if(content) content.innerHTML = noteRenderContent(fresh) + notePicsOf(fresh).map(p=>`<img class="nd-pic" src="${attr(p)}" alt="">`).join("");
+      };
+      const showChip = ()=>{
+        const sel = window.getSelection();
+        if(!sel || sel.rangeCount === 0) return hideChip();
+        const txt = String(sel).trim();
+        if(!txt || txt.length > 80 || !content) return hideChip();
+        const range = sel.getRangeAt(0);
+        if(!content.contains(range.commonAncestorContainer)) return hideChip();
+        const rect = range.getBoundingClientRect();
+        if(!rect || (rect.width === 0 && rect.height === 0)) return hideChip();
+        const or = overlay.getBoundingClientRect();
+        selText = txt;
+        offBtn.style.display = curHls().some(h => h.t === txt) ? "" : "none";
+        chip.classList.add("on");
+        chip.style.left = Math.max(10, Math.min(or.width - 150, rect.left - or.left + rect.width/2 - 70)) + "px";
+        chip.style.top = Math.max(8, rect.top - or.top - 44) + "px";
+      };
+      onSel = ()=>{ const s=window.getSelection(); (s && String(s).trim()) ? showChip() : hideChip(); };
+      document.addEventListener("selectionchange", onSel);
+      if(content){
+        content.addEventListener("mouseup", showChip);
+        content.addEventListener("touchend", ()=>setTimeout(showChip, 60));
+      }
+      chip.addEventListener("mousedown", e=>e.preventDefault());
+      const applyHl = c=>{
+        if(!selText) return;
+        const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
+        const hls = curHls();
+        const i = hls.findIndex(h=>h.t===selText);
+        if(i >= 0) hls[i].c = c; else hls.push({ t:selText, c:c });
+        r.highlights = hls;
+        persist(); rerender(); hideChip();
+      };
+      chip.querySelectorAll(".sw").forEach(sw => sw.onclick = e=>{ e.stopPropagation(); applyHl(sw.dataset.c); });
+      offBtn.onclick = e=>{
+        e.stopPropagation();
+        if(!selText) return;
+        const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
+        r.highlights = curHls().filter(h=>h.t!==selText);
+        persist(); rerender(); hideChip();
+      };
+      overlay.addEventListener("mousedown", e=>{ if(!chip.contains(e.target) && !(content && content.contains(e.target))) hideChip(); });
     }
-    const del = overlay.querySelector("[data-nd='del']");
-    if(del) del.onclick = ()=>{ confirmDelete(key, id); close(); };
-    const edit = overlay.querySelector("[data-nd='edit']");
-    if(edit) edit.onclick = ()=>{ close(); openNoteDetail(key, id, true); };
-    const pin = overlay.querySelector("[data-nd='pin']");
-    if(pin) pin.onclick = ()=>{
-      togglePin(key, id);
-      const cur = (data[key]||[]).find(i=>i.id==id);
-      pin.classList.toggle("on", !!(cur && cur.pinned));
-    };
-    /* 划重点（查看态）：三色浮层 + 取消高亮 */
-    const chip = document.createElement("div");
-    chip.className = "nd-hlchip";
-    chip.innerHTML = `<button type="button" class="sw sw-y" data-c="y" title="\u6d45\u9ec4"></button>`
-      + `<button type="button" class="sw sw-p" data-c="p" title="\u6d45\u7c89"></button>`
-      + `<button type="button" class="sw sw-g" data-c="g" title="\u6d45\u7eff"></button>`
-      + `<button type="button" class="nd-hl-off">\u53d6\u6d88\u9ad8\u4eae</button>`;
-    overlay.appendChild(chip);
-    const offBtn = chip.querySelector(".nd-hl-off");
-    let selText = "";
-    const norm = h => (typeof h === 'string') ? { t:h, c:'y' } : h;
-    const hideChip = ()=>{ chip.classList.remove("on"); selText = ""; offBtn.style.display = "none"; };
-    const curHls = ()=>{ const r=(data[key]||[]).find(i=>i.id==id); return r && Array.isArray(r.highlights) ? r.highlights.map(norm) : []; };
-    const rerender = ()=>{
-      const fresh = (data[key]||[]).find(ii=>ii.id==id);
-      if(content) content.innerHTML = noteRenderContent(fresh) + notePicsOf(fresh).map(p=>`<img class="nd-pic" src="${attr(p)}" alt="">`).join("");
-    };
-    const showChip = ()=>{
-      const sel = window.getSelection();
-      if(!sel || sel.rangeCount === 0) return hideChip();
-      const txt = String(sel).trim();
-      if(!txt || txt.length > 80 || !content) return hideChip();
-      const range = sel.getRangeAt(0);
-      if(!content.contains(range.commonAncestorContainer)) return hideChip();
-      const rect = range.getBoundingClientRect();
-      if(!rect || (rect.width === 0 && rect.height === 0)) return hideChip();
-      const or = overlay.getBoundingClientRect();
-      selText = txt;
-      offBtn.style.display = curHls().some(h => h.t === txt) ? "" : "none";
-      chip.classList.add("on");
-      chip.style.left = Math.max(10, Math.min(or.width - 150, rect.left - or.left + rect.width/2 - 70)) + "px";
-      chip.style.top = Math.max(8, rect.top - or.top - 44) + "px";
-    };
-    onSel = ()=>{ const s=window.getSelection(); (s && String(s).trim()) ? showChip() : hideChip(); };
-    document.addEventListener("selectionchange", onSel);
-    if(content){
-      content.addEventListener("mouseup", showChip);
-      content.addEventListener("touchend", ()=>setTimeout(showChip, 60));
+    /* 翻页纸：同一 overlay 内原地换内容。next=右页绕书脊向左翻起，越过 90° 露出已替换的新页；
+       prev=空白纸从左页翻回盖住右页，盖住瞬间替换内容再淡出——全程无 overlay 重建、无闪断 */
+    function flipTo(nextId, dir){
+      const book = overlay.querySelector('.nd-book');
+      const sheet = overlay.querySelector('.nd-sheet');
+      if(!book || !sheet){ openNoteDetail(key, nextId, false); return; }
+      const rec2 = (data[key]||[]).find(i=>i.id==nextId);
+      if(!rec2){ openNoteDetail(key, nextId, false); return; }
+      const finish = ()=>{
+        sheet.outerHTML = noteDetailHTML(key, rec2, canEdit, false);
+        bindView(nextId);
+        flipping = false;
+      };
+      if(dir === 'next'){
+        const leaf = document.createElement('div');
+        leaf.className = 'nd-leaf leaf-l';
+        leaf.innerHTML = sheet.outerHTML.replace(/\sid="[^"]*"/g, '');
+        book.appendChild(leaf);
+        finish();   /* 新内容已就位：leaf 越过 90° 即露出 */
+        setTimeout(()=>{ leaf.classList.add('bye'); setTimeout(()=>leaf.remove(), 340); }, 520);
+      } else {
+        const leaf = document.createElement('div');
+        leaf.className = 'nd-leaf leaf-back';
+        book.appendChild(leaf);
+        setTimeout(()=>{
+          finish();
+          leaf.classList.add('bye');
+          setTimeout(()=>leaf.remove(), 340);
+        }, 380);
+      }
     }
-    chip.addEventListener("mousedown", e=>e.preventDefault());
-    const applyHl = c=>{
-      if(!selText) return;
-      const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
-      const hls = curHls();
-      const i = hls.findIndex(h=>h.t===selText);
-      if(i >= 0) hls[i].c = c; else hls.push({ t:selText, c:c });
-      r.highlights = hls;
-      persist(); rerender(); hideChip();
-    };
-    chip.querySelectorAll(".sw").forEach(sw => sw.onclick = e=>{ e.stopPropagation(); applyHl(sw.dataset.c); });
-    offBtn.onclick = e=>{
-      e.stopPropagation();
-      if(!selText) return;
-      const r = (data[key]||[]).find(i=>i.id==id); if(!r) return;
-      r.highlights = curHls().filter(h=>h.t!==selText);
-      persist(); rerender(); hideChip();
-    };
-    overlay.addEventListener("mousedown", e=>{ if(!chip.contains(e.target) && !(content && content.contains(e.target))) hideChip(); });
+    bindView(id);
   }
 }
 
