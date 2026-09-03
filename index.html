@@ -145,14 +145,15 @@
   .sec-title::before { content:""; width: 3px; height: 13px; border-radius: 2px; background: var(--accent); }
   .sec-title .more { margin-left:auto; font-size: 12px; color: var(--text-secondary); font-weight: 500; cursor: pointer; display:inline-flex; align-items:center; gap:2px; }
 
-  /* 筛选标签 */
-  .filter-bar { display:flex; gap:8px; margin:14px 2px 4px; }
-  .filter-tab { border:1px solid var(--border); background:var(--surface-card); color:var(--text-secondary);
-    font-size:12px; font-weight:600; padding:6px 14px; border-radius:999px; cursor:pointer; transition:all .2s; }
-  .filter-tab:hover { border-color:var(--accent); color:var(--accent); }
-  .filter-tab.on { background:var(--accent); color:#fff; border-color:var(--accent); }
-  .filter-tab.on[data-filter="admin"] { background:#4a7ab5; border-color:#4a7ab5; }
-  .filter-tab.on[data-filter="family"] { background:#c97878; border-color:#c97878; }
+  /* 筛选标签：手账纸质标签（柔角 + 纸面渐变 + 标签折角式圆角） */
+  .filter-bar { display:flex; gap:10px; margin:14px 2px 4px; flex-wrap:wrap; }
+  .filter-tab { border:1px solid #E0D5C2; background:linear-gradient(180deg,#FDFAF3,#F6F0E2); color:#7A6A58;
+    font-family:var(--font-journal); font-size:12.5px; font-weight:500; letter-spacing:1.5px;
+    padding:6px 16px 7px; border-radius:12px 12px 12px 3px; cursor:pointer;
+    box-shadow:0 1px 2px rgba(61,50,38,.06); transition:transform .12s ease, box-shadow .15s, background .15s, color .15s; }
+  .filter-tab:active { transform:scale(.95); }
+  .filter-tab.on { background:linear-gradient(180deg,#F3E8D6,#EADBC2); color:#4A3B2C; font-weight:700;
+    border-color:#C9B79A; box-shadow:inset 0 1px 3px rgba(61,50,38,.08), 0 1px 2px rgba(61,50,38,.05); }
   .sec-title .more svg { color: var(--text-tertiary); }
 
   /* ---------- timeline ---------- */
@@ -1226,21 +1227,37 @@
      灵感备忘 · 头部迷你日历 / 心情 / 悬浮新建
      ============================================================ */
   .jn-cal { padding: 16px 14px 14px; background: #FBF7EF; border: 1px solid #ECE3D3; border-radius: 16px; margin-bottom: 12px; }
-  .jn-cal-hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
-  .jn-cal-my { font-family: var(--font-journal); font-size: 19px; font-weight: 500; color: #3D3226; letter-spacing: 1px; }
-  .jn-cal-count { font-family: var(--font-journal); font-size: 11px; color: #9A8B7A; letter-spacing: 1px; }
-  .jn-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
-  .jn-cal-wd { font-family: var(--font-journal); font-size: 11px; color: #6B5E4D; letter-spacing: 2px; padding: 6px 0 8px; }
-  .jn-cal-day { position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-journal); font-size: 14px; font-weight: 500; color: #2E2620; border-radius: 50%; cursor: pointer; transition: background .15s; }
-  .jn-cal-day:hover { background: rgba(92,74,58,.06); }
-  .jn-cal-day.today { background: rgba(196,168,128,.22); color: #3D3226; font-weight: 600; }
-  .jn-cal-day.sel { background: rgba(122,154,126,.18); color: #3D3226; font-weight: 600; }
-  .jn-cal-day.sel::after { content:""; position:absolute; inset:3px; border-radius:50%; border:1px dashed rgba(122,154,126,.8); }
-  .jn-cal-day.other { color: transparent; pointer-events: none; }
-  .jn-cal-day.future { pointer-events: none; opacity: 0.48; color: #9A8B7A; }
-  .jn-cal-day.has-mood { border-radius: 12px; }
-  .jn-cal-day .mood-corner { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; pointer-events:none; }
+  .jn-cal-hd { display:flex; align-items:center; gap:6px; margin-bottom:12px; }
+  .jn-cal-nav { width:30px; height:30px; flex:0 0 auto; border:none; background:transparent; color:#8A7A6A;
+    display:grid; place-items:center; cursor:pointer; border-radius:50%; transition:background .15s, transform .12s; }
+  .jn-cal-nav:active { background:rgba(92,74,58,.08); transform:scale(.92); }
+  .jn-cal-nav.nx svg { transform:rotate(180deg); }
+  .jn-cal-title { flex:1 1 auto; display:flex; align-items:baseline; justify-content:space-between; min-width:0; }
+  .jn-cal-my { font-family:var(--font-journal); font-size:22px; font-weight:600; color:#3D3226; letter-spacing:3px; }
+  .jn-cal-sub { font-family:var(--font-journal); font-size:10px; color:#9A8B7A; letter-spacing:2px; }
+  .jn-cal-sub b { font-size:16px; font-weight:600; color:#5C4A3A; margin-left:4px; letter-spacing:1px; }
+  /* 手账月历：细线表格网格（横向舒展比例） */
+  .jn-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); border-left:1px solid #E3D9C6; border-top:1px solid #E3D9C6; }
+  .jn-cal-wd { font-family:var(--font-journal); font-size:10px; color:#8A7A6A; letter-spacing:1px; text-align:left;
+    padding:4px 5px; border-right:1px solid #E3D9C6; border-bottom:1px solid #E3D9C6; background:rgba(236,227,211,.4); }
+  .jn-cal-wd i { font-style:normal; opacity:.55; font-size:8.5px; }
+  .jn-cal-day { position:relative; height:48px; padding:3px 5px; cursor:pointer; transition:background .15s;
+    border-right:1px solid #E3D9C6; border-bottom:1px solid #E3D9C6; }
+  .jn-cal-day .d { font-style:normal; font-family:var(--font-journal); font-size:9.5px; font-weight:500; color:#6B5E4D; letter-spacing:.5px; display:block; }
+  .jn-cal-day:hover { background:rgba(92,74,58,.05); }
+  .jn-cal-day.today .d { color:#B8837A; font-weight:700; }
+  .jn-cal-day.today::after { content:""; position:absolute; left:5px; right:5px; bottom:3px; height:2px;
+    background:rgba(184,131,122,.4); border-radius:2px; }
+  .jn-cal-day.sel::after { content:""; position:absolute; inset:2px; border:1px dashed rgba(184,131,122,.6); pointer-events:none; }
+  .jn-cal-day.other { pointer-events:none; background:rgba(236,227,211,.18); }
+  .jn-cal-day.future { pointer-events:none; opacity:.45; }
+  .jn-cal-day.future .d { color:#B0A28E; }
+  /* 印记：透明底猫咪贴纸居中，模拟手账印章 */
+  .jn-cal-day .mood-stamp { position:absolute; left:50%; top:56%; transform:translate(-50%,-50%);
+    width:76%; max-width:42px; aspect-ratio:1; object-fit:contain; pointer-events:none; }
+  .jn-cal-mem { margin-top:10px; border:1px solid #D8CCB6; border-radius:6px; padding:5px 10px;
+    display:flex; align-items:center; justify-content:space-between; background:rgba(255,253,247,.6);
+    font-family:var(--font-journal); font-size:10px; letter-spacing:2.5px; color:#8A7A6A; }
   /* 心情选择面板 */
   .jn-mood-pnl { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center;
     background: rgba(61,50,38,.35); animation: ndFade .2s ease both; }
@@ -1348,6 +1365,13 @@
   /* 中间书脊装订线：细直实线，位于左右页交界 */
   .nd-book::after { content:""; position:absolute; top:0; bottom:0; left:30px; width:2px;
     background:rgba(61,50,38,.18); z-index:2; pointer-events:none; }
+  /* 翻页动效：旧页向右翻出，新页自左翻入（模拟实体手账翻页） */
+  @keyframes ndFlipOut { to { transform: perspective(1500px) rotateY(42deg) translateX(8%); opacity:0; } }
+  .nd-book.nd-flip-out { transform-origin:right center; animation: ndFlipOut .3s ease-in both; pointer-events:none; }
+  @keyframes ndFlipIn { from { transform: perspective(1500px) rotateY(-16deg); opacity:0; } to { transform: rotateY(0deg); opacity:1; } }
+  .nd-book.nd-flip-in { transform-origin:left center; animation: ndFlipIn .45s cubic-bezier(.25,.7,.3,1) both; }
+  /* 隐形翻页触发区：正文右侧空白（不显示任何控件） */
+  .nd-turn { position:absolute; top:56px; bottom:84px; right:0; width:34%; z-index:30; cursor:pointer; }
   .nd-sheet { position:relative; z-index:1; display:flex; flex-direction:column; width:100%; height:100%;
     background-color:#F9F5EC; border-radius:0 10px 10px 0;
     box-shadow:
@@ -3612,19 +3636,32 @@ const NOTE_MOODS = [
   {key:'meh',   name:'\u4e00\u822c', src:'assets/stickers/mood-meh.png'},
 ];
 let _noteSelDate = '';
+/* 日历当前查看的年月（null = 当月）；切换月份只改视图，不动任何数据 */
+let _noteCalYM = null;
+function noteCalShift(key, delta){
+  const now = new Date();
+  const cur = _noteCalYM || { y: now.getFullYear(), m: now.getMonth() };
+  let m = cur.m + delta, y = cur.y;
+  if(m < 0){ m = 11; y--; } else if(m > 11){ m = 0; y++; }
+  _noteCalYM = { y, m };
+  const sy = window.scrollY;
+  renderModule(key, true);
+  window.scrollTo(0, sy);
+}
 function noteMoods(){ return NOTE_MOODS; }
 function noteCalendarHTML(key, items){
   const today = isoToday();
-  const d = new Date();
-  const y = d.getFullYear(), m = d.getMonth();
+  const now = new Date();
+  const y = _noteCalYM ? _noteCalYM.y : now.getFullYear();
+  const m = _noteCalYM ? _noteCalYM.m : now.getMonth();
   const first = new Date(y, m, 1);
   const last = new Date(y, m+1, 0);
   const startDay = first.getDay();
   const daysInMonth = last.getDate();
-  const MEN = ['\u4e00\u6708','\u4e8c\u6708','\u4e09\u6708','\u56db\u6708','\u4e94\u6708','\u516d\u6708','\u4e03\u6708','\u516b\u6708','\u4e5d\u6708','\u5341\u6708','\u5341\u4e00\u6708','\u5341\u4e8c\u6708'];
-  const WDS = ['\u65e5','\u4e00','\u4e8c','\u4e09','\u56db','\u4e94','\u516d'];
+  const MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const WDS = [['\u65e5','SUN'],['\u4e00','MON'],['\u4e8c','TUE'],['\u4e09','WED'],['\u56db','THU'],['\u4e94','FRI'],['\u516d','SAT']];
   const moods = (data.__noteMoods || {});
-  let grid = WDS.map(wd => `<div class="jn-cal-wd">${wd}</div>`).join('');
+  let grid = WDS.map(w => `<div class="jn-cal-wd">${w[0]} <i>/${w[1]}</i></div>`).join('');
   for(let i=0;i<startDay;i++) grid += `<div class="jn-cal-day other"></div>`;
   for(let day=1; day<=daysInMonth; day++){
     const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
@@ -3632,13 +3669,18 @@ function noteCalendarHTML(key, items){
     const isFuture = ds > today;
     const mood = moods[ds];
     const cls = ['jn-cal-day', isToday?'today':'', ds===_noteSelDate?'sel':'', mood?'has-mood':'', isFuture?'future':''].filter(Boolean).join(' ');
-    grid += `<div class="${cls}" data-cal-d="${ds}">${mood?`<img class="mood-corner" src="${mood.src}" alt="">`:day}</div>`;
+    grid += `<div class="${cls}" data-cal-d="${ds}"><i class="d">${String(m+1).padStart(2,'0')}/${String(day).padStart(2,'0')}</i>${mood?`<img class="mood-stamp" src="${mood.src}" alt="">`:''}</div>`;
   }
   const count = items.length;
-  const todayN = items.filter(x=>x.date===today).length;
+  const mm = String(m+1).padStart(2,'0');
   return `<div class="jn-cal" data-module="${attr(key)}">
-    <div class="jn-cal-hd"><div class="jn-cal-my">${y} · ${MEN[m]}</div><div class="jn-cal-count">${count} \u6761\u8bb0\u5f55 · \u4eca\u65e5 ${todayN} \u6761</div></div>
+    <div class="jn-cal-hd">
+      <button type="button" class="jn-cal-nav" data-shift="-1" title="\u4e0a\u4e2a\u6708">${icon('chevron',16,2)}</button>
+      <div class="jn-cal-title"><span class="jn-cal-my">MY ${MON[m]}</span><span class="jn-cal-sub">month / <b>${mm}</b></span></div>
+      <button type="button" class="jn-cal-nav nx" data-shift="1" title="\u4e0b\u4e2a\u6708">${icon('chevron',16,2)}</button>
+    </div>
     <div class="jn-cal-grid">${grid}</div>
+    <div class="jn-cal-mem"><span>MY</span><span>MEMORIES \u00b7 ${count}</span></div>
   </div>`;
 }
 function setNoteMood(date, obj){
@@ -3751,7 +3793,7 @@ function noteDetailHTML(key, x, canEdit, editing){
     + `</div>`;
 }
 
-function openNoteDetail(key, id, editing){
+function openNoteDetail(key, id, editing, flipIn){
   const m = modOf(key);
   let rec;
   if(id == null){
@@ -3771,6 +3813,7 @@ function openNoteDetail(key, id, editing){
   overlay.setAttribute("role", "dialog");
   overlay.innerHTML = '<div class="nd-book">' + noteDetailHTML(key, rec, canEdit, isEdit) + '</div>';
   document.body.appendChild(overlay);
+  if(flipIn){ const b = overlay.querySelector('.nd-book'); if(b) b.classList.add('nd-flip-in'); }
   let onSel = ()=>{};
   const close = ()=>{ overlay.remove(); document.removeEventListener("selectionchange", onSel); };
   overlay.addEventListener("click", e=>{ if(e.target===overlay) close(); });
@@ -3903,6 +3946,26 @@ function openNoteDetail(key, id, editing){
   } else {
     /* ================= 查看态 ================= */
     const content = overlay.querySelector(".nd-content");
+    /* 翻页：点正文右侧空白 → 上一条笔记（隐形触发区 + 向右翻页动效，无可见控件） */
+    const ordered = (data[key]||[]).slice().sort((a,b)=>{
+      const ad=a.date||'', bd=b.date||'';
+      return ad!==bd ? bd.localeCompare(ad) : (b.id||0)-(a.id||0);
+    });
+    const curIdx = ordered.findIndex(i=>i.id==id);
+    if(curIdx > 0){
+      const book = overlay.querySelector('.nd-book');
+      const tz = document.createElement('div');
+      tz.className = 'nd-turn';
+      book.appendChild(tz);
+      tz.onclick = ()=>{
+        const bk = overlay.querySelector('.nd-book');
+        if(bk) bk.classList.add('nd-flip-out');
+        setTimeout(()=>{
+          overlay.remove(); document.removeEventListener("selectionchange", onSel);
+          openNoteDetail(key, ordered[curIdx-1].id, false, true);
+        }, 280);
+      };
+    }
     const del = overlay.querySelector("[data-nd='del']");
     if(del) del.onclick = ()=>{ confirmDelete(key, id); close(); };
     const edit = overlay.querySelector("[data-nd='edit']");
@@ -3998,6 +4061,9 @@ function wireModule(key){
   if(m.type==="note"){
     $("#screen").querySelectorAll(".jn-cal-day[data-cal-d]").forEach(el=>{
       el.onclick = () => { if(el.classList.contains('future')) return; openMoodPicker(key, el.dataset.calD, (data[key]||[])); };
+    });
+    $("#screen").querySelectorAll(".jn-cal-nav[data-shift]").forEach(el=>{
+      el.onclick = () => noteCalShift(key, Number(el.dataset.shift));
     });
   }
 
