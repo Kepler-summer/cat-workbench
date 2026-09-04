@@ -1300,36 +1300,36 @@
   /* ============================================================
      灵感备忘 · weeks 时间轴（真实手账本 weeks 版式：日期左栏 + 圆点条目，无胶带/回形针）
      ============================================================ */
-  .jn-weeks { margin-top: 4px; padding: 16px 14px 22px;
+  .jn-weeks { margin-top: 4px; padding: 0 0 22px; overflow:hidden;
     background-color: #FBF8F1;
     background-image:
       linear-gradient(rgba(140,120,95,.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(140,120,95,.05) 1px, transparent 1px);
     background-size: 18px 18px;
     border: 1px solid #E8DFD0; border-radius: 14px; }
-  /* 月份分界条：浅棕纸条，每个月一条（手账月份分隔页的意象）；
-     首条右侧并入筛选标签：未选中纯文字，选中为贴在条上的奶油白纸片 */
-  .jn-wk-month { display:flex; align-items:center; gap:8px; margin:16px 0 12px; padding:7px 12px 8px;
-    background-color:#EDE3D3; border:1px solid #DCD0BA; border-radius:10px;
-    box-shadow:inset 0 1px 0 rgba(255,253,247,.6); }
-  .jn-weeks > .jn-wk-month:first-child, .jn-wk-row + .jn-wk-month { margin-top:2px; }
-  .jn-wk-mon { font-family:var(--font-journal); font-size:26px; font-weight:700; color:#3D3226; line-height:1; }
-  .jn-wk-yy  { font-size:10.5px; color:#8A7A6A; letter-spacing:1px; }
-  .jn-wk-en  { font-size:10.5px; color:#8A7A6A; letter-spacing:2.5px; text-transform:uppercase; margin-left:auto; white-space:nowrap; }
-  /* 筛选标签（仅首条分界条携带） */
+  /* 月份月签：灰米色通栏贴条，无圆角（weeks 手账月份页签意象）；
+     大号两位月数 + 右侧两行小字（年份/英文月），首条右侧并入筛选标签 */
+  .jn-wk-month { display:flex; align-items:center; gap:9px; margin:14px 0 10px; padding:10px 16px 11px;
+    background-color:#D8D1C2; border-radius:0;
+    box-shadow:inset 0 1px 0 rgba(255,253,247,.4); }
+  .jn-weeks > .jn-wk-month:first-child, .jn-wk-row + .jn-wk-month { margin-top:0; }
+  .jn-wk-mon { font-family:var(--font-journal); font-size:26px; font-weight:700; color:#4A4238; line-height:1; }
+  .jn-wk-my { display:flex; flex-direction:column; gap:2px; }
+  .jn-wk-my i { font-style:normal; font-size:9px; color:#7A7264; letter-spacing:1.5px; text-transform:uppercase; line-height:1; white-space:nowrap; }
+  /* 筛选标签（仅首条月签携带）：未选中纯文字，选中为奶油白纸片 */
   .jn-wk-tabs { margin-left:auto; display:flex; justify-content:flex-end; }
-  .jn-wk-month.has-filter .jn-wk-en { margin-left:12px; font-size:9px; letter-spacing:1.5px; }
-  .jn-wk-tabs .filter-bar { margin:0; display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:1px; }
-  .jn-wk-tabs .filter-tab { font-size:11.5px; padding:3px 7px 4px; letter-spacing:.5px; border-radius:7px; }
+  .jn-wk-tabs .filter-bar { margin:0; display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:2px; }
+  .jn-wk-tabs .filter-tab { font-size:11.5px; padding:3px 8px 4px; letter-spacing:.5px; border-radius:2px; }
   .jn-wk-tabs .filter-tab.on { background:#FFFDF7; color:#4A3B2C;
     box-shadow:0 1px 2px rgba(61,50,38,.16), inset 0 0 0 1px rgba(220,208,186,.8); }
-  /* 一日一行（虚线分隔，条目自然衔接） */
-  .jn-wk-row { display:flex; gap:12px; padding:10px 0 12px; border-top:1px dashed #E0D5C5; }
-  .jn-wk-month + .jn-wk-row { border-top:none; }
-  .jn-wk-day { flex:0 0 46px; text-align:left; padding-top:2px; }
+  /* 一日一行：日期栏与内容区之间纵向分隔线，行间横向细实线（weeks 手账版式） */
+  .jn-wk-row { display:flex; }
+  .jn-wk-day { flex:0 0 54px; text-align:left; padding:10px 10px 12px 16px; border-right:1px solid #E3D9C6; }
   .jn-wk-num { font-family:var(--font-journal); font-size:24px; font-weight:700; color:#3D3226; line-height:1.05; }
   .jn-wk-dow { font-size:10px; color:#B8A99A; letter-spacing:1.5px; margin-top:3px; }
-  .jn-wk-entries { flex:1; min-width:0; display:flex; flex-direction:column; gap:9px; padding-top:3px; }
+  .jn-wk-entries { flex:1; min-width:0; display:flex; flex-direction:column; gap:9px;
+    padding:10px 16px 12px 12px; border-top:1px solid #EAE0D0; }
+  .jn-wk-month + .jn-wk-row .jn-wk-entries { border-top:none; }
   /* 条目：橙点 + 微型分类猫 + 标题 + 分类字 + 收藏/删除 */
   .jn-wk-entry { display:flex; align-items:flex-start; gap:9px; cursor:pointer; padding:4px 5px; margin:-2px -5px; border-radius:10px; }
   .jn-wk-entry:active { background:rgba(92,74,58,.05); }
@@ -1361,11 +1361,10 @@
   .jn-wk-acts .pin-btn.on { color:#D98E5F; }
   .jn-wk-acts .pin-btn.on svg { fill:currentColor; }
   @media (max-width:359px){
-    .jn-weeks { padding:12px 10px 18px; }
-    .jn-wk-day { flex-basis:40px; }
+    .jn-weeks { padding:0 0 18px; }
+    .jn-wk-day { flex-basis:44px; padding-left:12px; }
     .jn-wk-num { font-size:21px; }
     .jn-wk-month { flex-wrap:wrap; row-gap:4px; }
-    .jn-wk-month.has-filter .jn-wk-en { margin-left:auto; }
   }
 
   /* ============================================================
@@ -3277,7 +3276,7 @@ function renderModule(key, append){
         if(mm && mm !== lastMon){
           lastMon = mm;
           const withTabs = !barDone;
-          mh = `<div class="jn-wk-month${withTabs?' has-filter':''}"><span class="jn-wk-mon">${Number(mm.slice(5,7))}</span><span class="jn-wk-yy">${esc(mm.slice(0,4))}</span>${withTabs?`<span class="jn-wk-tabs">${filterBar}</span>`:''}<span class="jn-wk-en">${MEN[Number(mm.slice(5,7))-1]}</span></div>`;
+          mh = `<div class="jn-wk-month${withTabs?' has-filter':''}"><span class="jn-wk-mon">${mm.slice(5,7)}</span><span class="jn-wk-my"><i>${esc(mm.slice(0,4))}</i><i>${MEN[Number(mm.slice(5,7))-1]}</i></span>${withTabs?`<span class="jn-wk-tabs">${filterBar}</span>`:''}</div>`;
           if(withTabs) barDone = true;
         }
         const items = groups[d].map(x=>jnWeekEntryHTML(m,x)).join('');
