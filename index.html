@@ -1381,8 +1381,9 @@
   .nd-leaf.leaf-l { animation:ndLeafL .5s cubic-bezier(.45,.05,.35,1) both; }
   .nd-leaf.leaf-back { background:#F9F5EC; border-radius:0 14px 14px 0;
     animation:ndLeafBack .38s cubic-bezier(.4,.08,.35,1) both; }
-  /* 纸背面（米色），翻过 90° 后可见 */
-  .nd-leaf::after { content:""; position:absolute; inset:0; background:#F3EDE0;
+  /* 纸背面（米色）：仅向左翻的空白纸（leaf-back）需要，用于盖住右页后原地换内容；
+     向右翻的克隆纸（leaf-l）不加纸背——翻过 90° 后直接透出底层新内容（渐进式翻开），避免新内容最后弹出式闪烁 */
+  .nd-leaf.leaf-back::after { content:""; position:absolute; inset:0; background:#F3EDE0;
     border-radius:0 14px 14px 0; transform:rotateY(180deg); backface-visibility:hidden; }
   .nd-leaf .nd-sheet { backface-visibility:hidden; }
   .nd-leaf.bye { animation:ndLeafBye .34s ease both; }
