@@ -145,19 +145,17 @@
   .sec-title::before { content:""; width: 3px; height: 13px; border-radius: 2px; background: var(--accent); }
   .sec-title .more { margin-left:auto; font-size: 12px; color: var(--text-secondary); font-weight: 500; cursor: pointer; display:inline-flex; align-items:center; gap:2px; }
 
-  /* 记录区筛选条：浅棕色圆角纸条，紧贴列表顶部（归属列表；月份只在日历标题，不在此重复） */
+  /* 记录区筛选条兜底（仅空列表/非 note 模块用；note 有记录时筛选标签已并入首个月份扉页行） */
   .rec-bar { margin:6px 0 12px; padding:6px 12px 5px; display:flex; align-items:center;
     background-color:#EDE3D3; border:1px solid #DCD0BA; border-radius:10px; }
-  .rec-bar.in-tl { margin:2px 0 12px; }
   .rec-bar .filter-bar { margin:0; flex:1 1 auto; flex-wrap:wrap; }
-  /* 筛选标签：日系手账文字标签式（未选中无背景无边框，选中浅底+纤细下划线） */
+  /* 筛选标签：纯文字标签式，未选中无背景无边框；选中才有色块 */
   .filter-tab { border:none; background:transparent; color:#6B5E4D;
     font-family:var(--font-journal); font-size:13px; font-weight:600; letter-spacing:1.5px;
     padding:4px 10px 5px; border-radius:6px; cursor:pointer;
-    transition:transform .12s ease, background .15s, color .15s, box-shadow .15s; }
+    transition:transform .12s ease, background .15s, color .15s; }
   .filter-tab:active { transform:scale(.95); }
-  .filter-tab.on { background:rgba(184,131,122,.15); color:#4A3B2C; font-weight:700;
-    box-shadow:inset 0 -2px 0 rgba(184,131,122,.5); }
+  .filter-tab.on { background:rgba(184,131,122,.18); color:#4A3B2C; font-weight:700; }
   .sec-title .more svg { color: var(--text-tertiary); }
 
   /* ---------- timeline ---------- */
@@ -1315,6 +1313,11 @@
   .jn-wk-mon { font-family:var(--font-journal); font-size:30px; font-weight:700; color:#3D3226; line-height:1; }
   .jn-wk-yy  { font-size:11px; color:#B8A99A; letter-spacing:1px; }
   .jn-wk-en  { font-size:11px; color:#9C8B7A; letter-spacing:2.5px; text-transform:uppercase; margin-left:auto; }
+  /* 筛选标签并入首个月份扉页行：纯文字，选中才有色块（独立浅棕方块已去掉） */
+  .jn-wk-tabs { margin-left:auto; align-self:center; display:flex; justify-content:flex-end; }
+  .jn-wk-month.has-filter .jn-wk-en { margin-left:10px; }
+  .jn-wk-tabs .filter-bar { margin:0; display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+  .jn-wk-tabs .filter-tab { font-size:12px; padding:3px 8px 4px; letter-spacing:1px; }
   /* 一日一行（虚线分隔，条目自然衔接） */
   .jn-wk-row { display:flex; gap:12px; padding:10px 0 12px; border-top:1px dashed #E0D5C5; }
   .jn-wk-month + .jn-wk-row { border-top:none; }
@@ -1387,6 +1390,9 @@
     border-radius:0 14px 14px 0; transform:rotateY(180deg); backface-visibility:hidden; }
   .nd-leaf .nd-sheet { backface-visibility:hidden; }
   .nd-leaf.bye { animation:ndLeafBye .34s ease both; }
+  /* 垫底新页（向右翻页用）：层级低于翻页纸、高于真实页；翻页过半淡入接管，杜绝闪烁 */
+  .nd-leaf.nd-under { z-index:20; opacity:0; transition:opacity .3s ease; }
+  .nd-leaf.nd-under.in { opacity:1; }
   @keyframes ndLeafL {  /* 右侧点击 -> 更早：右页绕书脊向左翻起，越过 90° 露出已替换的新页 */
     0%   { transform:perspective(1500px) rotateY(0deg); box-shadow:-2px 0 8px rgba(61,50,38,.06); }
     55%  { box-shadow:-20px 8px 26px rgba(61,50,38,.22); }
@@ -3255,14 +3261,15 @@ function renderModule(key, append){
       /* weeks 手账时间轴：月份扉页行 + 一日一行（日期左栏 + 圆点条目，参考真实 weeks 手账） */
       const MEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       let lastMon = '';
-      let barDone = false;   /* 筛选条只插在第一个月份条之后 */
+      let barDone = false;   /* 筛选标签只并入第一个月份扉页行（全局视图控制，不逐月重复） */
       const rows = dates.map(d=>{
         const mm = d ? d.slice(0,7) : '';
         let mh = '';
         if(mm && mm !== lastMon){
           lastMon = mm;
-          mh = `<div class="jn-wk-month"><span class="jn-wk-mon">${Number(mm.slice(5,7))}</span><span class="jn-wk-yy">${esc(mm.slice(0,4))}</span><span class="jn-wk-en">${MEN[Number(mm.slice(5,7))-1]}</span></div>`;
-          if(!barDone){ mh += `<div class="rec-bar in-tl">${filterBar}</div>`; barDone = true; }
+          const withTabs = !barDone;
+          mh = `<div class="jn-wk-month${withTabs?' has-filter':''}"><span class="jn-wk-mon">${Number(mm.slice(5,7))}</span><span class="jn-wk-yy">${esc(mm.slice(0,4))}</span>${withTabs?`<span class="jn-wk-tabs">${filterBar}</span>`:''}<span class="jn-wk-en">${MEN[Number(mm.slice(5,7))-1]}</span></div>`;
+          if(withTabs) barDone = true;
         }
         const items = groups[d].map(x=>jnWeekEntryHTML(m,x)).join('');
         return mh + `<div class="jn-wk-row"><div class="jn-wk-day">${jnDayCol(d)}</div><div class="jn-wk-entries">${items}</div></div>`;
@@ -4115,16 +4122,22 @@ function openNoteDetail(key, id, editing, flipIn){
         flipping = false;
       };
       if(dir === 'next'){
+        /* 旧页克隆绕书脊向左翻起；同时垫一层新内容页，翻页越过 90° 起淡入接管——
+           旧内容全程垫底、新内容以淡入登场，不依赖翻页纸遮挡，任何层序/时序下都无闪烁 */
+        const under = document.createElement('div');
+        under.className = 'nd-leaf nd-under';
+        under.innerHTML = noteDetailHTML(key, rec2, canEdit, false).replace(/\sid="[^"]*"/g, '');
+        book.appendChild(under);
         const leaf = document.createElement('div');
         leaf.className = 'nd-leaf leaf-l';
         leaf.innerHTML = sheet.outerHTML.replace(/\sid="[^"]*"/g, '');
         book.appendChild(leaf);
-        /* 先让翻页纸（旧内容）完成首帧绘制盖住右页，再在底层替换新内容，
-           避免新内容在遮罩纸盖住前闪现一帧（向右翻页的闪烁根源） */
-        requestAnimationFrame(()=>{
-          finish();   /* 新内容已就位：leaf 越过 90° 即露出 */
-          setTimeout(()=>{ leaf.classList.add('bye'); setTimeout(()=>leaf.remove(), 340); }, 520);
-        });
+        setTimeout(()=>under.classList.add('in'), 180);   /* 翻页过半（约 90°），新页淡入 */
+        setTimeout(()=>{
+          finish();     /* 真实页换为新内容：与垫底页像素一致，无感切换 */
+          under.remove();
+          leaf.remove();
+        }, 540);
       } else {
         const leaf = document.createElement('div');
         leaf.className = 'nd-leaf leaf-back';
