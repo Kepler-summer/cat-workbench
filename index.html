@@ -2011,7 +2011,7 @@
             <div class="jn-brand-title">二猫</div>
             <div class="jn-brand-slogan">两只小猫，一起把日子过成糖</div>
             <div class="jn-together js-together" title="点击设置在一起的日子">
-              <span class="jn-together-names is-solo">两只小猫</span>
+              <span class="jn-together-names">糖糖<i class="jn-together-heart">♡</i>果果</span>
               <span class="jn-together-count is-empty">设置在一起的日子</span>
             </div>
           </div>
@@ -2877,7 +2877,7 @@ function renderHome(){
   // 「在一起」气泡贴纸第 1 行：两个人的名字（配对未加载时占位，保持两行高度稳定、不抖动）
   const pairLine = (pairNames.admin && pairNames.family)
     ? `<span class="jn-together-names">${esc(pairNames.admin)}<i class="jn-together-heart">♡</i>${esc(pairNames.family)}</span>`
-    : `<span class="jn-together-names is-solo">两只小猫</span>`;
+    : `<span class="jn-together-names">糖糖<i class="jn-together-heart">♡</i>果果</span>`;
   // 第 2 行：在一起的天数
   const daysLine = togetherDays
     ? `<span class="jn-together-count">已在一起<b>${togetherDays}</b>天</span>`
