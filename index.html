@@ -1192,6 +1192,10 @@
   .rec .del:hover { background: var(--danger-muted); color: var(--danger); }
   .rec .pbar { height: 5px; border-radius:999px; background: var(--border); overflow:hidden; margin-top: 10px; }
   .rec .pbar i { display:block; height:100%; border-radius:999px; }
+  /* 家属操作标签（账本行/计划便签，与各页 pill 体系同风格） */
+  .led-fam, .tp-fam { flex:0 0 auto; font-size:0.62rem; font-weight:700; color:var(--berry,#B8837A);
+    background:color-mix(in srgb, var(--berry,#B8837A) 10%, transparent);
+    border-radius:999px; padding:0.14rem 0.5rem; line-height:1.4; }
   .rec .amt { font-size: 16px; font-weight: 700; letter-spacing:-.02em; margin-right: 76px; white-space:nowrap; }
   .rec .amt.exp { color: var(--danger); }
   .rec .amt.inc { color: var(--module-1); }
@@ -3089,6 +3093,19 @@ function injectSeed(){
       { id: 9030, title: "OLAY超白瓶身体乳 三瓶囤货装 260g*3", type: "expense", amount: 145.99, category: "购物", date: "2026-09-08" },
       { id: 9031, title: "BLACKMORES澳佳宝女生鱼油 omega3", type: "expense", amount: 90.34, category: "购物", date: "2026-09-08" },
       { id: 9032, title: "卡诗元气姜粉洗发水 500ml", type: "expense", amount: 357.95, category: "购物", date: "2026-09-08" },
+      // 2026-09-02 账单
+      { id: 9033, title: "创意书咖", type: "expense", amount: 10.00, category: "饮品", date: "2026-09-02" },
+      { id: 9034, title: "瑞幸咖啡", type: "expense", amount: 10.90, category: "饮品", date: "2026-09-02" },
+      { id: 9035, title: "怪兽充电", type: "expense", amount: 6.00, category: "日用", date: "2026-09-02" },
+      { id: 9036, title: "中洲·里程名邸停车场", type: "expense", amount: 9.00, category: "交通", date: "2026-09-02" },
+      // 2026-09-03 账单
+      { id: 9037, title: "瑞幸咖啡", type: "expense", amount: 11.30, category: "饮品", date: "2026-09-03" },
+      // 2026-09-04 账单
+      { id: 9038, title: "广州骑安 · 共享单车", type: "expense", amount: 1.80, category: "交通", date: "2026-09-04" },
+      { id: 9039, title: "广州骑安 · 共享单车", type: "expense", amount: 1.80, category: "交通", date: "2026-09-04" },
+      { id: 9040, title: "滴滴出行", type: "expense", amount: 19.10, category: "交通", date: "2026-09-04" },
+      { id: 9041, title: "西西弗书店", type: "expense", amount: 38.00, category: "购物", date: "2026-09-04" },
+      { id: 9042, title: "滴滴出行", type: "expense", amount: 14.93, category: "交通", date: "2026-09-04" },
     ],
     note: [
       { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
@@ -3845,6 +3862,7 @@ function renderTodoPage(key){
       <div class="tp-note tp-swipe-in ${x.done?'done':''}">
         <button type="button" class="tp-dot js-chk ${x.done?'on':''}" data-id="${x.id}" aria-label="完成">${x.done?icon("check",13,3):""}</button>
         <span class="tp-note-name ${x.done?'done':''}" data-edit="${x.id}">${esc(x.title)}</span>
+        ${resolveCreatorRole(x)==="family"?`<span class="tp-fam">家属</span>`:""}
         <span class="tp-note-time">${tlab}</span>
       </div>
     </div>`;
@@ -4389,9 +4407,11 @@ function recHTML(m,x){
     /* 账本行：直写纸面（无卡片），#条目 + 分类 + 金额；抠图贴纸盖章跟随行尾 */
     const cst=(x.stickerId && data.__customStickers && data.__customStickers[x.stickerId]) || null;
     const stamp=cst?`<img class="led-stamp" src="${attr(cst.src)}" alt="" data-stamp-redeem="${attr(x.stickerId)}" title="${esc(cst.name||'我的贴纸')}">`:"";
+    const fam = creatorRole==="family" ? `<span class="led-fam">家属</span>` : "";
     return `<div class="led-row" ${recAttrs}>
       ${x.image?`<img class="led-thumb" src="${attr(x.image)}" alt="">`:''}
       <span class="led-hash" data-edit="${x.id}">${esc(x.title)}</span>
+      ${fam}
       <span class="led-cat">${esc(x.category||'其他')}</span>
       ${stamp}
       <span class="led-amt ${inc?'inc':'exp'}">${inc?'+':'-'}¥${Number(x.amount).toFixed(2)}</span>
