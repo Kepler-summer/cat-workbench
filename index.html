@@ -8332,12 +8332,29 @@ async function loadUserRoleMap(){
     const map = {};
     (users||[]).forEach(u => { if(u && u.id != null) map[String(u.id)] = u.role; });
     _userRoleMap = map;
-    const gid = auth.session ? auth.session.groupId : null;
-    const gu = (users||[]).filter(u => !gid || u.group_id == null || u.group_id == gid);
-    const a = gu.find(u => u.role === "admin");
-    const f = gu.find(u => u.role === "family");
+
+    // 优先用当前登录用户自身记录里的 group_id，避免 session.groupId 为空/旧值
+    const sessionUserId = auth.session && auth.session.userId;
+    const me = sessionUserId ? (users||[]).find(u => String(u.id) === String(sessionUserId)) : null;
+    const gid = (me && me.group_id) || (auth.session && auth.session.groupId) || null;
+
+    // 同组成员（group_id 统一按字符串比较，兼容 number/string）
+    const gu = (users||[]).filter(u => !gid || u.group_id == null || String(u.group_id) === String(gid));
+
+    let a = gu.find(u => u.role === "admin");
+    let f = gu.find(u => u.role === "family");
+
+    // 兜底：当前用户自己补位，保证首页「在一起」至少能显示当前账号名字
+    if(me){
+      if(!a && me.role === "admin") a = me;
+      if(!f && me.role === "family") f = me;
+    }
+
     pairNames = { admin: (a && a.username) || "", family: (f && f.username) || "" };
-  }catch(e){ _userRoleMap = _userRoleMap || {}; }
+  }catch(e){
+    _userRoleMap = _userRoleMap || {};
+    console.warn("loadUserRoleMap failed:", e);
+  }
 }
 
 // 判定记录创建者角色：优先记录自带标记，其次用 createUserId 查用户表，最后兜底 admin
