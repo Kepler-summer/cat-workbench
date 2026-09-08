@@ -162,144 +162,153 @@
   .filter-tab:active { transform:scale(.95); }
   .filter-tab.on { background:var(--accent-muted); color:var(--accent); font-weight:700; }
 
-  /* ============ 时序页 v9：无框卡片化 · 月视图热力 · 对勾交互 ============ */
-  .tp-page { --tp-accent:#B8837A; --tp-deep:#5C4A3A; --tp-card:#FFFDF6;
-    --tp-shadow:0 4px 14px rgba(92,74,58,.09);
-    --tp-serif:"Songti SC","STSong","SimSun",serif; padding:0.2rem 0 5.5rem; }
-  /* ① 头部：手写日期 + 每日名言 + 一只极小透明底猫 */
-  .tp-head { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 0.75rem 0.1rem; }
+  /* ============ 时序页 v10：日式手账 · 无框卡片 · 方块热力 · 单次/多次区分 ============ */
+  .tp-page { --tp-accent:var(--accent); --tp-deep:#5C4A3A; --tp-card:#FFFDF9;
+    --tp-shadow:0 6px 18px rgba(92,74,58,.07);
+    --tp-serif:"Songti SC","STSong","SimSun",serif;
+    padding:0.2rem 0 5.5rem;
+    background-color:#FFFCF7;
+    background-image:
+      linear-gradient(rgba(140,120,95,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(140,120,95,.04) 1px, transparent 1px);
+    background-size:22px 22px; }
+  /* ① 头部：手写日期 + 每日名言 */
+  .tp-head { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 0.85rem 0.15rem; }
   .tp-date { font-family:var(--font-journal); font-size:1.25rem; font-weight:700; color:var(--text); letter-spacing:0.05em; }
-  .tp-date i { font-style:normal; font-size:0.8rem; margin-left:0.3rem; color:var(--text-secondary); letter-spacing:0.1em; font-weight:400; }
-  .tp-quote { font-family:var(--font-journal); font-size:0.8rem; color:var(--text-secondary); letter-spacing:0.12em; margin-top:0.2rem; }
+  .tp-date i { font-style:normal; font-size:0.78rem; margin-left:0.3rem; color:var(--text-secondary); letter-spacing:0.1em; font-weight:400; }
+  .tp-quote { font-family:var(--font-journal); font-size:0.78rem; color:var(--text-secondary); letter-spacing:0.1em; margin-top:0.25rem; }
   .tp-quote::before { content:"「 "; color:var(--text-secondary); }
   .tp-quote::after { content:" 」"; color:var(--text-secondary); }
-  /* 周历：纯文字无框，今天豆沙圆底高亮 */
-  .tp-weekbar { display:flex; gap:0.15rem; margin:0.7rem 0.75rem 0; }
-  .tp-wk { flex:1; text-align:center; padding:0.2rem 0; }
-  .tp-wk .w { display:block; font-size:0.6rem; color:var(--text-secondary); }
-  .tp-wk .d { display:block; width:1.72rem; height:1.72rem; line-height:1.72rem; margin:0.14rem auto 0;
-    border-radius:50%; font-family:var(--tp-serif); font-size:0.85rem; font-weight:700; color:var(--text); }
-  .tp-wk.today .d { background:var(--tp-accent); color:#fff; }
-  @media (max-width:359px){ .tp-wk .d { width:1.5rem; height:1.5rem; line-height:1.5rem; font-size:0.78rem; } }
-  /* 区域标题：手写体 + 枩爪印（无竖线） */
-  .tp-sec { display:flex; align-items:center; gap:0.4rem; margin:1.3rem 0.75rem 0.65rem; }
-  .tp-sec-title { font-family:var(--font-journal); font-size:1.12rem; font-weight:700; color:var(--text); letter-spacing:0.14em; }
-  .tp-sec img.mini { width:1rem; opacity:.55; transform:rotate(-12deg); }
-  .tp-sec-sub { margin-left:auto; font-size:0.82rem; font-weight:700; color:var(--tp-deep); }
-  /* 左滑删除容器：阴影落在壳上，内容平移露出删除钮 */
-  .tp-swipe { position:relative; border-radius:0.9rem; box-shadow:var(--tp-shadow); overflow:hidden; }
-  .tp-swipe-del { position:absolute; right:0; top:0; bottom:0; width:4.2rem; border:none;
-    background:var(--tp-accent); color:#fff; display:grid; place-items:center; cursor:pointer; }
-  .tp-swipe-del:active { background:color-mix(in srgb, var(--tp-accent) 82%, #000); }
+  /* 周历：纯文字无框，今天豆绿柔化圆底 */
+  .tp-weekbar { display:flex; gap:0.25rem; margin:0.6rem 0.75rem 0; }
+  .tp-wk { flex:1; text-align:center; padding:0.25rem 0; }
+  .tp-wk .w { display:block; font-size:0.6rem; color:var(--text-tertiary); letter-spacing:0.08em; }
+  .tp-wk .d { display:block; width:1.75rem; height:1.75rem; line-height:1.75rem; margin:0.12rem auto 0;
+    border-radius:50%; font-family:var(--tp-serif); font-size:0.82rem; font-weight:700; color:var(--tp-deep); transition:all .2s ease; }
+  .tp-wk.today .d { background:var(--tp-accent); color:#fff; box-shadow:0 3px 10px rgba(100,116,90,.28); }
+  @media (max-width:359px){ .tp-wk .d { width:1.55rem; height:1.55rem; line-height:1.55rem; font-size:0.75rem; } }
+  /* 区域标题：纯文字手写体，无框 */
+  .tp-sec { display:flex; align-items:baseline; gap:0.35rem; margin:1.6rem 0.75rem 0.55rem; }
+  .tp-sec-title { font-family:var(--font-journal); font-size:1.05rem; font-weight:700; color:var(--tp-deep); letter-spacing:0.18em; }
+  .tp-sec img.mini { width:0.9rem; opacity:.45; transform:rotate(-12deg); }
+  .tp-sec-sub { margin-left:auto; font-size:0.72rem; font-weight:500; color:var(--text-tertiary); }
+  /* 左滑删除容器 */
+  .tp-swipe { position:relative; border-radius:1.1rem; overflow:hidden; }
+  .tp-swipe-del { position:absolute; right:0; top:0; bottom:0; width:4rem; border:none;
+    background:var(--berry); color:#fff; display:grid; place-items:center; cursor:pointer; }
+  .tp-swipe-del:active { background:color-mix(in srgb, var(--berry) 86%, #000); }
   .tp-swipe-in { position:relative; transition:transform .2s ease; will-change:transform; }
-  /* ② 打卡月视图：一排 2 张（窄屏 1 刌 / 宽屏 3 刌），每习惯一色 */
-  .tp-mgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:0.6rem; margin:0 0.6rem; }
+  /* ② 习惯卡片：一行2个，柔和大圆角，无实线边框，弥散阴影 */
+  .tp-mgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:0.55rem; margin:0 0.6rem; }
   @media (max-width:359px){ .tp-mgrid { grid-template-columns:1fr; } }
-  @media (min-width:720px){ .tp-mgrid { grid-template-columns:repeat(3,1fr); } }
-  .tp-mcard { background:var(--tp-card); border-radius:0.9rem; padding:0.7rem 0.7rem 0.8rem 1rem; }
-  .tp-mcard.is-done { background:color-mix(in srgb, var(--tp-accent) 8%, var(--tp-card)); }
-  .tp-mcard-h { display:flex; align-items:center; gap:0.55rem; margin-bottom:0.6rem; }
-  .tp-mcard-t { flex:1; min-width:0; }
-  .tp-mcard-name { display:block; font-size:0.92rem; font-weight:700; color:var(--tp-deep);
+  .tp-mcard { background:var(--tp-card); border-radius:1.1rem; padding:0.65rem 0.65rem 0.55rem 0.75rem;
+    box-shadow:var(--tp-shadow); position:relative; overflow:hidden; transition:transform .15s ease, box-shadow .2s ease; }
+  .tp-mcard:active { transform:scale(.98); }
+  .tp-mcard.is-done { background:color-mix(in srgb, var(--tp-accent) 7%, var(--tp-card)); }
+  .tp-mcard-h { display:flex; align-items:flex-start; gap:0.45rem; margin-bottom:0.5rem; }
+  .tp-mcard-t { flex:1; min-width:0; padding-right:1.1rem; }
+  .tp-mcard-name { display:block; font-size:0.88rem; font-weight:700; color:var(--tp-deep);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
-  .tp-mcard-name.done { text-decoration:line-through; color:var(--text-secondary); }
-  .tp-mcard-sub { display:block; font-size:0.66rem; color:var(--text-secondary); margin-top:0.12rem; }
-  .tp-mcard { position:relative; }
-  .mh-tag { position:absolute; right:0.75rem; bottom:0.5rem; font-family:var(--font-journal);
-    font-size:0.6rem; letter-spacing:0.25em; color:var(--text-secondary); opacity:.75; pointer-events:none; }
-  /* Streak 统计卡：左连续天数大字 + 右近7天柱状 */
-  .tp-streak-card { display:flex; align-items:center; gap:0.8rem; background:var(--tp-card);
-    border-radius:0.9rem; box-shadow:var(--tp-shadow); padding:0.8rem 0.95rem; margin:0.6rem 0.6rem 0; }
-  .st-left { flex:1; min-width:0; }
-  .st-big { font-size:0.92rem; color:var(--text); }
-  .st-big b { font-family:var(--tp-serif); font-size:1.55rem; font-weight:700; color:var(--tp-accent);
-    margin:0 0.15rem; }
-  .st-sub { font-size:0.68rem; color:var(--text-secondary); margin-top:0.25rem; }
-  .st-bars { flex:0 0 auto; display:flex; align-items:flex-end; gap:0.3rem; height:2.6rem; }
-  .st-bar-col { display:flex; flex-direction:column; align-items:center; gap:0.15rem; height:100%; }
-  .st-bar { width:0.42rem; min-height:8%; border-radius:0.2rem 0.2rem 0.1rem 0.1rem;
-    background:color-mix(in srgb, var(--tp-accent) 62%, #fff); }
-  .st-bar-col.today .st-bar { background:var(--tp-accent); }
-  .st-bar-col span { font-size:0.55rem; color:var(--text-tertiary); }
-  /* 勦选框（打卡方形 / 讣划圆形）——同一左列，44px 热区 */
-  .tp-chk2, .tp-dot { position:relative; flex:0 0 auto; width:1.4rem; height:1.4rem; display:grid;
+  .tp-mcard-name.done { text-decoration:line-through; color:var(--text-tertiary); }
+  .tp-mcard-sub { display:block; font-size:0.62rem; color:var(--text-tertiary); margin-top:0.1rem; }
+  /* 单次/多次角标贴纸 */
+  .tp-mcard-badge { position:absolute; right:0.45rem; top:0.45rem; width:1.15rem; height:1.15rem;
+    object-fit:contain; opacity:.78; pointer-events:none; }
+  .mh-tag { position:absolute; right:0.55rem; bottom:0.4rem; font-family:var(--font-journal);
+    font-size:0.55rem; letter-spacing:0.22em; color:var(--text-tertiary); opacity:.6; pointer-events:none; }
+  /* ③ 方块热力格子：无描边、无圆角 */
+  .tp-mh-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:0.2rem; }
+  .mh-d { width:100%; aspect-ratio:1; border-radius:0.2rem; transition:transform .12s ease; }
+  .mh-d:active { transform:scale(.88); }
+  /* 单次任务：仅完成/未完成 */
+  .mh-d.single-lv0 { background:rgba(228,220,205,.35); }
+  .mh-d.single-lv1 { background:var(--tp-accent); }
+  /* 多次任务：按完成比例梯度 */
+  .mh-d.multi-lv0 { background:rgba(228,220,205,.35); }
+  .mh-d.multi-lv1 { background:color-mix(in srgb, var(--tp-accent) 34%, #fff); }
+  .mh-d.multi-lv2 { background:color-mix(in srgb, var(--tp-accent) 62%, #fff); }
+  .mh-d.multi-lv3 { background:var(--tp-accent); }
+  .mh-d.multi-lv4 { background:color-mix(in srgb, var(--tp-accent) 78%, #5C4A3A); }
+  .mh-d.future { opacity:.28; }
+  .mh-d.today { box-shadow:0 0 0 1.2px var(--tp-card), 0 0 0 2.4px var(--tp-accent); }
+  /* 打卡按钮：单次原生勾选框 / 多次 + 计数 */
+  .tp-chk2, .tp-dot { position:relative; flex:0 0 auto; width:1.35rem; height:1.35rem; display:grid;
     place-items:center; cursor:pointer; padding:0; background:transparent; color:#fff;
     transition:transform .12s ease, background .15s ease, border-color .15s ease; }
-  .tp-chk2::after, .tp-dot::after { content:""; position:absolute; inset:-0.65rem; border-radius:50%; }
-  .tp-chk2 { border:1.5px solid var(--tp-deep); border-radius:0.14rem; }
-  .tp-chk2.on { background:var(--tp-accent); border-color:var(--tp-accent); transform:scale(1.05); }
+  .tp-chk2::after, .tp-dot::after { content:""; position:absolute; inset:-0.55rem; border-radius:50%; }
+  .tp-chk2 { border:1.5px solid var(--tp-deep); border-radius:0.25rem; }
+  .tp-chk2.on { background:var(--tp-accent); border-color:var(--tp-accent); }
   .tp-chk2 .plus { color:var(--tp-deep); opacity:.32; line-height:0; }
-  /* 习惯主题色：仅热力点与名称旁小圆点 */
-  .hc-dot { flex:0 0 auto; width:0.5rem; height:0.5rem; border-radius:50%; background:var(--hc,var(--tp-accent)); opacity:.85; }
   .tp-dot { border:1.5px solid var(--tp-deep); border-radius:50%; }
-  .tp-dot.on { background:var(--tp-accent); border-color:var(--tp-accent); transform:scale(1.05); }
-  .tp-chk2:active, .tp-dot:active { transform:scale(.86); }
-  /* 对勾绘制动画（完成瞬间从无到有） */
+  .tp-dot.on { background:var(--tp-accent); border-color:var(--tp-accent); }
+  .tp-chk2:active, .tp-dot:active { transform:scale(.88); }
   .tp-chk2 svg path, .tp-dot svg path { stroke-dasharray:24; animation:chkDraw .28s ease both; }
   @keyframes chkDraw { from { stroke-dashoffset:24; } to { stroke-dashoffset:0; } }
-  /* 月历点阵：颜色随习惯 --hc */
-  .tp-mh-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:0.26rem; }
-  .mh-d { width:100%; aspect-ratio:1; border-radius:50%; transition:transform .12s ease; }
-  .mh-d:active { transform:scale(.82); }
-  .mh-d.lv0 { background:#EFE9DC; }
-  .mh-d.lv1 { background:color-mix(in srgb, var(--hc) 34%, #fff); }
-  .mh-d.lv2 { background:color-mix(in srgb, var(--hc) 68%, #fff); }
-  .mh-d.lv3 { background:var(--hc); }
-  .mh-d.future { opacity:.32; }
-  .mh-d.today { box-shadow:0 0 0 1.5px var(--tp-card), 0 0 0 3px var(--hc); }
-  /* 打卡入账糖币特效 */
-  @keyframes coinUp { 0%{opacity:0; transform:translateY(6px) scale(.6)} 25%{opacity:1}
-    70%{opacity:1; transform:translateY(-14px) scale(1)} 100%{opacity:0; transform:translateY(-26px) scale(.92)} }
-  .pet-coinfx { position:absolute; right:0.9rem; bottom:2.2rem; display:flex; align-items:center; gap:0.15rem;
-    pointer-events:none; z-index:4; animation:coinUp 1s ease both; }
-  .pet-coinfx img { width:1.05rem; }
-  .pet-coinfx i { font-style:normal; font-family:var(--tp-serif); font-size:0.85rem; font-weight:700;
-    color:var(--candy); }
+  /* 多次任务计数按钮 */
+  .tp-count { display:inline-flex; align-items:center; gap:0.2rem; margin-left:auto; }
+  .tp-count-btn { width:1.3rem; height:1.3rem; border:none; border-radius:50%; background:var(--tp-accent); color:#fff;
+    display:grid; place-items:center; cursor:pointer; transition:transform .12s ease; box-shadow:0 2px 6px rgba(100,116,90,.22); }
+  .tp-count-btn:active { transform:scale(.9); }
+  .tp-count-btn svg { width:0.7rem; height:0.7rem; }
+  .tp-count-text { font-size:0.62rem; color:var(--text-tertiary); min-width:2.2rem; text-align:center; }
+  /* 豆绿印章扩散动效 */
+  @keyframes stampRipple { 0%{transform:scale(.6); opacity:.55} 100%{transform:scale(2.6); opacity:0} }
+  .tp-stamp-ripple { position:absolute; inset:0; pointer-events:none; }
+  .tp-stamp-ripple::after { content:""; position:absolute; left:50%; top:50%; width:2rem; height:2rem; margin:-1rem 0 0 -1rem;
+    border-radius:50%; background:color-mix(in srgb, var(--tp-accent) 22%, transparent); animation:stampRipple .55s ease-out both; }
+  /* 统计/迷你图占位块（与习惯卡片同高同宽） */
+  .tp-mcard.tp-stat-card { display:flex; flex-direction:column; justify-content:center; gap:0.35rem;
+    background:linear-gradient(160deg, #fff 0%, #F8F4EC 100%); }
+  .tp-stat-row { display:flex; align-items:baseline; gap:0.3rem; }
+  .tp-stat-row img { width:1.1rem; height:1.1rem; object-fit:contain; opacity:.62; }
+  .tp-stat-row b { font-family:var(--tp-serif); font-size:1.15rem; color:var(--tp-deep); }
+  .tp-stat-row span { font-size:0.62rem; color:var(--text-tertiary); }
+  /* 迷你柱状图 */
+  .tp-mini-chart { display:flex; align-items:flex-end; justify-content:space-between; gap:0.18rem; height:3rem; margin-top:0.1rem; }
+  .tp-mini-bar { flex:1; border-radius:0.12rem 0.12rem 0.06rem 0.06rem; background:color-mix(in srgb, var(--tp-accent) 38%, #fff); transition:height .3s ease; }
+  .tp-mini-bar.today { background:var(--tp-accent); }
   /* 空态 */
-  .tp-empty { display:flex; flex-direction:column; align-items:center; gap:0.3rem; padding:1rem 0.4rem;
-    color:var(--text-secondary); font-size:0.78rem; text-align:center; }
-  .tp-empty img { width:1.9rem; opacity:.6; }
-  /* ③ 今日讣划：平整便签（无框 + 阣影），与打卡同左列 */
-  .tp-notes { display:flex; flex-direction:column; gap:0.6rem; }
-  .tp-note { display:flex; align-items:center; gap:0.6rem; background:var(--tp-card);
-    border-radius:0.9rem; padding:0.72rem 0.7rem 0.72rem 1rem; }
-  .tp-note.done { background:color-mix(in srgb, var(--tp-accent) 8%, var(--tp-card)); }
+  .tp-empty { display:flex; flex-direction:column; align-items:center; gap:0.35rem; padding:1.2rem 0.4rem;
+    color:var(--text-secondary); font-size:0.76rem; text-align:center; }
+  .tp-empty img { width:2.2rem; opacity:.5; }
+  /* ③ 今日待办：去除外框，仅保留勾选 + 文字 */
+  .tp-notes { display:flex; flex-direction:column; gap:0.45rem; margin:0 0.75rem; }
+  .tp-note { display:flex; align-items:center; gap:0.6rem; padding:0.55rem 0.3rem; border-radius:0.9rem; }
+  .tp-note.done { background:color-mix(in srgb, var(--tp-accent) 5%, transparent); }
   .tp-note-name { flex:1; min-width:0; font-size:0.9rem; font-weight:600; color:var(--tp-deep);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
-  .tp-note-name.done { text-decoration:line-through; color:var(--text-secondary); }
-  .tp-note-time { flex:0 0 auto; font-size:0.66rem; font-weight:600; color:var(--text-secondary);
-    background:color-mix(in srgb, var(--tp-deep) 7%, transparent);
-    border-radius:var(--radius-control); padding:0.18rem 0.5rem; }
-  /* 往日入口（标题行右侧，浅底无框） */
-  .tp-hist-toggle { margin:0 0 0 auto; border:none; background:var(--accent-muted);
-    color:var(--text-secondary); font-size:0.72rem; font-weight:600; cursor:pointer;
-    display:inline-flex; align-items:center; gap:0.25rem;
-    border-radius:var(--radius-control); padding:0.32rem 0.7rem; }
+  .tp-note-name.done { text-decoration:line-through; color:var(--text-tertiary); }
+  .tp-note-tag { flex:0 0 auto; font-size:0.6rem; color:var(--text-tertiary); font-weight:500; letter-spacing:0.05em; }
+  /* 往日入口 */
+  .tp-hist-toggle { margin:0 0 0 auto; border:none; background:transparent;
+    color:var(--text-tertiary); font-size:0.72rem; font-weight:500; cursor:pointer;
+    display:inline-flex; align-items:center; gap:0.25rem; }
   .tp-hist-toggle svg { transition:transform .2s ease; }
   .tp-hist-toggle.open svg { transform:rotate(90deg); }
-  .tp-hist-list { margin-top:0.5rem; }
-  /* ④ 成就贴纸册 */
+  .tp-hist-list { margin-top:0.4rem; }
+  /* ④ 成长勋章：去框线，贴纸直接落底色 */
   .ts-ach-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.7rem 0.4rem; margin:0 0.6rem; }
   @media (min-width:720px){ .ts-ach-grid { grid-template-columns:repeat(6,1fr); } }
-  .ts-ach { margin:0; text-align:center; padding:0.3rem 0.15rem 0.25rem; }
-  .ts-ach img { width:70%; max-width:3.6rem; aspect-ratio:1; object-fit:contain;
-    filter:drop-shadow(0 2px 4px rgba(92,74,58,.12)); }
+  .ts-ach { margin:0; text-align:center; padding:0.25rem 0.1rem; }
+  .ts-ach img { width:70%; max-width:3.4rem; aspect-ratio:1; object-fit:contain;
+    filter:drop-shadow(0 2px 4px rgba(92,74,58,.12)); transition:filter .3s ease, transform .2s ease; }
   .ts-ach:nth-child(odd) img { transform:rotate(-4deg); }
   .ts-ach:nth-child(even) img { transform:rotate(3deg); }
-  .ts-ach.no img { filter:grayscale(1) contrast(.65) brightness(1.08); opacity:.55; }
-  .ts-ach figcaption { font-size:0.8rem; font-weight:600; color:var(--tp-deep); margin-top:0.22rem; }
-  .ts-ach.no figcaption { color:var(--text-secondary); font-weight:400; }
+  .ts-ach.no img { filter:grayscale(1) contrast(.55) brightness(1.1); opacity:.4; }
+  .ts-ach.ok img { filter:drop-shadow(0 3px 8px rgba(100,116,90,.18)); }
+  .ts-ach figcaption { font-size:0.74rem; font-weight:600; color:var(--tp-deep); margin-top:0.2rem; }
+  .ts-ach.no figcaption { color:var(--text-tertiary); font-weight:400; }
   .ts-ach.ok { cursor:pointer; }
   .ts-ach.ok:active { transform:scale(.95); }
-  /* ⑥ 添加选择菜单 */
+  /* 添加选择菜单（保持原有交互，去线框） */
   .tp-add-ov { align-items:flex-end; }
-  .tp-add-sheet { width:100%; max-width:26rem; background:var(--paper-1); border-radius:1rem 1rem 0 0;
+  .tp-add-sheet { width:100%; max-width:26rem; background:var(--paper-1); border-radius:1.1rem 1.1rem 0 0;
     padding:0.6rem 1rem calc(1.1rem + env(safe-area-inset-bottom)); box-shadow:0 -4px 24px rgba(58,53,46,.14); }
   .tp-add-grab { width:2.4rem; height:0.28rem; border-radius:999px; background:var(--paper-4); margin:0 auto 0.7rem; }
   .tp-add-title { text-align:center; font-family:var(--font-journal); font-size:0.95rem; color:var(--text-secondary);
     letter-spacing:0.25em; margin-bottom:0.6rem; }
   .tp-add-opt { display:flex; align-items:center; gap:0.6rem; width:100%; border:none;
-    background:var(--surface-card); border-radius:0.8rem; padding:0.85rem 1rem; margin-bottom:0.5rem;
+    background:var(--surface-card); border-radius:0.9rem; padding:0.85rem 1rem; margin-bottom:0.5rem;
     font-size:0.95rem; font-weight:600; color:var(--tp-deep); cursor:pointer; box-shadow:var(--tp-shadow); }
   .tp-add-opt img { width:1.5rem; }
   .tp-add-opt:active { transform:scale(.98); }
@@ -310,21 +319,21 @@
     opacity:0; transition:all .25s ease; pointer-events:none; z-index:120; }
   #tpToast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   /* 往日折叠 */
-  .tp-hist-toggle { margin:0 0 0 auto; border:1px solid var(--border-soft); background:var(--surface-card);
-    color:var(--text-secondary); font-size:0.75rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.3rem;
-    border-radius:var(--radius-control); padding:0.35rem 0.8rem; }
+  .tp-hist-toggle { margin:0 0 0 auto; border:none; background:transparent;
+    color:var(--text-tertiary); font-size:0.72rem; font-weight:500; cursor:pointer;
+    display:inline-flex; align-items:center; gap:0.25rem; }
   .tp-hist-toggle svg { transition:transform .2s ease; }
   .tp-hist-toggle.open svg { transform:rotate(90deg); }
-  .tp-hist-list { margin-top:0.5rem; }
-  /* ⑥ 添加选择菜单 */
+  .tp-hist-list { margin-top:0.4rem; }
+  /* 添加选择菜单 */
   .tp-add-ov { align-items:flex-end; }
-  .tp-add-sheet { width:100%; max-width:26rem; background:var(--paper-1); border-radius:1rem 1rem 0 0;
+  .tp-add-sheet { width:100%; max-width:26rem; background:var(--paper-1); border-radius:1.1rem 1.1rem 0 0;
     padding:0.6rem 1rem calc(1.1rem + env(safe-area-inset-bottom)); box-shadow:0 -4px 24px rgba(58,53,46,.14); }
   .tp-add-grab { width:2.4rem; height:0.28rem; border-radius:999px; background:var(--paper-4); margin:0 auto 0.7rem; }
   .tp-add-title { text-align:center; font-family:var(--font-journal); font-size:0.95rem; color:var(--ink-mute);
     letter-spacing:0.25em; margin-bottom:0.6rem; }
   .tp-add-opt { display:flex; align-items:center; gap:0.6rem; width:100%; border:1px solid var(--paper-4);
-    background:var(--surface-card); border-radius:0.8rem; padding:0.85rem 1rem; margin-bottom:0.5rem;
+    background:var(--surface-card); border-radius:0.9rem; padding:0.85rem 1rem; margin-bottom:0.5rem;
     font-size:0.95rem; font-weight:600; color:var(--tp-deep,#5C4A3A); cursor:pointer; }
   .tp-add-opt img { width:1.5rem; }
   .tp-add-opt:active { transform:scale(.98); }
@@ -3733,11 +3742,12 @@ function tpBindPull(){
 function tpCnt(v){ return v===true?1:(typeof v==="number"?v:0); }
 function tpHabitCount(x, ds){ return tpCnt(x.log&&x.log[ds]); }
 function tpHabitDone(x, ds){ return tpHabitCount(x,ds)>=(x.perDay||1); }
-function tpLevelR(x, ds){  /* 热力颜色：按当日完成比例的绿色浓度 */
+function tpLevelR(x, ds){  /* 热力颜色：单次/多次区分；多次按完成比例梯度 */
   const pd=x.perDay||1, c=tpHabitCount(x,ds);
-  if(c<=0) return "lv0";
+  if(c<=0) return pd===1 ? "single-lv0" : "multi-lv0";
+  if(pd===1) return "single-lv1";
   const r=c/pd;
-  return r>=1?"lv3":(r>=0.5?"lv2":"lv1");
+  return r>=1?"multi-lv4":(r>=0.75?"multi-lv3":(r>=0.5?"multi-lv2":"multi-lv1"));
 }
 function tpToggle(x, ds){  /* 循环打卡：0→1→…→perDay→0；一天一次保持布尔兼容 */
   x.log=x.log||{}; const pd=x.perDay||1;
@@ -3794,7 +3804,7 @@ function renderTodoPage(key){
   const mm=String(mo+1).padStart(2,'0');
   const daysInM=new Date(y,mo+1,0).getDate();
   const ckCan=auth.canEdit("checkin");
-  /* ① 每日语录（小众激励词库，按日期轮换，同一天固定） */
+  /* ① 每日语录 */
   const QUOTES=[
     "凡是过往，皆为序章","心之所向，素履以往","慢慢走，欣赏啊","但行好事，莫问前程",
     "山不过来，我就过去","凛冬散尽，星河长明","怕什么真理无穷，进一寸有一寸的欢喜",
@@ -3804,7 +3814,7 @@ function renderTodoPage(key){
     "种一棵树最好的时间是十年前，其次是现在","所有的坚持，都是因为热爱","闭门即是深山，读书随处净土"
   ];
   const quote=QUOTES[Math.floor(Date.now()/86400000)%QUOTES.length];
-  /* 剌历：本周周一 → 剴日（纯文字无框） */
+  /* 周历 */
   const weekbar=(()=>{
     const mon=new Date(now); mon.setDate(now.getDate()-((now.getDay()+6)%7));
     let s="";
@@ -3816,10 +3826,9 @@ function renderTodoPage(key){
     }
     return `<div class="tp-weekbar">${s}</div>`;
   })();
-  /* ② 打卡月视图：一排 2 张，每习惯一套专属色；总览卡补位/通栏 */
-  const HCOLORS=["#7FA86F","#A08BC0","#7BA5C9","#D89A6A","#D98CA0","#6FB3AE","#C9A66B","#9AA7C9"];
+  /* ② 习惯月视图：一行2张，方块热力 */
   const endDays=now.getMonth()===mo?now.getDate():daysInM;
-  /* 本月总览数据 */
+  /* 本月总览 */
   let ovDays=0, ovTimes=0, ovPoss=0, ovDone=0;
   habits.forEach(x=>{
     const pd=x.perDay||1;
@@ -3834,12 +3843,13 @@ function renderTodoPage(key){
     if(habits.some(x=>tpHabitCount(x,ds)>0)) ovDays++;
   }
   const ovRate=ovPoss?Math.min(100,Math.round(ovDone/ovPoss*100)):0;
-  /* 当前连续打卡天数（取所有习惯最大值，用于 Streak 卡） */
+  /* 当前连续与最佳 */
   let maxStreak=0;
   habits.forEach(x=>{ const s=streak(x.log); if(s>maxStreak) maxStreak=s; });
+  const best=tsBestStreak();
   const mkCard=(x,idx)=>{
-    const hc=HCOLORS[idx%HCOLORS.length];
-    const pd=x.perDay||1, tc=tpHabitCount(x,t), done=tc>=pd;
+    const pd=x.perDay||1, isMulti=pd>1;
+    const tc=tpHabitCount(x,t), done=tpHabitDone(x,t);
     const st=streak(x.log), wk=tpHabitWeek(x);
     let mDays=0;
     for(let d=1;d<=endDays;d++){
@@ -3852,15 +3862,19 @@ function renderTodoPage(key){
       const fut=ds>t;
       dots+=`<i class="mh-d ${tpLevelR(x,ds)} ${ds===t?'today':''} ${fut?'future':''}" ${(!fut&&ckCan)?`data-hg="${ds}" data-id="${x.id}"`:""} title="${mm}/${d} · ${tpHabitCount(x,ds)}/${pd}"></i>`;
     }
-    const sub = `今日 ${tc}/${pd} · 连续 ${st} 天`;
-    const chk=`<button type="button" class="tp-chk2 ${done?'on':''}" ${ckCan?`data-hchk="${x.id}"`:""} aria-label="打卡">${done?icon("check",15,3):`<span class="plus">${icon("plus",11,2.6)}</span>`}</button>`;
+    const sub = isMulti ? `当前 ${tc}/${pd} · 连续 ${st} 天` : `连续 ${st} 天 · 本周 ${wk} 天`;
+    const control = isMulti
+      ? `<div class="tp-count"><span class="tp-count-text">${tc}/${pd}</span><button type="button" class="tp-count-btn" data-hplus="${x.id}" aria-label="加一次">${icon("plus",11,2.6)}</button></div>`
+      : `<button type="button" class="tp-chk2 ${done?'on':''}" ${ckCan?`data-hchk="${x.id}"`:""} aria-label="打卡">${done?icon("check",15,3):''}</button>`;
+    const badgeSrc = isMulti ? "assets/stickers/heart-soft.png" : "assets/stickers/paw.png";
     return `<div class="tp-swipe" data-mod="checkin">
       <button type="button" class="tp-swipe-del js-del" data-id="${x.id}" aria-label="删除">${icon("trash",16)}</button>
-      <div class="tp-mcard tp-swipe-in ${done?'is-done':''}" style="--hc:${hc}">
+      <div class="tp-mcard tp-swipe-in ${done?'is-done':''}">
+        <img class="tp-mcard-badge" src="${badgeSrc}" alt="">
         <div class="tp-mcard-h">
-          ${chk}
+          ${control}
           <div class="tp-mcard-t">
-            <span class="tp-mcard-name ${done?'done':''}" ${ckCan?`data-edit="${x.id}"`:""}><i class="hc-dot"></i>${esc(x.title)}</span>
+            <span class="tp-mcard-name ${done?'done':''}" ${ckCan?`data-edit="${x.id}"`:""}>${esc(x.title)}</span>
             <span class="tp-mcard-sub">${sub}</span>
           </div>
         </div>
@@ -3869,8 +3883,7 @@ function renderTodoPage(key){
       </div>
     </div>`;
   };
-  const cards=habits.map(mkCard).join("");
-  /* Streak 统计卡：左「连续打卡X天」大字 + 本月完成率小字；右近 7 天柱状图 */
+  /* 近7天数据 */
   const last7=(()=>{ const arr=[];
     for(let i=6;i>=0;i--){
       const dt=new Date(now); dt.setDate(now.getDate()-i);
@@ -3880,38 +3893,46 @@ function renderTodoPage(key){
     }
     return arr; })();
   const maxN=Math.max(1,...last7.map(o=>o.n));
-  const bars=last7.map(o=>`<div class="st-bar-col ${o.today?'today':''}">
-    <div class="st-bar" style="height:${Math.max(10,Math.round(o.n/maxN*100))}%"></div><span>${o.dw}</span></div>`).join("");
-  const streakCard=`<div class="tp-streak-card">
-    <div class="st-left">
-      <div class="st-big">连续打卡<b>${maxStreak}</b>天</div>
-      <div class="st-sub">本月完成率 ${ovRate}% · 已打卡 ${ovDays} 天 · 共 ${ovTimes} 次</div>
-    </div>
-    <div class="st-bars">${bars}</div>
-  </div>`;
+  /* 首卡差异化：单数放统计信息，双数放迷你柱状图 */
+  let statCard="";
+  if(habits.length){
+    if(habits.length%2===1){
+      statCard=`<div class="tp-mcard tp-stat-card">
+        <div class="tp-stat-row"><img src="assets/stickers/cat-medal.png" alt=""><b>${maxStreak}</b><span>连续打卡天</span></div>
+        <div class="tp-stat-row"><img src="assets/stickers/star.png" alt=""><b>${ovRate}%</b><span>本月完成率</span></div>
+        <div class="tp-stat-row"><img src="assets/stickers/cat-stars.png" alt=""><b>${best}</b><span>最佳连续天</span></div>
+      </div>`;
+    } else {
+      const bars=last7.map(o=>`<div class="tp-mini-bar ${o.today?'today':''}" style="height:${Math.max(12,Math.round(o.n/maxN*100))}%"></div>`).join("");
+      statCard=`<div class="tp-mcard tp-stat-card">
+        <div class="tp-mcard-name">近 7 天打卡</div>
+        <div class="tp-mini-chart">${bars}</div>
+      </div>`;
+    }
+  }
+  const cards=(statCard?[statCard]:[]).concat(habits.map(mkCard)).join("");
   const habitBlock = habits.length
-    ? `<div class="tp-mgrid">${cards}</div>`+streakCard
+    ? `<div class="tp-mgrid">${cards}</div>`
     : `<div class="tp-empty"><img src="assets/stickers/cat-wave.png" alt=""><span>还没有打卡项，点右下角「+ 新打卡」创建</span></div>`;
-  /* ③ 今日讣划便签（圆点勾选 + 左滑删除，与打卡同一左列） */
+  /* ③ 今日待办 */
   const notes=todayTodos.length?todayTodos.map(x=>{
     const tlab=x.time?esc(x.time):"待办";
     return `<div class="tp-swipe" data-mod="todo">
       <button type="button" class="tp-swipe-del js-del" data-id="${x.id}" aria-label="删除">${icon("trash",16)}</button>
       <div class="tp-note tp-swipe-in ${x.done?'done':''}">
-        <button type="button" class="tp-dot js-chk ${x.done?'on':''}" data-id="${x.id}" aria-label="完成">${x.done?icon("check",13,3):""}</button>
+        <button type="button" class="tp-dot js-chk ${x.done?'on':''}" data-id="${x.id}" aria-label="完成">${x.done?icon("check",13,3):''}</button>
         <span class="tp-note-name ${x.done?'done':''}" data-edit="${x.id}">${esc(x.title)}</span>
         ${resolveCreatorRole(x)==="family"?`<span class="tp-fam">家属</span>`:""}
-        <span class="tp-note-time">${tlab}</span>
+        <span class="tp-note-tag">${tlab}</span>
       </div>
     </div>`;
-  }).join("") : `<div class="tp-empty"><span>今天还没有讣划，点击右下角 + 添加</span></div>`;
+  }).join("") : `<div class="tp-empty"><span>今天还没有计划，点击右下角 + 添加</span></div>`;
   const histItems=todosAll.filter(x=>x.date&&x.date<t).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
   const histBtn=histItems.length
     ? `<button type="button" class="tp-hist-toggle ${_tpHistoryOpen?'open':''}" data-tp-hist="1">往日${icon("chevron",11,2)}</button>` : "";
   const histList=(_tpHistoryOpen&&histItems.length)
     ? `<div class="tp-hist-list" style="margin:0 0.6rem">${histItems.map(x=>recHTML(modOf("todo"),x)).join("")}</div>` : "";
-  /* ④ 成就贴纸册：历史最佳连续打卡天数解锁（获得后可用于首页/心情贴纸/粧光记录） */
-  const best=tsBestStreak();
+  /* ④ 成长勋章 */
   const ACH=[
     {d:7,   img:"cat-medal.png", name:"连续 7 天"},
     {d:14,  img:"cat-stars.png", name:"连续 14 天"},
@@ -3935,47 +3956,65 @@ function renderTodoPage(key){
       </div>
     </div>
     ${weekbar}
-    <div class="tp-sec"><span class="tp-sec-title">今日功课</span><img class="mini" src="assets/stickers/paw.png" alt=""></div>
+    <div class="tp-sec"><span class="tp-sec-title">今日习惯</span><img class="mini" src="assets/stickers/paw.png" alt=""></div>
     ${habitBlock}
-    <div class="tp-sec"><span class="tp-sec-title">今日心愿</span><img class="mini" src="assets/stickers/paw.png" alt="">${histBtn}</div>
-    <div class="tp-notes" style="margin:0 0.6rem">${notes}</div>
+    <div class="tp-sec"><span class="tp-sec-title">今日待办</span><img class="mini" src="assets/stickers/star.png" alt="">${histBtn}</div>
+    <div class="tp-notes">${notes}</div>
     ${histList}
-    <div class="tp-sec"><span class="tp-sec-title">功勋帖</span><img class="mini" src="assets/stickers/paw.png" alt=""><span class="tp-sec-sub">最佳连续 ${best} 天</span></div>
+    <div class="tp-sec"><span class="tp-sec-title">成长勋章</span><img class="mini" src="assets/stickers/cat-medal.png" alt=""><span class="tp-sec-sub">最佳连续 ${best} 天</span></div>
     <div class="ts-ach-grid">${achHTML}</div>
   </div>`;
-  /* 打卡交互：勾选框 / 月历点 → 循环打卡；完成瞬间真实入账糖币 */
+  /* 打卡交互 */
   const toggleHabit=(id, ds)=>{
     const x=habits.find(i=>i.id==id); if(!x) return;
     const wasDone=tpHabitDone(x, ds);
     tpToggle(x, ds);
     const nowDone=tpHabitDone(x, ds);
-    persist();  /* persist → render */
-    /* 糖币特效：仅当天首次完成时真实入账并显示真实数额（同日重复打卡不再发） */
+    persist();
     if(!wasDone && nowDone && ckCan){
       x._ckAwarded=x._ckAwarded||{};
       let gained=0;
       if(!x._ckAwarded[ds]){ gained=candy.awardCheckin(x.title+" · "+ds.slice(5), `ck-${x.id}-${ds}`); x._ckAwarded[ds]=1; }
-      if(gained>0){
-        const delBtn=$("#screen").querySelector(`.tp-swipe[data-mod="checkin"] .js-del[data-id="${id}"]`);
-        const card=delBtn?delBtn.parentElement.querySelector(".tp-mcard"):null;
-        if(card){
-          const fx=document.createElement("span");
-          fx.className="pet-coinfx";
-          fx.innerHTML=`<img src="assets/stickers/candy.png" alt=""><i>+${gained}</i>`;
-          fx.style.right=(0.7+Math.random()*1.4).toFixed(2)+"rem";
-          card.appendChild(fx);
-          fx.addEventListener("animationend",()=>fx.remove());
-        }
-      }
+      if(gained>0) tpCoinFx(id, gained);
+    }
+  };
+  const incHabit=(id, ds)=>{
+    const x=habits.find(i=>i.id==id); if(!x) return;
+    const wasDone=tpHabitDone(x, ds);
+    const pd=x.perDay||1;
+    const c=tpCnt(x.log&&x.log[ds]);
+    x.log=x.log||{};
+    x.log[ds]=Math.min(Math.round(pd*1.5), c+1);
+    persist();
+    if(!wasDone && tpHabitDone(x,ds) && ckCan){
+      x._ckAwarded=x._ckAwarded||{};
+      let gained=0;
+      if(!x._ckAwarded[ds]){ gained=candy.awardCheckin(x.title+" · "+ds.slice(5), `ck-${x.id}-${ds}`); x._ckAwarded[ds]=1; }
+      if(gained>0) tpCoinFx(id, gained);
+    }
+  };
+  const tpCoinFx=(id, gained)=>{
+    const delBtn=$("#screen").querySelector(`.tp-swipe[data-mod="checkin"] .js-del[data-id="${id}"]`);
+    const card=delBtn?delBtn.parentElement.querySelector(".tp-mcard"):null;
+    if(card){
+      const ripple=document.createElement("span"); ripple.className="tp-stamp-ripple"; card.appendChild(ripple);
+      setTimeout(()=>ripple.remove(),600);
+      const fx=document.createElement("span");
+      fx.className="pet-coinfx";
+      fx.innerHTML=`<img src="assets/stickers/candy.png" alt=""><i>+${gained}</i>`;
+      fx.style.right=(0.7+Math.random()*1.4).toFixed(2)+"rem";
+      card.appendChild(fx);
+      fx.addEventListener("animationend",()=>fx.remove());
     }
   };
   $("#screen").querySelectorAll("[data-hchk]").forEach(el=>el.onclick=e=>{ e.stopPropagation(); toggleHabit(el.dataset.hchk, t); });
+  $("#screen").querySelectorAll("[data-hplus]").forEach(el=>el.onclick=e=>{ e.stopPropagation(); incHabit(el.dataset.hplus, t); });
   $("#screen").querySelectorAll("[data-hg]").forEach(el=>el.onclick=()=>toggleHabit(el.dataset.id, el.dataset.hg));
   $("#screen").querySelectorAll("[data-tp-hist]").forEach(el=>el.onclick=()=>{
     _tpHistoryOpen=!_tpHistoryOpen;
     const sy=window.scrollY; renderModule("todo",true); window.scrollTo(0,sy);
   });
-  /* 左滑出删除：打卡卡与讣划便签通用 */
+  /* 左滑删除 */
   $("#screen").querySelectorAll(".tp-swipe").forEach(w=>{
     const inEl=w.querySelector(".tp-swipe-in"); if(!inEl) return;
     let sx=null, base=0;
@@ -4003,17 +4042,19 @@ function renderTodoPage(key){
   /* 已解锁成就点击放大 */
   $("#screen").querySelectorAll(".ts-ach.ok").forEach(el=>el.onclick=()=>{
     const ov=document.createElement("div"); ov.className="overlay";
-    ov.innerHTML=`<div class="modal"><div class="grab"></div>
+    ov.innerHTML=`<div class="modal modal-clean"><button class="mh-close" id="tsBigClose">✕</button>
       <div class="modal-cat"><img src="${el.dataset.tsBig}" alt=""></div>
       <h2>${el.dataset.tsName}</h2>
       <div class="sub">坚持的每一天，都被猫猫记录啦 · 已可在首页装扮与心情贴纸中使用</div>
       <div class="modal-actions"><button class="btn" id="tsBigOk">好棒</button></div></div>`;
     document.body.appendChild(ov);
     ov.onclick=e=>{ if(e.target===ov) ov.remove(); };
+    ov.querySelector("#tsBigClose").onclick=()=>ov.remove();
     ov.querySelector("#tsBigOk").onclick=()=>ov.remove();
   });
   wireModule(key);
   tpBindPull();
+}
 }
 
 
