@@ -2973,11 +2973,17 @@ const store = {
       if(error) throw error;
       return true;
     } catch(e) {
+      const msg = (e && (e.message || e.error_description || e.error)) || "未知错误";
       console.warn("Cloud save failed:", e);
       /* 同步失败必须可见（2026-09-08 静默失败导致笔记丢失） */
       if(!this._syncFailAt || Date.now()-this._syncFailAt > 60000){
         this._syncFailAt = Date.now();
-        try { if(typeof showCatPopup==="function") showCatPopup("云端同步失败","数据已存本地，网络恢复后会重试",true); } catch(_){}
+        try {
+          if(typeof showCatPopup==="function"){
+            const detail = String(msg).slice(0, 60);
+            showCatPopup("云端同步失败", detail, true);
+          }
+        } catch(_){}
       }
       return false;
     }
@@ -8108,13 +8114,36 @@ async function renderAuth(mode = "login") {
 async function bootstrap() {
   store.initSupabase();
 
-  // WorkBuddy 内嵌模式（URL 带 ?wb=1）：未登录时自动以果子(admin, groupId=1)进入，
-  // 避免内置浏览器无登录态而显示初始/种子数据。手机端正常打开不带此参数，不受影响。
+  // WorkBuddy 内嵌模式（URL 带 ?wb=1）：未登录时自动以测试号「果子」进入；
+  // 找不到果子时 fallback 到第一个 approved admin。避免内置浏览器无登录态而显示初始/种子数据。
+  // 手机端正常打开不带此参数，不受影响。
   try {
     const _wb = new URLSearchParams(location.search).get("wb");
-    if(_wb === "1" && !localStorage.getItem("__cat_session")) {
-      auth.saveSession({ userId: 1, username: "果子", role: "admin", groupId: 1 });
-      console.log("🔧 WorkBuddy 模式：自动以果子身份进入");
+    if(_wb === "1" && !localStorage.getItem("__cat_session") && store.sb) {
+      let u = null;
+      try {
+        const { data: rows } = await store.sb
+          .from("workbench_users")
+          .select("*")
+          .eq("username", "果子")
+          .eq("apply_status", "approved")
+          .limit(1);
+        u = rows && rows[0];
+      } catch(_) {}
+      if(!u) {
+        const { data: rows } = await store.sb
+          .from("workbench_users")
+          .select("*")
+          .eq("role", "admin")
+          .eq("apply_status", "approved")
+          .order("id", { ascending: true })
+          .limit(1);
+        u = rows && rows[0];
+      }
+      if(u) {
+        auth.saveSession({ userId: u.id, username: u.username, role: u.role, groupId: u.group_id });
+        console.log("🔧 WorkBuddy 模式：自动以", u.username, "身份进入");
+      }
     }
   } catch(e) { console.warn("wb auto-login skipped:", e); }
 
