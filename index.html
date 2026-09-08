@@ -1352,6 +1352,11 @@
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
     overflow-wrap:anywhere; word-break:break-word; }
   .rec.rec-layout-feature .feat-body { padding:0 12px 12px; font-size:13px; color:var(--text-secondary); }
+  .rec.rec-layout-feature .feat-meta { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 12px 10px; }
+  .rec.rec-layout-feature .feat-cat { flex:0 0 auto; font-size:11px; font-weight:600; color:var(--text-secondary); background:var(--surface-nested); padding:4px 10px; border-radius:999px; }
+  .rec.rec-layout-feature .feat-amt { flex:0 0 auto; font-family:var(--tp-serif, serif); font-size:16px; font-weight:700; }
+  .rec.rec-layout-feature .feat-amt.exp { color:var(--berry); }
+  .rec.rec-layout-feature .feat-amt.inc { color:var(--accent); }
   /* quote: 大字居中 + 留白 */
   .rec.rec-layout-quote { flex-direction:column; align-items:center; text-align:center; padding:44px 16px 20px; }
   .rec.rec-layout-quote .quote-text { font-size:16px; font-weight:600; line-height:1.6; color:var(--text); white-space:pre-wrap;
@@ -4393,9 +4398,15 @@ function recHTML(m,x){
   // feature layout: 大图在上 + 标题 + 正文 (适合有图记录)
   if(layout==='feature' && x.image){
     const body=(x.content||x.note||'').trim();
+    const isFin=m.type==='finance';
+    const finMeta=isFin?(()=>{
+      const inc=x.type==='income';
+      return `<div class="feat-meta"><span class="feat-cat">${esc(x.category||'其他')}</span><span class="feat-amt ${inc?'inc':'exp'}">${inc?'+':'-'}¥${Number(x.amount).toFixed(2)}</span></div>`;
+    })():'';
     return `<div class="rec ${layoutCls}" ${recAttrs}>${acts}<div class="top" data-edit="${x.id}" style="flex-direction:column">
       ${thumb}
       <div class="feat-title">${esc(x.title||'无标题')}</div>
+      ${finMeta}
       ${body?`<div class="feat-body">${esc(body)}</div>`:''}
       ${customBlock?`<div style="padding:0 12px 12px">${customBlock}</div>`:''}</div></div>`;
   }
