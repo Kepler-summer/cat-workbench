@@ -5340,9 +5340,20 @@ function openEditor(key, item){
       <div class="field-meta"><div class="field"><label>日期</label><input id="f-date" type="date" value="${d.date||isoToday()}"/></div></div>`;
   }
 
-  // layout variant selector
-  const layoutOpts=[{v:'default',l:'标准'},{v:'feature',l:'大图'},{v:'quote',l:'引文'},{v:'notebook',l:'线本'}];
-  fields=`<div class="field field-compact"><label>卡片样式</label><div class="seg" id="f-layout">${layoutOpts.map(o=>`<div class="opt ${o.v===(d.layout||'default')?'on':''}" data-v="${o.v}">${o.l}</div>`).join("")}</div></div>`+fields;
+  // layout variant selector —— 仅显示该模块真正支持的卡片样式，避免选到无效/错乱的布局
+  // 支持矩阵：note 固定手账卡片(layout 被忽略，故不显示该选项)；
+  // finance/todo/checkin/progress 仅 标准 + 大图 生效，引文/线本对其余类型无效或错乱。
+  const LAYOUTS = {
+    note:    [],
+    finance: [{v:'default',l:'账本行'},{v:'feature',l:'大图'}],
+    todo:    [{v:'default',l:'标准'},{v:'feature',l:'大图'}],
+    checkin: [{v:'default',l:'标准'},{v:'feature',l:'大图'}],
+    progress:[{v:'default',l:'标准'},{v:'feature',l:'大图'}],
+  };
+  const layoutOpts = LAYOUTS[m.type] || [{v:'default',l:'标准'},{v:'feature',l:'大图'}];
+  if(layoutOpts.length){
+    fields=`<div class="field field-compact"><label>卡片样式</label><div class="seg" id="f-layout">${layoutOpts.map(o=>`<div class="opt ${o.v===(d.layout||'default')?'on':''}" data-v="${o.v}">${o.l}</div>`).join("")}</div></div>`+fields;
+  }
 
   // custom fields (from m.fields config) — rendered after type-specific fields
   (m.fields||[]).forEach(f=>{
