@@ -16,3 +16,9 @@ npm-debug.log*
 # 带日期/序号的回滚备份（本轮设计整改产生，绝不入库）
 *.bak-*
 *.bak[0-9]
+
+# 数据快照/救援工具（含真实用户数据，绝不入库）
+cloud-snapshot-*.json
+deploy-cloud/
+rescue/
+rescue.html
