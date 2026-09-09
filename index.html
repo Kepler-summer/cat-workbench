@@ -190,7 +190,6 @@
   /* 区域标题：纯文字手写体，无框 */
   .tp-sec { display:flex; align-items:baseline; gap:0.35rem; margin:1.6rem 0.75rem 0.55rem; }
   .tp-sec-title { font-family:var(--font-journal); font-size:1.05rem; font-weight:700; color:var(--tp-deep); letter-spacing:0.18em; }
-  .tp-sec img.mini { width:0.9rem; opacity:.45; transform:rotate(-12deg); }
   .tp-sec-sub { margin-left:auto; font-size:0.72rem; font-weight:500; color:var(--text-tertiary); }
   /* 左滑删除容器 */
   .tp-swipe { position:relative; border-radius:1.1rem; overflow:hidden; }
@@ -201,10 +200,10 @@
   /* ② 习惯卡片：一行2个，柔和大圆角，无实线边框，弥散阴影 */
   .tp-mgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:0.55rem; margin:0 0.6rem; }
   @media (max-width:359px){ .tp-mgrid { grid-template-columns:1fr; } }
-  .tp-mcard { background:var(--tp-card); border-radius:1.1rem; padding:0.65rem 0.65rem 0.55rem 0.75rem;
+  .tp-mcard { --cc:var(--tp-accent); background:var(--tp-card); border-radius:1.1rem; padding:0.65rem 0.65rem 0.55rem 0.75rem;
     box-shadow:var(--tp-shadow); position:relative; overflow:hidden; transition:transform .15s ease, box-shadow .2s ease; }
   .tp-mcard:active { transform:scale(.98); }
-  .tp-mcard.is-done { background:color-mix(in srgb, var(--tp-accent) 7%, var(--tp-card)); }
+  .tp-mcard.is-done { background:color-mix(in srgb, var(--cc) 7%, var(--tp-card)); }
   .tp-mcard-h { display:flex; align-items:flex-start; gap:0.45rem; margin-bottom:0.5rem; }
   .tp-mcard-t { flex:1; min-width:0; padding-right:1.1rem; }
   .tp-mcard-name { display:block; font-size:0.88rem; font-weight:700; color:var(--tp-deep);
@@ -220,52 +219,62 @@
   .tp-mh-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:0.2rem; }
   .mh-d { width:100%; aspect-ratio:1; border-radius:0.2rem; transition:transform .12s ease; }
   .mh-d:active { transform:scale(.88); }
-  /* 单次任务：仅完成/未完成 */
+  /* 单次任务：仅完成/未完成（色随卡片主色 --cc） */
   .mh-d.single-lv0 { background:rgba(228,220,205,.35); }
-  .mh-d.single-lv1 { background:var(--tp-accent); }
+  .mh-d.single-lv1 { background:var(--cc, var(--tp-accent)); }
   /* 多次任务：按完成比例梯度 */
   .mh-d.multi-lv0 { background:rgba(228,220,205,.35); }
-  .mh-d.multi-lv1 { background:color-mix(in srgb, var(--tp-accent) 34%, #fff); }
-  .mh-d.multi-lv2 { background:color-mix(in srgb, var(--tp-accent) 62%, #fff); }
-  .mh-d.multi-lv3 { background:var(--tp-accent); }
-  .mh-d.multi-lv4 { background:color-mix(in srgb, var(--tp-accent) 78%, #5C4A3A); }
+  .mh-d.multi-lv1 { background:color-mix(in srgb, var(--cc, var(--tp-accent)) 34%, #fff); }
+  .mh-d.multi-lv2 { background:color-mix(in srgb, var(--cc, var(--tp-accent)) 62%, #fff); }
+  .mh-d.multi-lv3 { background:var(--cc, var(--tp-accent)); }
+  .mh-d.multi-lv4 { background:color-mix(in srgb, var(--cc, var(--tp-accent)) 78%, #5C4A3A); }
   .mh-d.future { opacity:.28; }
-  .mh-d.today { box-shadow:0 0 0 1.2px var(--tp-card), 0 0 0 2.4px var(--tp-accent); }
+  .mh-d.today { box-shadow:0 0 0 1.2px var(--tp-card), 0 0 0 2.4px var(--cc, var(--tp-accent)); }
   /* 打卡按钮：单次原生勾选框 / 多次 + 计数 */
   .tp-chk2, .tp-dot { position:relative; flex:0 0 auto; width:1.35rem; height:1.35rem; display:grid;
     place-items:center; cursor:pointer; padding:0; background:transparent; color:#fff;
     transition:transform .12s ease, background .15s ease, border-color .15s ease; }
   .tp-chk2::after, .tp-dot::after { content:""; position:absolute; inset:-0.55rem; border-radius:50%; }
   .tp-chk2 { border:1.5px solid var(--tp-deep); border-radius:0.25rem; }
-  .tp-chk2.on { background:var(--tp-accent); border-color:var(--tp-accent); }
+  .tp-chk2.on { background:var(--cc, var(--tp-accent)); border-color:var(--cc, var(--tp-accent)); }
   .tp-chk2 .plus { color:var(--tp-deep); opacity:.32; line-height:0; }
   .tp-dot { border:1.5px solid var(--tp-deep); border-radius:50%; }
   .tp-dot.on { background:var(--tp-accent); border-color:var(--tp-accent); }
   .tp-chk2:active, .tp-dot:active { transform:scale(.88); }
   .tp-chk2 svg path, .tp-dot svg path { stroke-dasharray:24; animation:chkDraw .28s ease both; }
   @keyframes chkDraw { from { stroke-dashoffset:24; } to { stroke-dashoffset:0; } }
-  /* 多次任务计数按钮 */
-  .tp-count { display:inline-flex; align-items:center; gap:0.2rem; margin-left:auto; }
-  .tp-count-btn { width:1.3rem; height:1.3rem; border:none; border-radius:50%; background:var(--tp-accent); color:#fff;
-    display:grid; place-items:center; cursor:pointer; transition:transform .12s ease; box-shadow:0 2px 6px rgba(100,116,90,.22); }
-  .tp-count-btn:active { transform:scale(.9); }
-  .tp-count-btn svg { width:0.7rem; height:0.7rem; }
-  .tp-count-text { font-size:0.62rem; color:var(--text-tertiary); min-width:2.2rem; text-align:center; }
+  /* 多次任务：分段进度环按钮（圆角方块底 + 分段圆环 + 中心加号） */
+  .tp-count { display:inline-flex; align-items:center; gap:0.35rem; margin-left:auto; }
+  .tp-ring-btn { position:relative; flex:0 0 auto; width:2.05rem; height:2.05rem; padding:0; border:none;
+    border-radius:0.6rem; background:color-mix(in srgb, var(--cc, var(--tp-accent)) 11%, #fff);
+    display:grid; place-items:center; cursor:pointer; transition:transform .12s ease; }
+  .tp-ring-btn:active { transform:scale(.9); }
+  .tp-ring-btn > svg { position:absolute; inset:0.24rem; width:calc(100% - 0.48rem); height:calc(100% - 0.48rem); }
+  .tp-ring-btn .rb-bg { fill:none; stroke:color-mix(in srgb, var(--cc, var(--tp-accent)) 30%, #fff); stroke-width:4.4; stroke-linecap:round; }
+  .tp-ring-btn .rb-fg { fill:none; stroke:var(--cc, var(--tp-accent)); stroke-width:4.4; stroke-linecap:round;
+    transition:stroke-dasharray .32s cubic-bezier(.34,1.4,.64,1); }
+  .tp-ring-btn .rb-plus { position:relative; display:grid; place-items:center; color:var(--cc, var(--tp-accent)); }
+  .tp-ring-btn .rb-plus svg { position:static; width:0.72rem; height:0.72rem; }
+  .tp-count-text { font-size:0.66rem; font-weight:600; color:var(--tp-deep); min-width:2rem; text-align:left; }
   /* 豆绿印章扩散动效 */
   @keyframes stampRipple { 0%{transform:scale(.6); opacity:.55} 100%{transform:scale(2.6); opacity:0} }
   .tp-stamp-ripple { position:absolute; inset:0; pointer-events:none; }
   .tp-stamp-ripple::after { content:""; position:absolute; left:50%; top:50%; width:2rem; height:2rem; margin:-1rem 0 0 -1rem;
-    border-radius:50%; background:color-mix(in srgb, var(--tp-accent) 22%, transparent); animation:stampRipple .55s ease-out both; }
-  /* 统计/迷你图占位块（与习惯卡片同高同宽） */
-  .tp-mcard.tp-stat-card { display:flex; flex-direction:column; justify-content:center; gap:0.35rem;
-    background:linear-gradient(160deg, #fff 0%, #F8F4EC 100%); }
-  .tp-stat-row { display:flex; align-items:baseline; gap:0.3rem; }
-  .tp-stat-row img { width:1.1rem; height:1.1rem; object-fit:contain; opacity:.62; }
-  .tp-stat-row b { font-family:var(--tp-serif); font-size:1.15rem; color:var(--tp-deep); }
-  .tp-stat-row span { font-size:0.62rem; color:var(--text-tertiary); }
+    border-radius:50%; background:color-mix(in srgb, var(--cc, var(--tp-accent)) 22%, transparent); animation:stampRipple .55s ease-out both; }
+  /* 统计卡（总结数据栏）：全宽一行，左侧三行统计（彩色竖条+大数字+说明），右侧近7天条形图 */
+  .tp-mcard.tp-stat-card { grid-column:1 / -1; display:flex; flex-direction:row; align-items:center; gap:0.75rem;
+    padding:0.9rem 0.95rem; background:linear-gradient(160deg, #fff 0%, #F8F4EC 100%); }
+  .tp-stats { flex:1; min-width:0; display:flex; flex-direction:column; gap:0.5rem; }
+  .tp-stat-row { display:flex; align-items:center; gap:0.45rem; }
+  .tp-stat-row .sc { flex:0 0 auto; width:0.22rem; height:1.45rem; border-radius:1px; background:var(--sc, var(--tp-accent)); }
+  .tp-stat-v { display:flex; flex-direction:column; min-width:0; }
+  .tp-stat-row b { font-family:var(--tp-serif); font-size:1.22rem; line-height:1.15; color:var(--tp-deep); }
+  .tp-stat-row span { font-size:0.6rem; color:var(--text-tertiary); letter-spacing:0.02em; }
+  .tp-stat-chart { flex:0 0 5.4rem; display:flex; flex-direction:column; gap:0.3rem; }
+  .tp-chart-cap { font-size:0.56rem; color:var(--text-tertiary); text-align:right; letter-spacing:0.1em; opacity:.85; }
   /* 迷你柱状图 */
-  .tp-mini-chart { display:flex; align-items:flex-end; justify-content:space-between; gap:0.18rem; height:3rem; margin-top:0.1rem; }
-  .tp-mini-bar { flex:1; border-radius:0.12rem 0.12rem 0.06rem 0.06rem; background:color-mix(in srgb, var(--tp-accent) 38%, #fff); transition:height .3s ease; }
+  .tp-mini-chart { display:flex; align-items:flex-end; justify-content:space-between; gap:0.16rem; height:2.6rem; }
+  .tp-mini-bar { flex:1; border-radius:0.12rem 0.12rem 0.06rem 0.06rem; background:color-mix(in srgb, var(--tp-accent) 32%, #fff); transition:height .3s ease; }
   .tp-mini-bar.today { background:var(--tp-accent); }
   /* 空态 */
   .tp-empty { display:flex; flex-direction:column; align-items:center; gap:0.35rem; padding:1.2rem 0.4rem;
@@ -3847,6 +3856,8 @@ function renderTodoPage(key){
   let maxStreak=0;
   habits.forEach(x=>{ const s=streak(x.log); if(s>maxStreak) maxStreak=s; });
   const best=tsBestStreak();
+  /* 习惯卡主色板：每个打卡板块轮换不同主色，卡内勾选框/热力格/环按钮随 --cc */
+  const TP_PALETTE=["#64745A","#B8837A","#A08BC0","#7BA5C9","#C2A36B","#8A9B6E"];
   const mkCard=(x,idx)=>{
     const pd=x.perDay||1, isMulti=pd>1;
     const tc=tpHabitCount(x,t), done=tpHabitDone(x,t);
@@ -3863,13 +3874,22 @@ function renderTodoPage(key){
       dots+=`<i class="mh-d ${tpLevelR(x,ds)} ${ds===t?'today':''} ${fut?'future':''}" ${(!fut&&ckCan)?`data-hg="${ds}" data-id="${x.id}"`:""} title="${mm}/${d} · ${tpHabitCount(x,ds)}/${pd}"></i>`;
     }
     const sub = isMulti ? `当前 ${tc}/${pd} · 连续 ${st} 天` : `连续 ${st} 天 · 本周 ${wk} 天`;
+    const cc=TP_PALETTE[(idx||0)%TP_PALETTE.length];
+    /* 多次打卡：分段进度环（段数=perDay，已完成段填主色）+ 中心加号 */
+    const ring=(()=>{ const r=13, c=2*Math.PI*r, gap=Math.min(4.2, c/pd*0.28), seg=c/pd-gap;
+      const bg=Array.from({length:pd},()=>seg.toFixed(2)+" "+gap.toFixed(2)).join(" ");
+      const dn=Math.min(tc,pd);
+      const fg=dn>0?(dn*seg+(dn-1)*gap).toFixed(2)+" "+c.toFixed(2):"0 "+c.toFixed(2);
+      return {bg,fg,r}; })();
     const control = isMulti
-      ? `<div class="tp-count"><span class="tp-count-text">${tc}/${pd}</span><button type="button" class="tp-count-btn" data-hplus="${x.id}" aria-label="加一次">${icon("plus",11,2.6)}</button></div>`
+      ? `<div class="tp-count"><button type="button" class="tp-ring-btn" data-hplus="${x.id}" aria-label="加一次">
+          <svg viewBox="0 0 32 32"><circle class="rb-bg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.bg}" transform="rotate(-90 16 16)"/><circle class="rb-fg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.fg}" transform="rotate(-90 16 16)"/></svg>
+          <span class="rb-plus">${icon("plus",11,2.6)}</span></button><span class="tp-count-text">${tc}/${pd}</span></div>`
       : `<button type="button" class="tp-chk2 ${done?'on':''}" ${ckCan?`data-hchk="${x.id}"`:""} aria-label="打卡">${done?icon("check",15,3):''}</button>`;
     const badgeSrc = isMulti ? "assets/stickers/heart-soft.png" : "assets/stickers/paw.png";
     return `<div class="tp-swipe" data-mod="checkin">
       <button type="button" class="tp-swipe-del js-del" data-id="${x.id}" aria-label="删除">${icon("trash",16)}</button>
-      <div class="tp-mcard tp-swipe-in ${done?'is-done':''}">
+      <div class="tp-mcard tp-swipe-in ${done?'is-done':''}" style="--cc:${cc}">
         <img class="tp-mcard-badge" src="${badgeSrc}" alt="">
         <div class="tp-mcard-h">
           ${control}
@@ -3893,22 +3913,21 @@ function renderTodoPage(key){
     }
     return arr; })();
   const maxN=Math.max(1,...last7.map(o=>o.n));
-  /* 首卡差异化：单数放统计信息，双数放迷你柱状图 */
+  /* 总结数据栏：统计三行 + 近7天条形图，内容固定一致，全宽自适应（不再按习惯单双数切换两套样式） */
   let statCard="";
   if(habits.length){
-    if(habits.length%2===1){
-      statCard=`<div class="tp-mcard tp-stat-card">
-        <div class="tp-stat-row"><img src="assets/stickers/cat-medal.png" alt=""><b>${maxStreak}</b><span>连续打卡天</span></div>
-        <div class="tp-stat-row"><img src="assets/stickers/star.png" alt=""><b>${ovRate}%</b><span>本月完成率</span></div>
-        <div class="tp-stat-row"><img src="assets/stickers/cat-stars.png" alt=""><b>${best}</b><span>最佳连续天</span></div>
-      </div>`;
-    } else {
-      const bars=last7.map(o=>`<div class="tp-mini-bar ${o.today?'today':''}" style="height:${Math.max(12,Math.round(o.n/maxN*100))}%"></div>`).join("");
-      statCard=`<div class="tp-mcard tp-stat-card">
-        <div class="tp-mcard-name">近 7 天打卡</div>
+    const bars=last7.map(o=>`<div class="tp-mini-bar ${o.today?'today':''}" style="height:${Math.max(12,Math.round(o.n/maxN*100))}%"></div>`).join("");
+    statCard=`<div class="tp-mcard tp-stat-card">
+      <div class="tp-stats">
+        <div class="tp-stat-row"><i class="sc" style="--sc:#64745A"></i><div class="tp-stat-v"><b>${maxStreak}</b><span>连续打卡天</span></div></div>
+        <div class="tp-stat-row"><i class="sc" style="--sc:#C2A36B"></i><div class="tp-stat-v"><b>${ovRate}%</b><span>本月完成率</span></div></div>
+        <div class="tp-stat-row"><i class="sc" style="--sc:#B8837A"></i><div class="tp-stat-v"><b>${best}</b><span>最佳连续天</span></div></div>
+      </div>
+      <div class="tp-stat-chart">
         <div class="tp-mini-chart">${bars}</div>
-      </div>`;
-    }
+        <span class="tp-chart-cap">近 7 天</span>
+      </div>
+    </div>`;
   }
   const cards=(statCard?[statCard]:[]).concat(habits.map(mkCard)).join("");
   const habitBlock = habits.length
@@ -3956,12 +3975,12 @@ function renderTodoPage(key){
       </div>
     </div>
     ${weekbar}
-    <div class="tp-sec"><span class="tp-sec-title">今日习惯</span><img class="mini" src="assets/stickers/paw.png" alt=""></div>
+    <div class="tp-sec"><span class="tp-sec-title">今日习惯</span></div>
     ${habitBlock}
-    <div class="tp-sec"><span class="tp-sec-title">今日待办</span><img class="mini" src="assets/stickers/star.png" alt="">${histBtn}</div>
+    <div class="tp-sec"><span class="tp-sec-title">今日待办</span>${histBtn}</div>
     <div class="tp-notes">${notes}</div>
     ${histList}
-    <div class="tp-sec"><span class="tp-sec-title">成长勋章</span><img class="mini" src="assets/stickers/cat-medal.png" alt=""><span class="tp-sec-sub">最佳连续 ${best} 天</span></div>
+    <div class="tp-sec"><span class="tp-sec-title">成长勋章</span><span class="tp-sec-sub">最佳连续 ${best} 天</span></div>
     <div class="ts-ach-grid">${achHTML}</div>
   </div>`;
   /* 打卡交互 */
