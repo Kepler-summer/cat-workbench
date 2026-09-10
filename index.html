@@ -250,8 +250,8 @@
     display:grid; place-items:center; cursor:pointer; transition:transform .12s ease; }
   .tp-ring-btn:active { transform:scale(.9); }
   .tp-ring-btn > svg { position:absolute; inset:0.24rem; width:calc(100% - 0.48rem); height:calc(100% - 0.48rem); }
-  .tp-ring-btn .rb-bg { fill:none; stroke:color-mix(in srgb, var(--cc, var(--tp-accent)) 30%, #fff); stroke-width:4.4; stroke-linecap:round; }
-  .tp-ring-btn .rb-fg { fill:none; stroke:var(--cc, var(--tp-accent)); stroke-width:4.4; stroke-linecap:round;
+  .tp-ring-btn .rb-bg { fill:none; stroke:color-mix(in srgb, var(--cc, var(--tp-accent)) 30%, #fff); stroke-width:3.6; stroke-linecap:round; }
+  .tp-ring-btn .rb-fg { fill:none; stroke:var(--cc, var(--tp-accent)); stroke-width:3.6; stroke-linecap:round;
     transition:stroke-dasharray .32s cubic-bezier(.34,1.4,.64,1); }
   .tp-ring-btn .rb-plus { position:relative; display:grid; place-items:center; color:var(--cc, var(--tp-accent)); }
   .tp-ring-btn .rb-plus svg { position:static; width:0.72rem; height:0.72rem; }
@@ -280,10 +280,10 @@
   .tp-empty { display:flex; flex-direction:column; align-items:center; gap:0.35rem; padding:1.2rem 0.4rem;
     color:var(--text-secondary); font-size:0.76rem; text-align:center; }
   .tp-empty img { width:2.2rem; opacity:.5; }
-  /* ③ 今日待办：去除外框，仅保留勾选 + 文字 */
+  /* ③ 今日待办：去除外框，仅保留勾选 + 文字（背景必须不透明，否则左滑删除按钮会透出来） */
   .tp-notes { display:flex; flex-direction:column; gap:0.45rem; margin:0 0.75rem; }
-  .tp-note { display:flex; align-items:center; gap:0.6rem; padding:0.55rem 0.3rem; border-radius:0.9rem; }
-  .tp-note.done { background:color-mix(in srgb, var(--tp-accent) 5%, transparent); }
+  .tp-note { display:flex; align-items:center; gap:0.6rem; padding:0.55rem 0.3rem; border-radius:0.9rem; background:#FFFCF7; }
+  .tp-note.done { background:color-mix(in srgb, var(--tp-accent) 6%, #FFFCF7); }
   .tp-note-name { flex:1; min-width:0; font-size:0.9rem; font-weight:600; color:var(--tp-deep);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
   .tp-note-name.done { text-decoration:line-through; color:var(--text-tertiary); }
@@ -2994,12 +2994,14 @@ const store = {
       for(const k in d) if(this.isGameKey(k)) all[k] = d[k];
       try {
         const cloud = await this.loadCloud();
+        const tomb = (d && d.__deleted) || {};   /* 删除墓碑：这些 id 已在本地删除，合并时禁止从云端并回 */
         if(cloud && cloud.data && typeof cloud.data === "object"){
           for(const k in cloud.data){
             const remote = cloud.data[k], local = all[k];
             if(Array.isArray(remote) || Array.isArray(local)){
+              const dead = (tomb[k]||[]).map(String);
               const map = new Map();
-              (remote||[]).forEach(x=>{ if(x && x.id!=null) map.set(String(x.id), x); });
+              (remote||[]).forEach(x=>{ if(x && x.id!=null && dead.indexOf(String(x.id))<0) map.set(String(x.id), x); });
               (local==null?[]:(Array.isArray(local)?local:[local])).forEach(x=>{
                 if(x && x.id!=null) map.set(String(x.id), x);
                 else map.set("noid-"+JSON.stringify(x).slice(0,80), x);
@@ -3013,6 +3015,16 @@ const store = {
             }
           }
           for(const k in d){ if(!(k in all)) all[k] = d[k]; }
+          /* 墓碑清理：云端已确认不含的 id 不再需要墓碑，避免无限增长 */
+          const newTomb = {};
+          for(const k in tomb){
+            const cloudArr = Array.isArray(cloud.data[k]) ? cloud.data[k] : null;
+            if(!cloudArr){ newTomb[k] = tomb[k]; continue; }
+            const cloudIds = new Set(cloudArr.map(x=>String(x.id)));
+            const remain = (tomb[k]||[]).filter(id=>cloudIds.has(String(id)));
+            if(remain.length) newTomb[k] = remain;
+          }
+          all.__deleted = newTomb;
         }
       } catch(mergeErr){ console.warn("cloud merge failed, fallback to local snapshot:", mergeErr); }
       const now = new Date().toISOString();
@@ -3875,15 +3887,19 @@ function renderTodoPage(key){
     }
     const sub = isMulti ? `当前 ${tc}/${pd} · 连续 ${st} 天` : `连续 ${st} 天 · 本周 ${wk} 天`;
     const cc=TP_PALETTE[(idx||0)%TP_PALETTE.length];
-    /* 多次打卡：分段进度环（段数=perDay，已完成段填主色）+ 中心加号 */
-    const ring=(()=>{ const r=13, c=2*Math.PI*r, gap=Math.min(4.2, c/pd*0.28), seg=c/pd-gap;
-      const bg=Array.from({length:pd},()=>seg.toFixed(2)+" "+gap.toFixed(2)).join(" ");
+    /* 多次打卡：分段进度环（段数=perDay，已完成段填主色）+ 中心加号
+       段间距必须 > 描边宽（圆头端帽会向两侧各外扩半个描边宽），否则分段会糊成整圈 */
+    const ring=(()=>{ const r=13, c=2*Math.PI*r, sw=3.6;
+      let gap=sw+0.8, seg=c/pd-gap;
+      if(seg<1){ gap=c/pd*0.45; seg=c/pd-gap; }   /* perDay 很大时退化为平分环 */
+      const bg=Array.from({length:pd},()=>Math.max(0.2,seg).toFixed(2)+" "+gap.toFixed(2)).join(" ");
       const dn=Math.min(tc,pd);
-      const fg=dn>0?(dn*seg+(dn-1)*gap).toFixed(2)+" "+c.toFixed(2):"0 "+c.toFixed(2);
+      /* dn=0 时不渲染进度环：dasharray=0 + 圆头端帽会画出一个多余的圆点 */
+      const fg=dn>0?(dn*seg+(dn-1)*gap).toFixed(2)+" "+c.toFixed(2):null;
       return {bg,fg,r}; })();
     const control = isMulti
       ? `<div class="tp-count"><button type="button" class="tp-ring-btn" data-hplus="${x.id}" aria-label="加一次">
-          <svg viewBox="0 0 32 32"><circle class="rb-bg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.bg}" transform="rotate(-90 16 16)"/><circle class="rb-fg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.fg}" transform="rotate(-90 16 16)"/></svg>
+          <svg viewBox="0 0 32 32"><circle class="rb-bg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.bg}" transform="rotate(-90 16 16)"/>${ring.fg?`<circle class="rb-fg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.fg}" transform="rotate(-90 16 16)"/>`:""}</svg>
           <span class="rb-plus">${icon("plus",11,2.6)}</span></button><span class="tp-count-text">${tc}/${pd}</span></div>`
       : `<button type="button" class="tp-chk2 ${done?'on':''}" ${ckCan?`data-hchk="${x.id}"`:""} aria-label="打卡">${done?icon("check",15,3):''}</button>`;
     const badgeSrc = isMulti ? "assets/stickers/heart-soft.png" : "assets/stickers/paw.png";
@@ -5551,7 +5567,15 @@ function confirmDelete(key,id){
   const close=()=>overlay.remove();
   overlay.onclick=e=>{ if(e.target===overlay) close(); };
   overlay.querySelector("#c-cancel").onclick=close;
-  overlay.querySelector("#c-ok").onclick=()=>{ data[key]=data[key].filter(i=>i.id!=id); persist(); close(); };
+  overlay.querySelector("#c-ok").onclick=()=>{
+    data[key]=(data[key]||[]).filter(i=>i.id!=id);
+    /* 删除墓碑：saveCloud 的字段级并集会把云端已删条目当"其他设备新增"并回来，导致删除复活。
+       必须把删除意图持久化，合并时按墓碑剔除。 */
+    if(!data.__deleted) data.__deleted={};
+    const _dead=new Set((data.__deleted[key]||[]).map(String)); _dead.add(String(id));
+    data.__deleted[key]=Array.from(_dead).slice(-800);
+    persist(); close();
+  };
 }
 
 /* ---------- 通用二次确认弹窗（与 confirmDelete / confirmCalUncheck 同构） ---------- */
