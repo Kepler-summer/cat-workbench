@@ -193,7 +193,7 @@
   .tp-sec-sub { margin-left:auto; font-size:0.72rem; font-weight:500; color:var(--text-tertiary); }
   /* 左滑删除容器 */
   .tp-swipe { position:relative; border-radius:1.1rem; overflow:hidden; }
-  .tp-swipe-del { position:absolute; right:0; top:0; bottom:0; width:4rem; border:none;
+  .tp-swipe-del { position:absolute; right:0; top:0; bottom:0; width:4rem; border:none; border-radius:0 1.1rem 1.1rem 0;
     background:var(--berry); color:#fff; display:grid; place-items:center; cursor:pointer; }
   .tp-swipe-del:active { background:color-mix(in srgb, var(--berry) 86%, #000); }
   .tp-swipe-in { position:relative; transition:transform .2s ease; will-change:transform; }
@@ -274,6 +274,12 @@
   .tp-stamp-ripple { position:absolute; inset:0; pointer-events:none; }
   .tp-stamp-ripple::after { content:""; position:absolute; left:50%; top:50%; width:2rem; height:2rem; margin:-1rem 0 0 -1rem;
     border-radius:50%; background:color-mix(in srgb, var(--cc, var(--tp-accent)) 22%, transparent); animation:stampRipple .55s ease-out both; }
+  /* 打卡糖果奖励：绝对定位居中偏下，上浮+淡出 */
+  @keyframes coinFloat { 0%{opacity:1; transform:translateY(0) scale(1)} 100%{opacity:0; transform:translateY(-2.4rem) scale(.85)} }
+  .pet-coinfx { position:absolute; left:50%; bottom:2.4rem; transform:translateX(-50%); display:flex; align-items:center; gap:.3rem;
+    pointer-events:none; animation:coinFloat .9s ease-out forwards; z-index:5; white-space:nowrap; }
+  .pet-coinfx img { width:1.6rem; height:1.6rem; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(147,88,27,.25)); }
+  .pet-coinfx i { font-style:normal; font-size:.82rem; font-weight:700; color:var(--candy); font-family:var(--font-journal); }
   /* 统计卡（总结数据栏）：全宽一行，左侧三行统计（彩色竖条+大数字+说明），右侧近7天条形图 */
   .tp-mcard.tp-stat-card { grid-column:1 / -1; display:flex; flex-direction:row; align-items:center; gap:0.6rem;
     padding:0.75rem 0.85rem; background:linear-gradient(160deg, #fff 0%, #F8F4EC 100%); }
@@ -1379,11 +1385,13 @@
   /* feature: 大图在上 + 标题覆盖 + 正文在下 */
   .rec.rec-layout-feature { flex-direction:column; padding:0; overflow:hidden; }
   .rec.rec-layout-feature .thumb { width:100%; height:140px; border-radius:0; margin:0; }
-  .rec.rec-layout-feature .feat-title { padding:10px 74px 10px 12px; font-size:15px; font-weight:700; color:var(--text);
+  .rec.rec-layout-feature .feat-title { padding:0; font-size:15px; font-weight:700; color:var(--text);
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-    overflow-wrap:anywhere; word-break:break-word; }
+    overflow-wrap:anywhere; word-break:break-word; flex:1; min-width:0; }
+  .rec.rec-layout-feature .feat-title-row { display:flex; align-items:center; gap:8px; padding:10px 12px 0; }
+  .rec.rec-layout-feature .feat-title-row .acts { position:static; flex:0 0 auto; }
   .rec.rec-layout-feature .feat-body { padding:0 12px 12px; font-size:13px; color:var(--text-secondary); }
-  .rec.rec-layout-feature .feat-meta { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; margin-top:auto; border-top:1px dashed var(--border); }
+  .rec.rec-layout-feature .feat-meta { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:0 12px; }
   .rec.rec-layout-feature .feat-cat { flex:0 0 auto; font-size:11px; font-weight:400; color:var(--text-tertiary); }
   .rec.rec-layout-feature .feat-amt { flex:0 0 auto; font-family:var(--tp-serif, serif); font-size:15px; font-weight:700; white-space:nowrap; }
   .rec.rec-layout-feature .feat-amt.exp { color:var(--berry); }
@@ -4052,7 +4060,6 @@ function renderTodoPage(key){
       const fx=document.createElement("span");
       fx.className="pet-coinfx";
       fx.innerHTML=`<img src="assets/stickers/candy.png" alt=""><i>+${gained}</i>`;
-      fx.style.right=(0.7+Math.random()*1.4).toFixed(2)+"rem";
       card.appendChild(fx);
       fx.addEventListener("animationend",()=>fx.remove());
     }
@@ -4491,14 +4498,23 @@ function recHTML(m,x){
     const isFin=m.type==='finance';
     const finMeta=isFin?(()=>{
       const inc=x.type==='income';
-      return `<div class="feat-meta"><span class="feat-cat">${esc(x.category||'其他')}</span><span class="feat-amt ${inc?'inc':'exp'}">${inc?'+':'-'}¥${Number(x.amount).toFixed(2)}</span></div>`;
+      return `<span class="feat-cat">${esc(x.category||'其他')}</span><span class="feat-amt ${inc?'inc':'exp'}">${inc?'+':'-'}¥${Number(x.amount).toFixed(2)}</span>`;
     })():'';
+    if(isFin){
+      // 记账大图布局：标题行左侧标题+右侧价格标签，下图上文，无虚线分隔
+      return `<div class="rec ${layoutCls}" ${recAttrs}><div class="top" data-edit="${x.id}" style="flex-direction:column">
+        ${thumb}
+        <div class="feat-title-row"><div class="feat-title">${esc(x.title||'无标题')}</div>${finMeta}${acts}</div>
+        ${body?`<div class="feat-body">${esc(body)}</div>`:''}
+        ${customBlock?`<div style="padding:0 12px 12px">${customBlock}</div>`:''}
+        </div></div>`;
+    }
     return `<div class="rec ${layoutCls}" ${recAttrs}>${acts}<div class="top" data-edit="${x.id}" style="flex-direction:column">
       ${thumb}
       <div class="feat-title">${esc(x.title||'无标题')}</div>
       ${body?`<div class="feat-body">${esc(body)}</div>`:''}
       ${customBlock?`<div style="padding:0 12px 12px">${customBlock}</div>`:''}
-      ${finMeta}</div></div>`;
+      </div></div>`;
   }
   // quote layout: 大字居中 (适合短文本/灵感/金句)
   if(layout==='quote'){
