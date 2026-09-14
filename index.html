@@ -3921,7 +3921,7 @@ function renderTodoPage(key){
       }
       bars+=`<div class="tp-mh-bar">${cells}</div>`;
     }
-    const sub = isMulti ? `今日 ${tc}/${pd} 次 · 已连续 ${st} 天` : `已连续 ${st} 天 · 本周 ${wk} 天`;
+    const sub = `已连续 ${st} 天 · 本周 ${wk} 天`;
     const cc=TP_PALETTE[(idx||0)%TP_PALETTE.length];
     /* 多次打卡：分段进度环（段数=perDay，已完成段填主色）+ 中心加号
        段间距必须 > 描边宽（圆头端帽会向两侧各外扩半个描边宽），否则分段会糊成整圈 */
