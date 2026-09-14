@@ -1663,6 +1663,7 @@
   .jn-mood-it.on { border-color: #7A9A7E; background: #F3F7F1; }
   .jn-mood-it img { width: 44px; height: 44px; object-fit: contain; }
   .jn-mood-it span { font-size: 11px; color: var(--text); }
+  .jn-stk-cnt { display:inline-block; margin-top:2px; font-size:10px; font-weight:700; color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, #fff); border-radius:999px; padding:0 5px; }
   .jn-mood-clear { display: block; width: 100%; margin-top: 14px; padding: 10px; border: 1px dashed var(--paper-6);
     background: transparent; border-radius: 999px; color: var(--ink-mute); font-size: 12px; cursor: pointer; }
   /* 三分类 Tab */
@@ -4107,13 +4108,13 @@ function renderTodoPage(key){
     const wasDone=tpHabitDone(x, ds);
     tpToggle(x, ds);
     const nowDone=tpHabitDone(x, ds);
-    persist();
     if(!wasDone && nowDone && ckCan){
       x._ckAwarded=x._ckAwarded||{};
       let gained=0;
       if(!x._ckAwarded[ds]){ gained=candy.awardCheckin(x.title+" · "+ds.slice(5), `ck-${x.id}-${ds}`); x._ckAwarded[ds]=1; }
       if(gained>0) tpCoinFx(id, gained);
     }
+    persist();   /* 必须在加分(awardCheckin 写 __candyLog)之后保存，否则本次糖币不落库、UI 不刷新 */
     const nowAllDone = habits.length>0 && habits.every(h=>tpHabitDone(h,ds));
     if(!wasAllDone && nowAllDone) tpSummaryCelebrate();
   };
@@ -4126,13 +4127,13 @@ function renderTodoPage(key){
     if(c>=pd) return;   /* 已达当日目标，禁止继续打卡 */
     x.log=x.log||{};
     x.log[ds]=c+1;
-    persist();
     if(!wasDone && tpHabitDone(x,ds) && ckCan){
       x._ckAwarded=x._ckAwarded||{};
       let gained=0;
       if(!x._ckAwarded[ds]){ gained=candy.awardCheckin(x.title+" · "+ds.slice(5), `ck-${x.id}-${ds}`); x._ckAwarded[ds]=1; }
       if(gained>0) tpCoinFx(id, gained);
     }
+    persist();   /* 必须在加分(awardCheckin 写 __candyLog)之后保存，否则本次糖币不落库、UI 不刷新 */
     const nowAllDone = habits.length>0 && habits.every(h=>tpHabitDone(h,ds));
     if(!wasAllDone && nowAllDone) tpSummaryCelebrate();
   };
@@ -4885,7 +4886,7 @@ function openMoodPicker(key, date, items){
       ${uniqPics.length ? `<div class="jn-mood-grid">${uniqPics.map(src => `<button type="button" class="jn-mood-it ${cur.type==='photo'&&cur.key===src?'on':''}" data-type="photo" data-key="${attr(src)}" data-src="${attr(src)}" data-name="\u5f53\u65e5\u56fe\u7247"><img src="${attr(src)}" alt=""></button>`).join('')}</div>` : `<div class="jn-mood-empty">\u8fd9\u5929\u8fd8\u6ca1\u6709\u5e26\u56fe\u7684\u7b14\u8bb0</div>`}
     </div>
     <div class="jn-mood-pane" data-p="stk" hidden>
-      ${ownedStickers.length ? `<div class="jn-mood-grid">${ownedStickers.map(id=>{ const it=STICKER_COLLECTION[id]; const nm=(it&&it.name)||(data.__customStickers[id]&&data.__customStickers[id].name)||"自制贴纸"; return `<button type="button" class="jn-mood-it ${cur.type==='sticker'&&cur.key===id?'on':''}" data-type="sticker" data-key="${attr(id)}" data-src="${shopIcon(id)}" data-name="${attr(nm)}"><img src="${shopIcon(id)}" alt=""><span>${esc(nm)}</span></button>`; }).join('')}</div>` : `<div class="jn-mood-empty">\u8fd8\u6ca1\u6709\u5df2\u8d2d\u85cf\u54c1\u8d34\u7eb8</div>`}
+      ${ownedStickers.length ? `<div class="jn-mood-grid">${ownedStickers.map(id=>{ const it=STICKER_COLLECTION[id]; const nm=(it&&it.name)||(data.__customStickers[id]&&data.__customStickers[id].name)||"自制贴纸"; return `<button type="button" class="jn-mood-it ${cur.type==='sticker'&&cur.key===id?'on':''}" data-type="sticker" data-key="${attr(id)}" data-src="${shopIcon(id)}" data-name="${attr(nm)}"><img src="${shopIcon(id)}" alt=""><span>${esc(nm)}</span>${candy.getItemCount(id)?`<i class="jn-stk-cnt">×${candy.getItemCount(id)}</i>`:""}</button>`; }).join('')}</div>` : `<div class="jn-mood-empty">\u8fd8\u6ca1\u6709\u5df2\u8d2d\u85cf\u54c1\u8d34\u7eb8</div>`}
     </div>
     ${cur.key ? `<button type="button" class="jn-mood-clear" id="mood-clear">\u6e05\u9664\u5370\u8bb0</button>` : ''}
   </div>`;
