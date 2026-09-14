@@ -272,6 +272,7 @@
   .tp-ring-btn .rb-plus { position:relative; display:grid; place-items:center; color:var(--cc, var(--tp-accent)); }
   .tp-ring-btn .rb-plus svg { position:static; width:0.72rem; height:0.72rem; }
   .tp-count-text { font-size:0.66rem; font-weight:600; color:var(--tp-deep); min-width:2rem; text-align:left; }
+  .tp-count-below { display:block; font-size:0.7rem; font-weight:600; color:var(--cc,#64745A); margin-top:0.15rem; }
   /* 豆绿印章扩散动效 */
   @keyframes stampRipple { 0%{transform:scale(.6); opacity:.55} 100%{transform:scale(2.6); opacity:0} }
   .tp-stamp-ripple { position:absolute; inset:0; pointer-events:none; }
@@ -3942,7 +3943,7 @@ function renderTodoPage(key){
       }
       bars+=`<div class="tp-mh-bar">${cells}</div>`;
     }
-    const sub = `已连续 ${st} 天 · 本周 ${wk} 天`;
+    const sub = `已连续 ${st} 天`;
     const cc=TP_PALETTE[(idx||0)%TP_PALETTE.length];
     /* 多次打卡：分段进度环（段数=perDay，已完成段填主色）+ 中心加号
        段间距必须 > 描边宽（圆头端帽会向两侧各外扩半个描边宽），否则分段会糊成整圈 */
@@ -3958,9 +3959,10 @@ function renderTodoPage(key){
     const control = isMulti
       ? `<div class="tp-count"><button type="button" class="tp-ring-btn ${maxed?'maxed':''}" data-hplus="${x.id}" aria-label="加一次" ${maxed?'disabled':''}>
           <svg viewBox="0 0 32 32"><circle class="rb-bg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.bg}" transform="rotate(-90 16 16)"/>${ring.fg?`<circle class="rb-fg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.fg}" transform="rotate(-90 16 16)"/>`:""}</svg>
-          <span class="rb-plus">${maxed?icon("check",12,3):icon("plus",11,2.6)}</span></button><span class="tp-count-text">${tc}/${pd}</span></div>`
+          <span class="rb-plus">${maxed?icon("check",12,3):icon("plus",11,2.6)}</span></button></div>`
       : `<button type="button" class="tp-chk2 ${done?'on':''}" ${ckCan?`data-hchk="${x.id}"`:""} aria-label="打卡">${done?icon("check",15,3):''}</button>`;
     const badgeSrc = isMulti ? "assets/stickers/heart-soft.png" : "assets/stickers/paw.png";
+    const countText = isMulti ? `<span class="tp-count-below">${tc}/${pd}</span>` : "";
     return `<div class="tp-mcard ${done?'is-done':''}" style="--cc:${cc}" data-mod="checkin" data-id="${x.id}">
         <button type="button" class="tp-card-del js-del" data-id="${x.id}" aria-label="删除">${icon("trash",13)}</button>
         <img class="tp-mcard-badge" src="${badgeSrc}" alt="">
@@ -3969,10 +3971,11 @@ function renderTodoPage(key){
           <div class="tp-mcard-t">
             <span class="tp-mcard-name ${done?'done':''}" ${ckCan?`data-edit="${x.id}"`:""}>${esc(x.title)}</span>
             <span class="tp-mcard-sub">${sub}</span>
+            ${countText}
           </div>
         </div>
         <div class="tp-mh">${bars}</div>
-        <span class="mh-tag">本月</span>
+        <span class="mh-tag">连续 ${st} 天</span>
       </div>`;
   };
   /* 近7天数据 */
@@ -3985,7 +3988,7 @@ function renderTodoPage(key){
     }
     return arr; })();
   const maxN=Math.max(1,...last7.map(o=>o.n));
-  /* 首框：统计卡（整行）+ 打卡总结卡（占1格），始终显示 */
+  /* 首框：打卡总结卡（始终显示，占1格），统计卡已移除 */
   const allDoneToday = habits.length>0 && habits.every(x=>tpHabitDone(x,t));
   const remainToday = habits.filter(x=>!tpHabitDone(x,t)).length;
   /* 本周小圆点：周一起，任意习惯当日完成即点亮 */
@@ -3996,35 +3999,22 @@ function renderTodoPage(key){
     const on=habits.some(x=>tpHabitDone(x,ds));
     sumDots+=`<i class="sm-d ${on?'on':''} ${ds===t?'today':''}"></i>`;
   }
-  let headCards=[];
+  let headCard="";
   if(habits.length){
-    /* 统计卡：始终第一行占满 */
-    const bars=last7.map(o=>`<div class="tp-mini-bar ${o.today?'today':''}" style="height:${Math.max(12,Math.round(o.n/maxN*100))}%"></div>`).join("");
-    headCards.push(`<div class="tp-mcard tp-stat-card">
-        <div class="tp-stats">
-          <div class="tp-stat-row"><i class="sc" style="--sc:#64745A"></i><div class="tp-stat-v"><b>${maxStreak}</b><span>连续打卡天</span></div></div>
-          <div class="tp-stat-row"><i class="sc" style="--sc:#C2A36B"></i><div class="tp-stat-v"><b>${ovRate}%</b><span>本月完成率</span></div></div>
-          <div class="tp-stat-row"><i class="sc" style="--sc:#B8837A"></i><div class="tp-stat-v"><b>${best}</b><span>最佳连续天</span></div></div>
-        </div>
-        <div class="tp-stat-chart">
-          <div class="tp-mini-chart">${bars}</div>
-          <span class="tp-chart-cap">近 7 天</span>
-        </div>
-      </div>`);
     /* 总结卡：始终显示 */
     const catImg = allDoneToday ? "assets/stickers/cat-medal.png" : "assets/stickers/cat-think.png";
     const bigTxt = allDoneToday ? "今天全都做到啦" : "还差一点点";
     const subTxt = allDoneToday ? `已连续 ${maxStreak} 天` : `还差 ${remainToday} 项 · 已连续 ${maxStreak} 天`;
-    headCards.push(`<div class="tp-summary-card ${allDoneToday?'done':''}" data-summary="1">
+    headCard=`<div class="tp-summary-card ${allDoneToday?'done':''}" data-summary="1">
         <img class="tp-sum-cat" src="${catImg}" alt="">
         <div class="tp-sum-body">
           <div class="tp-sum-big">${bigTxt}</div>
           <div class="tp-sum-sub">${subTxt}</div>
           <div class="tp-sum-dots">${sumDots}</div>
         </div>
-      </div>`);
+      </div>`;
   }
-  const cards=headCards.concat(habits.map(mkCard)).join("");
+  const cards=(headCard?[headCard]:[]).concat(habits.map(mkCard)).join("");
   const habitBlock = habits.length
     ? `<div class="tp-mgrid">${cards}</div>`
     : `<div class="tp-empty"><img src="assets/stickers/cat-wave.png" alt=""><span>还没有打卡项，点右下角「+ 新打卡」创建</span></div>`;
