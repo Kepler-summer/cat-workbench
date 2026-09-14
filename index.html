@@ -218,37 +218,38 @@
   .tp-mcard:active { transform:scale(.98); }
   .tp-mcard.is-done { background:color-mix(in srgb, var(--cc) 7%, var(--tp-card)); }
   .tp-mcard-h { display:flex; align-items:flex-start; gap:0.45rem; margin-bottom:0.5rem; }
-  .tp-mcard-t { flex:1; min-width:0; padding-right:1.1rem; }
+  .tp-mcard-t { flex:1; min-width:0; padding-right:2.1rem; }
   .tp-mcard-name { display:block; font-size:0.88rem; font-weight:700; color:var(--tp-deep);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
   .tp-mcard-name.done { text-decoration:line-through; color:var(--text-tertiary); }
   .tp-mcard-sub { display:block; font-size:0.62rem; color:var(--text-tertiary); margin-top:0.1rem; }
   /* 单次/多次角标贴纸 */
-  .tp-mcard-badge { position:absolute; right:0.45rem; top:0.45rem; width:1.15rem; height:1.15rem;
-    object-fit:contain; opacity:.78; pointer-events:none; }
+  .tp-mcard-badge { position:absolute; left:0.5rem; bottom:0.45rem; width:1rem; height:1rem;
+    object-fit:contain; opacity:.6; pointer-events:none; }
   .mh-tag { position:absolute; right:0.55rem; bottom:0.4rem; font-family:var(--font-journal);
     font-size:0.55rem; letter-spacing:0.22em; color:var(--text-tertiary); opacity:.6; pointer-events:none; }
-  /* ③ 方块热力格子：无描边、无圆角 */
-  .tp-mh-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:0.2rem; }
-  .mh-d { width:100%; aspect-ratio:1; border-radius:0.2rem; transition:transform .12s ease; }
-  .mh-d:active { transform:scale(.88); }
+  /* ③ 月热力：横条（每周一行），一排2条，圆形小点，压缩高度 */
+  .tp-mh { display:grid; grid-template-columns:1fr 1fr; gap:0.28rem 0.55rem; margin-top:0.2rem; }
+  .tp-mh-bar { display:flex; gap:0.16rem; align-items:center; }
+  .mh-d { flex:1 1 0; aspect-ratio:1; max-width:0.6rem; min-width:0; border-radius:50%; transition:transform .12s ease; }
+  .mh-d:active { transform:scale(.82); }
   /* 单次任务：仅完成/未完成（色随卡片主色 --cc） */
-  .mh-d.single-lv0 { background:rgba(228,220,205,.35); }
+  .mh-d.single-lv0 { background:rgba(228,220,205,.4); }
   .mh-d.single-lv1 { background:var(--cc, var(--tp-accent)); }
   /* 多次任务：按完成比例梯度 */
-  .mh-d.multi-lv0 { background:rgba(228,220,205,.35); }
+  .mh-d.multi-lv0 { background:rgba(228,220,205,.4); }
   .mh-d.multi-lv1 { background:color-mix(in srgb, var(--cc, var(--tp-accent)) 34%, #fff); }
   .mh-d.multi-lv2 { background:color-mix(in srgb, var(--cc, var(--tp-accent)) 62%, #fff); }
   .mh-d.multi-lv3 { background:var(--cc, var(--tp-accent)); }
-  .mh-d.multi-lv4 { background:color-mix(in srgb, var(--cc, var(--tp-accent)) 78%, #5C4A3A); }
-  .mh-d.future { opacity:.28; }
-  .mh-d.today { box-shadow:0 0 0 1.2px var(--tp-card), 0 0 0 2.4px var(--cc, var(--tp-accent)); }
+  .mh-d.multi-lv4 { background:color-mix(in srgb, var(--cc, var(--tp-accent)) 80%, #5C4A3A); }
+  .mh-d.future { opacity:.26; }
+  .mh-d.today { box-shadow:0 0 0 1.4px var(--tp-card), 0 0 0 2.6px var(--cc, var(--tp-accent)); }
   /* 打卡按钮：单次原生勾选框 / 多次 + 计数 */
   .tp-chk2, .tp-dot { position:relative; flex:0 0 auto; width:1.35rem; height:1.35rem; display:grid;
     place-items:center; cursor:pointer; padding:0; background:transparent; color:#fff;
     transition:transform .12s ease, background .15s ease, border-color .15s ease; }
   .tp-chk2::after, .tp-dot::after { content:""; position:absolute; inset:-0.55rem; border-radius:50%; }
-  .tp-chk2 { border:1.5px solid var(--tp-deep); border-radius:0.25rem; }
+  .tp-chk2 { border:1.5px solid var(--tp-deep); border-radius:50%; }
   .tp-chk2.on { background:var(--cc, var(--tp-accent)); border-color:var(--cc, var(--tp-accent)); }
   .tp-chk2 .plus { color:var(--tp-deep); opacity:.32; line-height:0; }
   .tp-dot { border:1.5px solid var(--tp-deep); border-radius:50%; }
@@ -259,8 +260,10 @@
   /* 多次任务：分段进度环按钮（圆角方块底 + 分段圆环 + 中心加号） */
   .tp-count { display:inline-flex; align-items:center; gap:0.35rem; margin-left:auto; }
   .tp-ring-btn { position:relative; flex:0 0 auto; width:2.05rem; height:2.05rem; padding:0; border:none;
-    border-radius:0.6rem; background:color-mix(in srgb, var(--cc, var(--tp-accent)) 11%, #fff);
+    border-radius:50%; background:color-mix(in srgb, var(--cc, var(--tp-accent)) 11%, #fff);
     display:grid; place-items:center; cursor:pointer; transition:transform .12s ease; }
+  .tp-ring-btn.maxed { background:color-mix(in srgb, var(--cc, var(--tp-accent)) 18%, #fff); cursor:default; }
+  .tp-ring-btn.maxed:active { transform:none; }
   .tp-ring-btn:active { transform:scale(.9); }
   .tp-ring-btn > svg { position:absolute; inset:0.24rem; width:calc(100% - 0.48rem); height:calc(100% - 0.48rem); }
   .tp-ring-btn .rb-bg { fill:none; stroke:color-mix(in srgb, var(--cc, var(--tp-accent)) 30%, #fff); stroke-width:3.6; stroke-linecap:round; }
@@ -372,6 +375,14 @@
     opacity:0; transition:all .25s ease; pointer-events:none; z-index:120; }
   #tpToast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
+  /* 往日：按日期分组收纳（参考记账页日期分组，日期小标签 + 轻量纸感条目） */
+  .tp-hist-group { margin:0.55rem 0.1rem 0.15rem; }
+  .tp-hist-date { font-family:var(--font-journal); font-size:0.74rem; font-weight:700; color:var(--text-tertiary);
+    letter-spacing:0.2em; margin:0.4rem 0 0.2rem; padding-left:0.12rem; }
+  .tp-hist-list .rec { background:transparent; border:none; box-shadow:none; padding:0.5rem 0.2rem; margin-bottom:0; }
+  .tp-hist-list .rec .body { padding-right:0.5rem; }
+  .tp-hist-list .rec + .rec { border-top:1px dashed rgba(140,120,95,.18); }
+  .tp-hist-list .rec .chk { margin-top:0; }
   /* ============ 打卡统计（内嵌于时序页）：柱状图 / 年度热力 / 成就册 ============ */
   .ts-ov-big .n { font-family:var(--tp-serif); font-size:1.7rem; font-weight:700; color:var(--tp-accent); line-height:1; }
   .ts-ov-big .d b { color:var(--tp-accent); }
@@ -1205,7 +1216,7 @@
     box-shadow: var(--shadow-card); padding: 13px 14px; margin-bottom: 9px; transition: border-color .15s; }
   .rec:active { border-color: var(--border-input); }
   .rec .top { display:flex; align-items:flex-start; gap: 11px; }
-  .rec .chk { flex:0 0 auto; width: 22px; height: 22px; border-radius: var(--radius-control); border: 1.6px solid var(--border-input);
+  .rec .chk { flex:0 0 auto; width: 22px; height: 22px; border-radius:50%; border: 1.6px solid var(--border-input);
     display:grid; place-items:center; cursor:pointer; background:var(--surface-card); color:#fff; transition: all .15s; margin-top: 1px; }
   .rec .chk.on { background: var(--module-1); border-color: var(--module-1); }
   .rec .chk svg { opacity: 0; }
@@ -3900,13 +3911,17 @@ function renderTodoPage(key){
       const ds=`${y}-${mm}-${String(d).padStart(2,'0')}`;
       if(tpHabitDone(x,ds)) mDays++;
     }
-    let dots="";
-    for(let d=1;d<=daysInM;d++){
-      const ds=`${y}-${mm}-${String(d).padStart(2,'0')}`;
-      const fut=ds>t;
-      dots+=`<i class="mh-d ${tpLevelR(x,ds)} ${ds===t?'today':''} ${fut?'future':''}" ${(!fut&&ckCan)?`data-hg="${ds}" data-id="${x.id}"`:""} title="${mm}/${d} · ${tpHabitCount(x,ds)}/${pd}"></i>`;
+    let bars=""; const nBars=Math.ceil(daysInM/7);
+    for(let w=0;w<nBars;w++){
+      let cells="";
+      for(let d=w*7+1; d<=Math.min(daysInM, w*7+7); d++){
+        const ds=`${y}-${mm}-${String(d).padStart(2,'0')}`;
+        const fut=ds>t;
+        cells+=`<i class="mh-d ${tpLevelR(x,ds)} ${ds===t?'today':''} ${fut?'future':''}" ${(!fut&&ckCan)?`data-hg="${ds}" data-id="${x.id}"`:""} title="${mm}/${d} · ${tpHabitCount(x,ds)}/${pd}"></i>`;
+      }
+      bars+=`<div class="tp-mh-bar">${cells}</div>`;
     }
-    const sub = isMulti ? `当前 ${tc}/${pd} · 连续 ${st} 天` : `连续 ${st} 天 · 本周 ${wk} 天`;
+    const sub = isMulti ? `今日 ${tc}/${pd} 次 · 已连续 ${st} 天` : `已连续 ${st} 天 · 本周 ${wk} 天`;
     const cc=TP_PALETTE[(idx||0)%TP_PALETTE.length];
     /* 多次打卡：分段进度环（段数=perDay，已完成段填主色）+ 中心加号
        段间距必须 > 描边宽（圆头端帽会向两侧各外扩半个描边宽），否则分段会糊成整圈 */
@@ -3918,15 +3933,14 @@ function renderTodoPage(key){
       /* dn=0 时不渲染进度环：dasharray=0 + 圆头端帽会画出一个多余的圆点 */
       const fg=dn>0?(dn*seg+(dn-1)*gap).toFixed(2)+" "+c.toFixed(2):null;
       return {bg,fg,r}; })();
+    const maxed = isMulti && tc>=pd;
     const control = isMulti
-      ? `<div class="tp-count"><button type="button" class="tp-ring-btn" data-hplus="${x.id}" aria-label="加一次">
+      ? `<div class="tp-count"><button type="button" class="tp-ring-btn ${maxed?'maxed':''}" data-hplus="${x.id}" aria-label="加一次" ${maxed?'disabled':''}>
           <svg viewBox="0 0 32 32"><circle class="rb-bg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.bg}" transform="rotate(-90 16 16)"/>${ring.fg?`<circle class="rb-fg" cx="16" cy="16" r="${ring.r}" stroke-dasharray="${ring.fg}" transform="rotate(-90 16 16)"/>`:""}</svg>
-          <span class="rb-plus">${icon("plus",11,2.6)}</span></button><span class="tp-count-text">${tc}/${pd}</span></div>`
+          <span class="rb-plus">${maxed?icon("check",12,3):icon("plus",11,2.6)}</span></button><span class="tp-count-text">${tc}/${pd}</span></div>`
       : `<button type="button" class="tp-chk2 ${done?'on':''}" ${ckCan?`data-hchk="${x.id}"`:""} aria-label="打卡">${done?icon("check",15,3):''}</button>`;
     const badgeSrc = isMulti ? "assets/stickers/heart-soft.png" : "assets/stickers/paw.png";
-    return `<div class="tp-swipe" data-mod="checkin">
-      <button type="button" class="tp-swipe-del js-del" data-id="${x.id}" aria-label="删除">${icon("trash",16)}</button>
-      <div class="tp-mcard tp-swipe-in ${done?'is-done':''}" style="--cc:${cc}">
+    return `<div class="tp-mcard ${done?'is-done':''}" style="--cc:${cc}" data-mod="checkin" data-id="${x.id}">
         <button type="button" class="tp-card-del js-del" data-id="${x.id}" aria-label="删除">${icon("trash",13)}</button>
         <img class="tp-mcard-badge" src="${badgeSrc}" alt="">
         <div class="tp-mcard-h">
@@ -3936,10 +3950,9 @@ function renderTodoPage(key){
             <span class="tp-mcard-sub">${sub}</span>
           </div>
         </div>
-        <div class="tp-mh-grid">${dots}</div>
+        <div class="tp-mh">${bars}</div>
         <span class="mh-tag">本月</span>
-      </div>
-    </div>`;
+      </div>`;
   };
   /* 近7天数据 */
   const last7=(()=>{ const arr=[];
@@ -3973,23 +3986,26 @@ function renderTodoPage(key){
     : `<div class="tp-empty"><img src="assets/stickers/cat-wave.png" alt=""><span>还没有打卡项，点右下角「+ 新打卡」创建</span></div>`;
   /* ③ 今日待办 */
   const notes=todayTodos.length?todayTodos.map(x=>{
-    const tlab=x.time?esc(x.time):"待办";
-    return `<div class="tp-swipe" data-mod="todo">
-      <button type="button" class="tp-swipe-del js-del" data-id="${x.id}" aria-label="删除">${icon("trash",16)}</button>
-      <div class="tp-note tp-swipe-in ${x.done?'done':''}">
+    const tlab=x.time?esc(x.time):"全天";
+    return `<div class="tp-note ${x.done?'done':''}" data-mod="todo">
         <button type="button" class="tp-card-del js-del" data-id="${x.id}" aria-label="删除">${icon("trash",13)}</button>
         <button type="button" class="tp-dot js-chk ${x.done?'on':''}" data-id="${x.id}" aria-label="完成">${x.done?icon("check",13,3):''}</button>
         <span class="tp-note-name ${x.done?'done':''}" data-edit="${x.id}">${esc(x.title)}</span>
         ${resolveCreatorRole(x)==="family"?`<span class="tp-fam">家属</span>`:""}
         <span class="tp-note-tag">${tlab}</span>
-      </div>
-    </div>`;
+      </div>`;
   }).join("") : `<div class="tp-empty"><span>今天还没有计划，点击右下角 + 添加</span></div>`;
-  const histItems=todosAll.filter(x=>x.date&&x.date<t).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
-  const histBtn=histItems.length
+  const histItems=todosAll.filter(x=>x.date&&x.date<t);
+  const histGroups={};
+  histItems.forEach(x=>{ const d=x.date; (histGroups[d]=histGroups[d]||[]).push(x); });
+  const histDates=Object.keys(histGroups).sort((a,b)=>b.localeCompare(a));
+  const histBtn=histDates.length
     ? `<button type="button" class="tp-hist-toggle ${_tpHistoryOpen?'open':''}" data-tp-hist="1">往日${icon("chevron",11,2)}</button>` : "";
-  const histList=(_tpHistoryOpen&&histItems.length)
-    ? `<div class="tp-hist-list" style="margin:0 0.6rem">${histItems.map(x=>recHTML(modOf("todo"),x)).join("")}</div>` : "";
+  const histList=(_tpHistoryOpen&&histDates.length)
+    ? `<div class="tp-hist-list" style="margin:0 0.6rem">${histDates.map(d=>{
+        const label=d===t?"今天":d.replace(/-/g,"/");
+        return `<div class="tp-hist-group"><div class="tp-hist-date">${label}</div>${histGroups[d].map(x=>recHTML(modOf("todo"),x)).join("")}</div>`;
+      }).join("")}</div>` : "";
   /* ④ 成长勋章 */
   const ACH=[
     {d:7,   img:"cat-medal.png", name:"连续 7 天"},
@@ -4014,7 +4030,7 @@ function renderTodoPage(key){
       </div>
     </div>
     ${weekbar}
-    <div class="tp-sec"><span class="tp-sec-title">今日习惯</span></div>
+    <div class="tp-sec"><span class="tp-sec-title">习惯打卡</span></div>
     ${habitBlock}
     <div class="tp-sec"><span class="tp-sec-title">今日待办</span>${histBtn}</div>
     <div class="tp-notes">${notes}</div>
@@ -4041,8 +4057,9 @@ function renderTodoPage(key){
     const wasDone=tpHabitDone(x, ds);
     const pd=x.perDay||1;
     const c=tpCnt(x.log&&x.log[ds]);
+    if(c>=pd) return;   /* 已达当日目标，禁止继续打卡 */
     x.log=x.log||{};
-    x.log[ds]=Math.min(Math.round(pd*1.5), c+1);
+    x.log[ds]=c+1;
     persist();
     if(!wasDone && tpHabitDone(x,ds) && ckCan){
       x._ckAwarded=x._ckAwarded||{};
@@ -4052,8 +4069,7 @@ function renderTodoPage(key){
     }
   };
   const tpCoinFx=(id, gained)=>{
-    const delBtn=$("#screen").querySelector(`.tp-swipe[data-mod="checkin"] .js-del[data-id="${id}"]`);
-    const card=delBtn?delBtn.parentElement.querySelector(".tp-mcard"):null;
+    const card=$("#screen").querySelector(`.tp-mcard[data-mod="checkin"][data-id="${id}"]`);
     if(card){
       const ripple=document.createElement("span"); ripple.className="tp-stamp-ripple"; card.appendChild(ripple);
       setTimeout(()=>ripple.remove(),600);
@@ -4071,31 +4087,7 @@ function renderTodoPage(key){
     _tpHistoryOpen=!_tpHistoryOpen;
     const sy=window.scrollY; renderModule("todo",true); window.scrollTo(0,sy);
   });
-  /* 左滑删除 */
-  $("#screen").querySelectorAll(".tp-swipe").forEach(w=>{
-    const inEl=w.querySelector(".tp-swipe-in"); if(!inEl) return;
-    let sx=null, base=0;
-    inEl.addEventListener("touchstart",e=>{
-      sx=e.touches[0].clientX;
-      base=parseFloat(inEl.style.transform||"0")||0;
-      inEl.style.transition="none";
-    },{passive:true});
-    inEl.addEventListener("touchmove",e=>{
-      if(sx===null) return;
-      const dx=e.touches[0].clientX-sx;
-      const off=Math.max(-4.4, Math.min(0, base+Math.min(dx,0)));
-      inEl.style.transform=`translateX(${off}rem)`;
-    },{passive:true});
-    inEl.addEventListener("touchend",()=>{
-      if(sx===null) return; sx=null;
-      inEl.style.transition="transform .2s ease";
-      const cur=parseFloat((inEl.style.transform.match(/-?[\d.]+/)||[0])[0]);
-      inEl.style.transform = cur<-2.2 ? "translateX(-4.4rem)" : "translateX(0)";
-    });
-    inEl.addEventListener("click",()=>{
-      if((parseFloat(inEl.style.transform)||0)<-0.5){ inEl.style.transform="translateX(0)"; }
-    });
-  });
+  /* 删除统一用卡片内按钮（.tp-card-del），不再做左滑手势，避免与按钮功能重叠 */
   /* 已解锁成就点击放大 */
   $("#screen").querySelectorAll(".ts-ach.ok").forEach(el=>el.onclick=()=>{
     const ov=document.createElement("div"); ov.className="overlay";
