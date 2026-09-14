@@ -5398,8 +5398,7 @@ function openEditor(key, item){
       <div class="field-meta">
         <div class="field"><label>计划时间</label><input id="f-time" type="time" value="${attr(d.time||'')}" style="font-size:15px"/></div>
         <div class="field"><label>计划日期</label><input id="f-date" type="date" value="${attr(d.date||isoToday())}" style="font-size:15px"/></div>
-      </div>
-      <div class="field field-compact"><label>备注</label><textarea id="f-note" placeholder="补充说明">${esc(d.note||'')}</textarea></div>`;
+      </div>`;
   } else if(m.type==="checkin"){
     fields=`<div class="field field-title"><input id="f-title" value="${attr(d.title)}" placeholder="例如：喝够 8 杯水"/></div>
       <div class="field-meta"><div class="field"><label>每日次数</label><input id="f-pd" type="number" min="1" max="9" value="${d.perDay||1}"/></div></div>
@@ -5438,21 +5437,6 @@ function openEditor(key, item){
       <div class="field-meta"><div class="field"><label>日期</label><input id="f-date" type="date" value="${d.date||isoToday()}"/></div></div>`;
   }
 
-  // layout variant selector —— 仅显示该模块真正支持的卡片样式，避免选到无效/错乱的布局
-  // 支持矩阵：note 固定手账卡片(layout 被忽略，故不显示该选项)；
-  // finance/todo/checkin/progress 仅 标准 + 大图 生效，引文/线本对其余类型无效或错乱。
-  const LAYOUTS = {
-    note:    [],
-    finance: [{v:'default',l:'账本行'},{v:'feature',l:'大图'}],
-    todo:    [{v:'default',l:'标准'},{v:'feature',l:'大图'}],
-    checkin: [{v:'default',l:'标准'},{v:'feature',l:'大图'}],
-    progress:[{v:'default',l:'标准'},{v:'feature',l:'大图'}],
-  };
-  const layoutOpts = LAYOUTS[m.type] || [{v:'default',l:'标准'},{v:'feature',l:'大图'}];
-  if(layoutOpts.length){
-    fields=`<div class="field field-compact"><label>卡片样式</label><div class="seg" id="f-layout">${layoutOpts.map(o=>`<div class="opt ${o.v===(d.layout||'default')?'on':''}" data-v="${o.v}">${o.l}</div>`).join("")}</div></div>`+fields;
-  }
-
   // custom fields (from m.fields config) — rendered after type-specific fields
   (m.fields||[]).forEach(f=>{
     const v=d[f.key]||"";
@@ -5461,15 +5445,6 @@ function openEditor(key, item){
     else if(f.type==="number") fields+=`<div class="field field-compact"><label>${esc(f.label)}</label><input id="f-cf-${f.key}" type="number" value="${attr(v)}" placeholder="${attr(f.placeholder||'')}"></div>`;
     else fields+=`<div class="field field-compact"><label>${esc(f.label)}</label><input id="f-cf-${f.key}" value="${attr(v)}" placeholder="${attr(f.placeholder||'')}"></div>`;
   });
-  // shared image field (URL 输入 + 本地上传压缩，二选一)
-  fields+=`<div class="field field-compact"><label>图片（可选）</label>
-    <input id="f-image" value="${attr(d.image||'')}" placeholder="图片 URL，或用下方按钮上传"/>
-    <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <button type="button" class="btn" id="f-upload-img">上传图片（自动压缩）</button>
-      <input type="file" id="f-upload-input" accept="image/*" hidden>
-      <span id="f-upload-tip" style="font-size:11px;color:var(--text-tertiary)"></span>
-    </div></div>`;
-
   const overlay=document.createElement("div"); overlay.className="overlay";
   overlay.innerHTML=`<div class="modal modal-clean">
     <div class="modal-header">
@@ -5488,20 +5463,6 @@ function openEditor(key, item){
     seg.querySelectorAll(".opt").forEach(x=>x.classList.remove("on")); o.classList.add("on");
   }));
   if(editing) overlay.querySelector("#m-del").onclick=()=>{ close(); confirmDelete(key, d.id); };
-  // 本地图片上传：FileReader + canvas 压缩（照抄头像上传实现，最长边 1024、自动降档、上限 ~300KB）
-  const upBtn=overlay.querySelector("#f-upload-img");
-  const upInput=overlay.querySelector("#f-upload-input");
-  const upTip=overlay.querySelector("#f-upload-tip");
-  if(upBtn && upInput) upBtn.onclick=()=>upInput.click();
-  if(upInput) upInput.onchange=e=>{
-    const f=e.target.files&&e.target.files[0]; if(!f) return;
-    if(f.size>6*1024*1024){ alert("图片超过 6MB，请换一张更小的～"); upInput.value=""; return; }
-    compressImageToDataURL(f, out=>{
-      if(!out) { upInput.value=""; return; }
-      const inp=overlay.querySelector("#f-image"); if(inp) inp.value=out;
-      if(upTip) upTip.textContent="已压缩至约 " + Math.max(1,Math.round(out.length*0.75/1024)) + "KB";
-    });
-  };
   /* 抠图贴纸（finance）：上传 → 抠图工作台 → 存 __customStickers → 记录引用 stickerId */
   const stkMake=overlay.querySelector("#f-stk-make");
   if(stkMake){
@@ -5539,8 +5500,7 @@ function openEditor(key, item){
     const val=id=>{ const el=overlay.querySelector(id); return el?el.value:undefined; };
     const seg=id=>{ const el=overlay.querySelector(id+" .on"); return el?el.dataset.v:undefined; };
     d.title=(val("#f-title")||"").trim()||"未命名";
-    d.layout=seg("#f-layout")||'default';
-    if(m.type==="todo"){ d.priority=seg("#f-prio")||d.priority; d.note=(val("#f-note")||"").trim(); d.time=val("#f-time")||""; d.date=val("#f-date")||isoToday(); }
+    if(m.type==="todo"){ d.priority=seg("#f-prio")||d.priority; d.time=val("#f-time")||""; d.date=val("#f-date")||isoToday(); }
     else if(m.type==="progress"){ d.current=Math.max(0,+val("#f-cur")||0); d.target=Math.max(1,+val("#f-tgt")||1); d.unit=(val("#f-unit")||"").trim(); d.note=(val("#f-note")||"").trim(); }
     else if(m.type==="checkin"){ d.perDay=Math.min(9,Math.max(1,Math.round(+val("#f-pd")||1))); }
     else if(m.type==="finance"){ d.type=seg("#f-ftype")||"expense"; d.amount=Math.max(0,+val("#f-amt")||0); d.category=seg("#f-cat")||(m.categories&&m.categories[0])||"其他"; d.date=val("#f-date"); d.stickerId = (typeof window.__editorStickerId==="function" ? window.__editorStickerId() : undefined) || d.stickerId || null; }
@@ -5551,8 +5511,6 @@ function openEditor(key, item){
       else if(f.type==="number") d[f.key]=Math.max(0,+val("#f-cf-"+f.key)||0);
       else d[f.key]=(val("#f-cf-"+f.key)||"").trim();
     });
-    // save image
-    d.image=(val("#f-image")||"").trim();
     const wasNew = !editing;
     if(wasNew) {
       (data[key]=data[key]||[]).unshift(d);
