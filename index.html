@@ -299,41 +299,37 @@
   .tp-mini-chart { display:flex; align-items:flex-end; justify-content:space-between; gap:0.18rem; height:3.2rem; width:100%; }
   .tp-mini-bar { flex:1; border-radius:0.15rem 0.15rem 0.08rem 0.08rem; background:color-mix(in srgb, var(--tp-accent) 30%, #fff); transition:height .3s ease; }
   .tp-mini-bar.today { background:var(--tp-accent); }
-  /* 打卡总结卡：左文右猫布局（参考图：左侧数字+副文+周历，右侧大猫咪）
-     奇数→占1格；偶数→占整排（顶部） */
-  .tp-summary-card { grid-column:auto; border-radius:1.1rem; padding:0.65rem 0.7rem 0.6rem;
+  /* 打卡总结卡：左文右猫（紧凑排版，参考图） */
+  .tp-summary-card { grid-column:auto; border-radius:1.1rem; padding:0.6rem 0.65rem 0.55rem;
     background:
       linear-gradient(135deg, #d8e8f4 0%, #eef5eb 50%, #f5f0e8 100%),
       repeating-linear-gradient(40deg, rgba(100,110,90,0.025) 0 3px, transparent 3px 7px);
-    display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:0.35rem;
-    min-height:7.2rem; box-shadow:var(--tp-shadow); border:none; position:relative; overflow:hidden; }
-  /* 左侧文字区 */
-  .tp-sum-body { display:flex; flex-direction:column; align-items:flex-start; gap:0.08rem; flex:1; min-width:0; z-index:1; }
-  .tp-sum-num { font-family:var(--tp-serif); font-size:1.72rem; font-weight:800; line-height:1.15; color:#4a5568; letter-spacing:-0.02em; }
+    display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:0.2rem;
+    min-height:5.8rem; box-shadow:var(--tp-shadow); border:none; position:relative; overflow:hidden; }
+  /* 左侧文字区 — 紧凑 */
+  .tp-sum-body { display:flex; flex-direction:column; align-items:flex-start; gap:0; flex:1; min-width:0; z-index:1; }
+  .tp-sum-num { font-family:var(--tp-serif); font-size:1.56rem; font-weight:800; line-height:1.2; color:#4a5568; letter-spacing:-0.02em; }
   .tp-summary-card.done .tp-sum-num { color:var(--accent); }
   .tp-summary-card.none .tp-sum-num { color:#9ca3af; }
-  .tp-sum-sub { font-size:0.58rem; color:#88929e; line-height:1.3; margin-top:0.06rem; }
-  /* 周历行：星期标签 + 圆点 */
-  .tp-sum-week { display:flex; flex-direction:column; gap:0.12rem; margin-top:0.28rem; }
-  .tp-sum-wd { display:flex; gap:0.32rem; }
-  .tp-sum-wd span { font-size:0.46rem; color:#b0b8c0; width:0.72rem; text-align:center; font-weight:500; }
-  .tp-sum-dots { display:flex; gap:0.32rem; }
-  .tp-sum-dots .sm-d { width:0.52rem; height:0.52rem; border-radius:50%; background:#d8dde2; display:flex; align-items:center; justify-content:center; }
+  .tp-sum-sub { font-size:0.55rem; color:#88929e; line-height:1.25; margin-top:0.04rem; }
+  /* 周历行：标签+圆点紧贴 */
+  .tp-sum-week { display:flex; flex-direction:row; align-items:center; gap:0.4rem; margin-top:0.22rem; }
+  .tp-sum-wd { display:flex; gap:0.28rem; }
+  .tp-sum-wd span { font-size:0.42rem; color:#b0b8c0; width:0.62rem; text-align:center; font-weight:500; }
+  .tp-sum-dots { display:flex; gap:0.28rem; }
+  .tp-sum-dots .sm-d { width:0.46rem; height:0.46rem; border-radius:50%; background:#d8dde2; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .tp-sum-dots .sm-d.on { background:var(--accent); box-shadow:inset 0 1px 0 rgba(255,255,255,.35); }
-  .tp-sum-dots .sm-d.on::after { content:""; width:0.26rem; height:0.38rem; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg) translateY(-1px); }
-  .tp-sum-dots .sm-d.today:not(.on) { box-shadow:0 0 0 1.5px rgba(45,122,94,.3); }
-  /* 右侧猫咪贴纸 */
-  .tp-sum-cat { width:4.2rem; height:4.2rem; object-fit:contain; flex-shrink:0; z-index:1;
-    filter:drop-shadow(0 2px 4px rgba(0,0,0,.1)); }
-  /* 偶数整排版：加大内边距和猫咪 */
-  .tp-summary-card.full { grid-column:1 / -1; padding:0.75rem 1.1rem 0.75rem 0.9rem; min-height:5.4rem; }
-  .tp-summary-card.full .tp-sum-cat { width:4.6rem; height:4.6rem; }
-  .tp-summary-card.full .tp-sum-num { font-size:1.9rem; }
-  .tp-summary-card.full .tp-sum-sub { font-size:0.64rem; }
-  .tp-summary-card.full .tp-sum-wd { gap:0.42rem; }
-  .tp-summary-card.full .tp-sum-wd span { font-size:0.5rem; width:0.82rem; }
-  .tp-summary-card.full .tp-sum-dots { gap:0.42rem; }
-  .tp-summary-card.full .tp-sum-dots .sm-d { width:0.58rem; height:0.58rem; }
+  .tp-sum-dots .sm-d.on::after { content:""; width:0.22rem; height:0.34rem; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg) translateY(-1px); }
+  .tp-sum-dots .sm-d.today:not(.on) { box-shadow:0 0 0 1.4px rgba(45,122,94,.28); }
+  /* 右侧猫咪 */
+  .tp-sum-cat { width:3.6rem; height:3.6rem; object-fit:contain; flex-shrink:0; z-index:1;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.08)); align-self:flex-end; margin-bottom:-0.15rem; }
+  /* 偶数整排 */
+  .tp-summary-card.full { grid-column:1 / -1; padding:0.65rem 1rem 0.6rem 0.85rem; min-height:5rem; }
+  .tp-summary-card.full .tp-sum-cat { width:4rem; height:4rem; }
+  .tp-summary-card.full .tp-sum-num { font-size:1.72rem; }
+  .tp-summary-card.full .tp-sum-sub { font-size:0.6rem; }
+  .tp-summary-card.full .tp-sum-week { gap:0.5rem; }
   /* 最后一项打满时：总结卡弹跳 + 绿色光晕脉冲 */
   .tp-summary-card.celebrate { animation:summaryPop .62s cubic-bezier(.34,1.56,.64,1) both; }
   @keyframes summaryPop {
@@ -3964,7 +3960,7 @@ function renderTodoPage(key){
       }
       bars+=`<div class="tp-mh-bar">${cells}</div>`;
     }
-    const sub = `已连续 ${st} 天`;
+    const sub = "";   /* 已移至右下角标签「连续 N 天」，此处不重复 */
     const cc=TP_PALETTE[(idx||0)%TP_PALETTE.length];
     /* 多次打卡：分段进度环（段数=perDay，已完成段填主色）+ 中心加号
        段间距必须 > 描边宽（圆头端帽会向两侧各外扩半个描边宽），否则分段会糊成整圈 */
