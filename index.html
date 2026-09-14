@@ -299,7 +299,8 @@
   .tp-mini-chart { display:flex; align-items:flex-end; justify-content:space-between; gap:0.18rem; height:3.2rem; width:100%; }
   .tp-mini-bar { flex:1; border-radius:0.15rem 0.15rem 0.08rem 0.08rem; background:color-mix(in srgb, var(--tp-accent) 30%, #fff); transition:height .3s ease; }
   .tp-mini-bar.today { background:var(--tp-accent); }
-  /* 打卡总结卡：首框（卡片数为奇数时），猫咪可爱风，无实线边框，浅绿渐变 */
+  /* 打卡总结卡：首框（猫咪可爱风，无实线边框，浅绿渐变）
+     布局：习惯数奇数 → 占 1 格（与首习惯卡并排）；偶数 → 占整排（顶部） */
   .tp-summary-card { grid-column:auto; border-radius:1.1rem; padding:0.7rem 0.55rem 0.6rem;
     background:linear-gradient(150deg, color-mix(in srgb, var(--accent) 13%, #fff) 0%, color-mix(in srgb, var(--accent) 4%, #fff) 100%);
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.28rem; text-align:center;
@@ -308,6 +309,10 @@
   .tp-sum-body { display:flex; flex-direction:column; align-items:center; gap:0.12rem; }
   .tp-sum-big { font-family:var(--tp-serif); font-size:0.92rem; font-weight:700; line-height:1.25; color:var(--text-secondary); }
   .tp-summary-card.done .tp-sum-big { color:var(--accent); }
+  .tp-summary-card.full { grid-column:1 / -1; flex-direction:row; justify-content:flex-start; gap:0.7rem; text-align:left; min-height:4.6rem; padding:0.7rem 0.9rem; }
+  .tp-summary-card.full .tp-sum-cat { width:2.6rem; height:2.6rem; }
+  .tp-summary-card.full .tp-sum-body { align-items:flex-start; }
+  .tp-summary-card.full .tp-sum-big { font-size:1.02rem; }
   .tp-sum-sub { font-size:0.6rem; color:var(--text-tertiary); letter-spacing:.01em; }
   .tp-sum-dots { display:flex; gap:0.2rem; margin-top:0.18rem; }
   .tp-sum-dots .sm-d { width:0.3rem; height:0.3rem; border-radius:50%; background:color-mix(in srgb, var(--accent) 24%, #fff); }
@@ -3988,9 +3993,10 @@ function renderTodoPage(key){
     }
     return arr; })();
   const maxN=Math.max(1,...last7.map(o=>o.n));
-  /* 首框：打卡总结卡（始终显示，占1格），统计卡已移除 */
+  /* 首框：打卡总结卡（始终显示）。布局：习惯数奇数 → 占1格（与首卡并排）；偶数 → 占整排（顶部） */
   const allDoneToday = habits.length>0 && habits.every(x=>tpHabitDone(x,t));
   const remainToday = habits.filter(x=>!tpHabitDone(x,t)).length;
+  const sumFull = habits.length>0 && habits.length % 2 === 0;   /* 偶数 → 整排 */
   /* 本周小圆点：周一起，任意习惯当日完成即点亮 */
   let sumDots="";
   for(let i=0;i<7;i++){
@@ -4005,7 +4011,7 @@ function renderTodoPage(key){
     const catImg = allDoneToday ? "assets/stickers/cat-medal.png" : "assets/stickers/cat-think.png";
     const bigTxt = allDoneToday ? "今天全都做到啦" : "还差一点点";
     const subTxt = allDoneToday ? `已连续 ${maxStreak} 天` : `还差 ${remainToday} 项 · 已连续 ${maxStreak} 天`;
-    headCard=`<div class="tp-summary-card ${allDoneToday?'done':''}" data-summary="1">
+    headCard=`<div class="tp-summary-card ${allDoneToday?'done':''} ${sumFull?'full':''}" data-summary="1">
         <img class="tp-sum-cat" src="${catImg}" alt="">
         <div class="tp-sum-body">
           <div class="tp-sum-big">${bigTxt}</div>
