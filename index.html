@@ -3170,6 +3170,30 @@ const store = {
           all.__deleted = newTomb;
         }
       } catch(mergeErr){ console.warn("cloud merge failed, skip upsert to avoid overwrite:", mergeErr); return false; }
+
+      // ★★★ 防御守门（2026-09-15）：记录数不降 —— 任何同步 / 代码改动都不得静默丢用户的操作记录 ★★★
+      // 合并后每个数组字段的条目数必须 ≥ 云端现有条目数（合法删除走 __deleted 墓碑，已剔除的不算丢失）；
+      // 一旦检测到「云端有、合并后无」且不在墓碑中的 id，判定为非预期丢失，立即放弃上传并告警，绝不写回云端。
+      try {
+        const tombNow = (all && all.__deleted) || {};
+        const arrKeys = (this.bizKeys || []).filter(k => Array.isArray(all[k]) || Array.isArray((cloud.data||{})[k]));
+        for(const k of arrKeys){
+          const cloudArr = Array.isArray((cloud.data||{})[k]) ? cloud.data[k] : [];
+          const mergedArr = Array.isArray(all[k]) ? all[k] : [];
+          if(mergedArr.length >= cloudArr.length) continue;          // 没变少，安全
+          const dead = new Set((tombNow[k]||[]).map(String));        // 合法删除的 id（墓碑），不算丢失
+          const mergedIds = new Set(mergedArr.filter(x=>x&&x.id!=null).map(x=>String(x.id)));
+          const lost = cloudArr.filter(x=>x&&x.id!=null && !mergedIds.has(String(x.id)) && !dead.has(String(x.id)));
+          if(lost.length){
+            console.error("⛔ 记录数不降守门拦截：字段 "+k+" 将丢失 "+lost.length+" 条云端记录（id示例 "+lost.slice(0,3).map(x=>x.id).join("/")+"），已放弃覆盖上传以防数据回退丢失");
+            try { if(typeof showCatPopup==="function") showCatPopup("已拦截一次可能丢数据的同步","请反馈开发核查",true); } catch(_){}
+            // 异常时把本次合并后的完整数据留底到本地，便于人工回滚（绝不动云端）
+            try { localStorage.setItem("__emergencyBackup_"+CONFIG.storageKey, JSON.stringify({ts:Date.now(), data:all})); } catch(_){}
+            return false;
+          }
+        }
+      } catch(guardErr){ console.warn("record-count guard skip (不影响正常同步):", guardErr); }
+
       const now = new Date().toISOString();
       const { error } = await this.sb.from("workbench_data").upsert({
         storage_key: CONFIG.businessKey, data: all,
@@ -3321,6 +3345,9 @@ function injectSeed(){
       { id: 9040, title: "滴滴出行", type: "expense", amount: 19.10, category: "交通", date: "2026-09-04" },
       { id: 9041, title: "西西弗书店", type: "expense", amount: 38.00, category: "购物", date: "2026-09-04" },
       { id: 9042, title: "滴滴出行", type: "expense", amount: 14.93, category: "交通", date: "2026-09-04" },
+      // 2026-09-15 账单
+      { id: 9043, title: "盒马鲜生 · 瑞士卷+天然水5L*2+0乳糖牛乳1L", type: "expense", amount: 51.70, category: "餐饮", date: "2026-09-15" },
+      { id: 9044, title: "美团闪购 · 隐形眼镜护理液2瓶", type: "expense", amount: 17.20, category: "购物", date: "2026-09-15" },
     ],
     note: [
       { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
