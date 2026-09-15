@@ -3041,6 +3041,29 @@ const store = {
           out[k] = C;
         }
       });
+      // 修正传播规则：「（恢复）」类补录记录只信任云端版本。
+      // 防止某设备本地缓存仍留着已删除/已改的恢复记录，联网后通过并集又把旧值同步回云端。
+      try {
+        const cloudIds = new Set();
+        (this.bizKeys || []).forEach(k => {
+          const C = cloud ? cloud[k] : undefined;
+          if(Array.isArray(C)) C.forEach(x => { if(x && x.id != null) cloudIds.add(String(x.id)); });
+        });
+        (this.bizKeys || []).forEach(k => {
+          const arr = out[k];
+          if(!Array.isArray(arr)) return;
+          out[k] = arr.map(x => {
+            if(x && typeof (x.title) === "string" && x.title.indexOf("（恢复）") >= 0){
+              if(cloudIds.has(String(x.id))){
+                const cv = (cloud && Array.isArray(cloud[k]) ? cloud[k] : []).find(y => String(y.id) === String(x.id));
+                return cv || null;            // 用云端版本覆盖本地旧值
+              }
+              return null;                    // 云端已无此恢复记录 → 丢弃本地缓存副本
+            }
+            return x;
+          }).filter(Boolean);
+        });
+      } catch(e){ /* 不影响主合并 */ }
       return out;
     } catch(e){ console.warn("unionData failed, fallback to cloud:", e); return cloud; }
   },
