@@ -3034,11 +3034,14 @@ const store = {
           L.forEach(x => { if(x && x.id != null) m.set(String(x.id), x); else if(x != null) m.set("noid-" + JSON.stringify(x).slice(0,80), x); });
           out[k] = [...m.values()];
         } else if(L && typeof L === "object" && !Array.isArray(L) && C && typeof C === "object" && !Array.isArray(C)){
-          out[k] = Object.assign({}, C, L);
-        } else if(L !== undefined && L !== null){
-          out[k] = L;
-        } else if(C !== undefined && C !== null){
-          out[k] = C;
+          out[k] = Object.assign({}, C, L);   // 对象：云端为底、本地覆盖（本地空对象不会删云端键）
+        } else {
+          // 防「本地空容器把云端已存在数组/对象清空」：本地若是 空数组/空对象/undefined/null，保留云端值；
+          // 仅当本地是真实值（含 0、""、非空容器）才以本地为准。确保任何同步都不静默丢用户记录。
+          const isEmpty = (L === undefined || L === null)
+            || (Array.isArray(L) && L.length === 0)
+            || (typeof L === "object" && !Array.isArray(L) && Object.keys(L).length === 0);
+          if(!isEmpty) out[k] = L;            // 本地有真实值 → 以本地为准（否则保留 out[k] 中的云端克隆）
         }
       });
       // 修正传播规则：「（恢复）」类补录记录只信任云端版本。
