@@ -3502,7 +3502,10 @@ function renderHome(){
   const totalCandy = candy.total();
   const todayCandy = candy.todayEarned();
   const collectCount = Object.keys(candy.getCollection()).length;
-  const doneTasks = todayTodos.filter(x=>x.done).length;
+  // 「今日任务」= 每日任务系统（完成1个任务 / 记1笔账 / 登录打卡）的完成进度，
+  // 不是「今日计划」待办的完成数（后者是 todo 列表，二者不是同一口径）
+  const dailyTaskList = candy.getDailyTasks().tasks;
+  const dailyDoneCount = dailyTaskList.filter(t=>t.done).length;
 
   // 在一起天数
   let togetherDays = 0;
@@ -3575,7 +3578,7 @@ function renderHome(){
       <div class="jn-candy-num" id="homeCandyNum">${totalCandy}<span>糖币</span></div>
       <div class="jn-candy-stats">
         <div class="jn-cs"><b>+${todayCandy}</b>今日获得</div>
-        <div class="jn-cs"><b>${doneTasks}/${todayTodos.length}</b>今日任务</div>
+        <div class="jn-cs"><b>${dailyDoneCount}/${dailyTaskList.length}</b>今日任务</div>
         <div class="jn-cs"><b>${collectCount}</b>藏品图鉴</div>
       </div>
     </div>
