@@ -330,6 +330,13 @@
   .tp-summary-card.full .tp-sum-num { font-size:1.72rem; }
   .tp-summary-card.full .tp-sum-sub { font-size:0.6rem; }
   .tp-summary-card.full .tp-sum-week { gap:0.5rem; }
+  /* 奇数习惯时总结卡只占 1 格（窄卡）：周历收紧并允许换行，避免右侧标签/圆点被 overflow:hidden 裁掉 */
+  .tp-sum-week { flex-wrap:wrap; row-gap:0.12rem; }
+  .tp-summary-card:not(.full) .tp-sum-cat { width:3rem; height:3rem; }
+  .tp-summary-card:not(.full) .tp-sum-wd { gap:0.15rem; }
+  .tp-summary-card:not(.full) .tp-sum-wd span { width:0.5rem; font-size:0.4rem; }
+  .tp-summary-card:not(.full) .tp-sum-dots { gap:0.15rem; }
+  .tp-summary-card:not(.full) .tp-sum-dots .sm-d { width:0.42rem; height:0.42rem; }
   /* 最后一项打满时：总结卡弹跳 + 绿色光晕脉冲 */
   .tp-summary-card.celebrate { animation:summaryPop .62s cubic-bezier(.34,1.56,.64,1) both; }
   @keyframes summaryPop {
@@ -945,15 +952,20 @@
   .collect-locked-title { font-size:12px; color:var(--text-tertiary); margin-bottom:8px;
     padding-left:4px; font-weight:500; }
   .locked-grid .collect-icon { filter:grayscale(1); }
-  /* 已放置贴纸 — 点击选中，拖动移位，删除需二次确认 */
-  .placed-sticker { position:absolute; width:32px; height:32px; object-fit:contain; opacity:.7;
-    cursor:grab; touch-action:none; user-select:none; z-index:5;
-    transition: opacity .2s, transform .2s, box-shadow .2s; }
-  .placed-sticker:hover { opacity:1; transform: scale(1.15) rotate(0deg) !important; }
+  /* 已放置贴纸 — 点击选中后可拖动移位 / 缩放 / 旋转 / 删除（删除二次确认） */
+  .placed-sticker { position:absolute; width:32px; height:32px; object-fit:contain; opacity:.78;
+    cursor:grab; touch-action:none; user-select:none; z-index:5; transform-origin:center center;
+    transition: opacity .2s, box-shadow .2s; }
+  .placed-sticker:hover { opacity:1; }
   .placed-sticker.selected { opacity:1; z-index:10; box-shadow:0 0 0 2px var(--accent), 0 4px 12px rgba(26,41,56,.15); border-radius:8px; }
-  .sticker-del-btn { position:absolute; width:18px; height:18px; border-radius:50%; background:var(--danger); color:#fff;
-    font-size:11px; font-weight:700; display:grid; place-items:center; cursor:pointer; z-index:20;
-    box-shadow:0 2px 6px rgba(26,41,56,.2); border:none; padding:0; line-height:1; }
+  /* 贴纸编辑控制条（选中后出现）：↺ − ＋ ↻ × */
+  .sticker-ctl { position:absolute; display:flex; align-items:center; gap:2px; z-index:22;
+    background:rgba(255,255,255,.97); border-radius:999px; padding:2px;
+    box-shadow:0 2px 8px rgba(26,41,56,.22); border:1px solid rgba(26,41,56,.08); }
+  .sticker-ctl button { width:22px; height:22px; border:none; border-radius:50%; background:#f2f4f6; color:#3a4a58;
+    font-size:13px; font-weight:700; display:grid; place-items:center; cursor:pointer; padding:0; line-height:1; }
+  .sticker-ctl button:active { background:color-mix(in srgb, var(--accent) 22%, #fff); }
+  .sticker-ctl button.del { background:var(--danger); color:#fff; }
 
   /* ---------- RARITY SYSTEM ---------- */
   .rarity-tag { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px;
@@ -1700,7 +1712,7 @@
   .jn-wk-tabs .filter-tab.on { background:var(--accent-muted); color:var(--accent); font-weight:700; }
   /* 一日一行：日期栏与内容区之间纵向分隔线，行间横向细实线（weeks 手账版式） */
   .jn-wk-row { display:flex; }
-  .jn-wk-day { flex:0 0 54px; text-align:left; padding:10px 10px 12px 16px; border-right:1px solid var(--paper-3); }
+  .jn-wk-day { flex:0 0 54px; min-width:0; text-align:left; padding:10px 10px 12px 16px; border-right:1px solid var(--paper-3); }
   .jn-wk-num { font-family:var(--font-journal); font-size:24px; font-weight:700; color:var(--ink-strong); line-height:1.05; }
   .jn-wk-dow { font-size:10px; color:var(--ink-faint); letter-spacing:1.5px; margin-top:3px; }
   .jn-wk-entries { flex:1; min-width:0; display:flex; flex-direction:column; gap:9px;
@@ -2577,7 +2589,7 @@
     <div><h2 id="drawerName">果子</h2><p id="drawerSlogan">两只小猫，一起把日子过成糖</p></div>
   </div>
   <div class="dsep"></div>
-  <div id="drawerList"><div class="ditem" data-go="home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5"></path><path d="M6 10.5V19h12v-8.5"></path></svg>首页</div><div class="ditem" data-go="money"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h11a1.5 1.5 0 0 1 1.5 1.5V8"></path><rect x="3.5" y="7.5" width="17" height="11.5" rx="2.5"></rect><circle cx="16.5" cy="13.2" r="1.3"></circle></svg>记账本</div><div class="ditem" data-go="todo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 6h11"></path><path d="M8.5 12h11"></path><path d="M8.5 18h11"></path><circle cx="4.5" cy="6" r=".9"></circle><circle cx="4.5" cy="12" r=".9"></circle><circle cx="4.5" cy="18" r=".9"></circle></svg>今日计划</div><div class="ditem" data-go="checkin"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4C10 4 4 9 4 17c0 1 .1 2 .5 3 5.5-9 9-9.5 15.5-16z"></path><path d="M4.5 20c3-6 7-9.5 13-11.5"></path></svg>习惯打卡</div><div class="ditem" data-go="goal"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="4"></circle></svg>长期目标</div><div class="ditem" data-go="note"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.2-4L16 5.2l2.8 2.8L8 19z"></path><path d="M14.2 7l2.8 2.8"></path></svg>灵感备忘</div><div class="ditem" data-go="game"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg>糖果小铺</div><div class="ditem" data-go="users"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5.5 19c.7-3.2 3.2-5 6.5-5s5.8 1.8 6.5 5"></path></svg>用户管理</div></div>
+  <div id="drawerList"><div class="ditem" data-go="home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5"></path><path d="M6 10.5V19h12v-8.5"></path></svg>首页</div><div class="ditem" data-go="money"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h11a1.5 1.5 0 0 1 1.5 1.5V8"></path><rect x="3.5" y="7.5" width="17" height="11.5" rx="2.5"></rect><circle cx="16.5" cy="13.2" r="1.3"></circle></svg>记账本</div><div class="ditem" data-go="todo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 6h11"></path><path d="M8.5 12h11"></path><path d="M8.5 18h11"></path><circle cx="4.5" cy="6" r=".9"></circle><circle cx="4.5" cy="12" r=".9"></circle><circle cx="4.5" cy="18" r=".9"></circle></svg>今日计划</div><div class="ditem" data-go="checkin"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4C10 4 4 9 4 17c0 1 .1 2 .5 3 5.5-9 9-9.5 15.5-16z"></path><path d="M4.5 20c3-6 7-9.5 13-11.5"></path></svg>习惯打卡</div><div class="ditem" data-go="note"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.2-4L16 5.2l2.8 2.8L8 19z"></path><path d="M14.2 7l2.8 2.8"></path></svg>灵感备忘</div><div class="ditem" data-go="game"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 16.9l-5.2 2.75 1-5.8-4.2-4.1 5.8-.85z"></path></svg>糖果小铺</div><div class="ditem" data-go="users"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5.5 19c.7-3.2 3.2-5 6.5-5s5.8 1.8 6.5 5"></path></svg>用户管理</div></div>
   <div class="dsep"></div>
   <div class="dfoot" id="drawerFoot">二猫 · 云端同步中</div>
 </aside>
@@ -2766,8 +2778,6 @@ const CONFIG = {
       calc: d => { const t=today(); const it=(d.todo||[]).filter(x=>!x.date||x.date===t); const done=it.filter(x=>x.done).length; return { value: it.length?Math.round(done/it.length*100):0, sub: `${done}/${it.length} 项` }; } },
     { key: "checkin", label: "打卡", icon: "leaf", color: "var(--module-1)",
       calc: d => { const it=d.checkin||[]; const t=today(); const done=it.filter(x=>x.log&&x.log[t]).length; return { value: it.length?Math.round(done/it.length*100):0, sub: `${done}/${it.length} 项` }; } },
-    { key: "goal", label: "目标", icon: "target", color: "var(--module-2)",
-      calc: d => avgProgress(d.goal) },
   ],
 
   // 本周状态趋势（真实数据：读取用户填写的 __trend，7 个数字；没有就留空）
@@ -2820,15 +2830,6 @@ const CONFIG = {
         { id: 22, title: "23:30 前睡觉", log: {} },
         { id: 23, title: "背 50 个单词", log: {} },
         { id: 24, title: "维生素 / 补品", log: {} },
-      ],
-    },
-    {
-      key: "goal", name: "长期目标", icon: "target", tint: "#e0ecf5", color: "var(--module-2)",
-      type: "progress", unit: "页", desc: "考研进度 · 阅读计划 · 里程碑追踪",
-      seed: [
-        { id: 31, title: "MBA 管综逻辑", current: 120, target: 300, unit: "页", note: "第 5 章：形式逻辑" },
-        { id: 32, title: "英语真题阅读", current: 8, target: 20, unit: "套", note: "近 5 年真题" },
-        { id: 33, title: "《经济学原理》", current: 90, target: 280, unit: "页", note: "微观经济学部分" },
       ],
     },
     {
@@ -5986,7 +5987,7 @@ const auth = {
     if(!this.session) return false;
     if(this.isAdmin()) return true;
     if(this.isFamily()) {
-      return ["note", "money", "todo", "goal"].includes(moduleKey);
+      return ["note", "money", "todo"].includes(moduleKey);
     }
     return false;
   },
@@ -7136,6 +7137,17 @@ function updateStickerPos(index, x, y) {
   placements[index].y = y;
   saveStickerPlacements(placements);
 }
+/* 贴纸编辑：缩放 / 旋转（移动见 updateStickerPos）；三者共存于同一条 placement 记录 */
+const STK_MIN = 0.5, STK_MAX = 3, STK_STEP = 0.15, STK_ROT_STEP = 15;
+function getStickerScale(p){ return (p && typeof p.scale === "number" && p.scale > 0) ? p.scale : 1; }
+function updateStickerTransform(index, opts){
+  const placements = getStickerPlacements();
+  const p = placements[index];
+  if(!p) return;
+  if(opts.scale != null) p.scale = Math.max(STK_MIN, Math.min(STK_MAX, Math.round(opts.scale * 100) / 100));
+  if(opts.rot != null) p.rot = ((Math.round(opts.rot) % 360) + 360) % 360;
+  saveStickerPlacements(placements);
+}
 function renderPlacedStickers(cardId) {
   const placements = getStickerPlacements();
   const cardPlacements = placements.map((p, i) => ({ ...p, _idx: i })).filter(p => p.cardId === cardId);
@@ -7144,28 +7156,62 @@ function renderPlacedStickers(cardId) {
     const img = shopIcon(p.stickerId);
     if(!img) return "";
     return `<img class="placed-sticker" src="${img}" alt=""
-      style="left:${p.x}%;top:${p.y}%;transform:rotate(${p.rot}deg)"
+      style="left:${p.x}%;top:${p.y}%;transform:rotate(${p.rot||0}deg) scale(${getStickerScale(p)})"
       data-sticker-idx="${p._idx}"
-      draggable="true">`;
+      draggable="false">`;
   }).join("");
 }
 let _selectedStickerIdx = null;
 function clearStickerSelection() {
   document.querySelectorAll(".placed-sticker.selected").forEach(el => el.classList.remove("selected"));
-  document.querySelectorAll(".sticker-del-btn").forEach(el => el.remove());
+  document.querySelectorAll(".sticker-ctl").forEach(el => el.remove());
   _selectedStickerIdx = null;
+}
+/* 控制条定位：贴在选中贴纸正下方（下方空间不足则移到上方），并夹在卡片范围内 */
+function positionStickerCtl(el, panel){
+  const parent = el.parentElement; if(!parent) return;
+  const px = parseFloat(el.style.left) || 0;
+  const py = parseFloat(el.style.top) || 0;
+  const w = parent.clientWidth, h = parent.clientHeight;
+  const cw = panel.offsetWidth || 132, ch = panel.offsetHeight || 26;
+  let left = px / 100 * w + 16 - cw / 2;
+  let top = py / 100 * h + 34;
+  left = Math.max(4, Math.min(w - cw - 4, left));
+  if(top + ch > h - 2) top = py / 100 * h - ch - 4;
+  top = Math.max(2, top);
+  panel.style.left = left + "px";
+  panel.style.top = top + "px";
 }
 function selectSticker(el) {
   clearStickerSelection();
   el.classList.add("selected");
   _selectedStickerIdx = parseInt(el.dataset.stickerIdx);
-  const btn = document.createElement("button");
-  btn.className = "sticker-del-btn";
-  btn.textContent = "×";
-  btn.style.left = (parseFloat(el.style.left) + 2) + "%";
-  btn.style.top = (parseFloat(el.style.top) - 3) + "%";
-  btn.onclick = e => { e.stopPropagation(); confirmDeleteSticker(_selectedStickerIdx); };
-  el.parentElement.appendChild(btn);
+  const parent = el.parentElement;
+  const panel = document.createElement("div");
+  panel.className = "sticker-ctl";
+  panel.innerHTML = `<button type="button" data-act="rot-" title="逆时针旋转">↺</button>`
+    + `<button type="button" data-act="scale-" title="缩小">−</button>`
+    + `<button type="button" data-act="scale+" title="放大">＋</button>`
+    + `<button type="button" data-act="rot+" title="顺时针旋转">↻</button>`
+    + `<button type="button" class="del" data-act="del" title="删除">×</button>`;
+  panel.addEventListener("click", e => {
+    e.stopPropagation();
+    const btn = e.target.closest("button"); if(!btn) return;
+    const act = btn.dataset.act;
+    const idx = _selectedStickerIdx;
+    const p = getStickerPlacements()[idx]; if(!p) return;
+    if(act === "del"){ confirmDeleteSticker(idx); return; }
+    if(act === "scale+") updateStickerTransform(idx, { scale: getStickerScale(p) + STK_STEP });
+    else if(act === "scale-") updateStickerTransform(idx, { scale: getStickerScale(p) - STK_STEP });
+    else if(act === "rot+") updateStickerTransform(idx, { rot: (p.rot || 0) + STK_ROT_STEP });
+    else if(act === "rot-") updateStickerTransform(idx, { rot: (p.rot || 0) - STK_ROT_STEP });
+    const np = getStickerPlacements()[idx];
+    el.style.transform = `rotate(${(np.rot || 0)}deg) scale(${getStickerScale(np)})`;
+    positionStickerCtl(el, panel);
+  });
+  panel.addEventListener("pointerdown", e => e.stopPropagation());
+  parent.appendChild(panel);
+  positionStickerCtl(el, panel);
 }
 function confirmDeleteSticker(idx) {
   const placements = getStickerPlacements();
@@ -7201,8 +7247,8 @@ function initStickerDrag() {
       const newY = Math.max(0, Math.min(90, origY + dy / rect.height * 100));
       el.style.left = newX + "%";
       el.style.top = newY + "%";
-      const delBtn = parent.querySelector(".sticker-del-btn");
-      if(delBtn) { delBtn.style.left = (newX + 2) + "%"; delBtn.style.top = (newY - 3) + "%"; }
+      const ctl = parent.querySelector(".sticker-ctl");
+      if(ctl) positionStickerCtl(el, ctl);
     });
     el.addEventListener("pointerup", e => {
       if(!dragging) return;
@@ -7217,7 +7263,7 @@ function initStickerDrag() {
     el.addEventListener("click", e => { e.stopPropagation(); });
   });
   document.addEventListener("click", e => {
-    if(!e.target.closest(".placed-sticker") && !e.target.closest(".sticker-del-btn")) {
+    if(!e.target.closest(".placed-sticker") && !e.target.closest(".sticker-ctl")) {
       clearStickerSelection();
     }
   });
