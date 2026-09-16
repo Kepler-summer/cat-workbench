@@ -2800,13 +2800,8 @@ const CONFIG = {
       key: "money", name: "记账本", icon: "wallet", tint: "#d0efef", color: "var(--module-4)",
       type: "finance", desc: "收支流水 · 分类占比 · 月度小结",
       categories: ["餐饮", "饮品", "交通", "购物", "学习", "居家", "日用", "娱乐", "兼职", "其他"],
-      seed: [
-        { id: 51, title: "午餐 · 食堂", type: "expense", amount: 18, category: "餐饮", date: isoToday() },
-        { id: 52, title: "地铁通勤", type: "expense", amount: 6, category: "交通", date: isoToday() },
-        { id: 53, title: "考研资料打印", type: "expense", amount: 15, category: "学习", date: isoToday() },
-        { id: 54, title: "兼职稿费", type: "income", amount: 300, category: "兼职", date: isoToday() },
-        { id: 9002, title: "抹茶拿铁 · 远家", type: "expense", amount: 40, category: "饮品", date: "2026-08-23" },
-      ],
+      // 已停用演示种子（2026-09-16 整改）：模块不再向账号注入任何示例记录
+      seed: [],
     },
     {
       key: "todo", name: "今日计划", icon: "list", tint: "#d5eede", color: "var(--accent)",
@@ -2816,32 +2811,22 @@ const CONFIG = {
         { key: "P1", label: "一般", color: "#f5f0e0", text: "#c9a23f" },
         { key: "P2", label: "随手", color: "var(--tint-green)", text: "var(--accent)" },
       ],
-      seed: [
-        { id: 11, title: "英语核心词汇 30min", priority: "P0", done: false, time: "08:00", date: isoToday(), note: "每日积累，稳步提升词汇量" },
-        { id: 12, title: "完成今日课程作业", priority: "P1", done: false, time: "14:00", date: isoToday(), note: "" },
-        { id: 13, title: "看一篇财经资讯", priority: "P2", done: true, time: "20:00", date: isoToday(), note: "关注市场动态" },
-      ],
+      // 已停用演示种子（2026-09-16 整改）
+      seed: [],
     },
     {
       key: "checkin", name: "习惯打卡", icon: "leaf", tint: "#d5f0e0", color: "var(--module-1)",
       type: "checkin", desc: "喝水·早睡·单词·补品等每日打卡",
-      seed: [
-        { id: 21, title: "喝够 8 杯水", log: {} },
-        { id: 22, title: "23:30 前睡觉", log: {} },
-        { id: 23, title: "背 50 个单词", log: {} },
-        { id: 24, title: "维生素 / 补品", log: {} },
-      ],
+      // 已停用演示种子（2026-09-16 整改）
+      seed: [],
     },
     {
       key: "note", name: "灵感备忘", icon: "pen", tint: "#eae6f2", color: "var(--module-5)",
       type: "note", desc: "市场观察 · 学习笔记 · 灵感速记",
       categories: ["学习笔记", "市场观察", "灵感速记", "读书摘录", "AI技术", "金融知识", "生活随笔", "其他"],
       moods: ["灵感", "复盘", "资讯", "备忘"],
-      seed: [
-        { id: 61, title: "今日市场观察", content: "大盘缩量整理，关注科技板块轮动机会。二猫觉得，耐心等待也是一种策略喵～", mood: "资讯", category: "市场观察", date: isoToday() },
-        { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
-        { id: 9003, title: "周日早晨 · 远家", content: "暖光台灯、透明水杯、屏幕上 09:33 的周日。木桌百叶窗，窗外绿植，一切都慢下来——和那杯抹茶拿铁一个味道。", mood: "备忘", category: "生活随笔", date: "2026-08-23", layout: "feature", image: "assets/matcha-sunday.jpg" },
-      ],
+      // 已停用演示种子（2026-09-16 整改）
+      seed: [],
     },
   ],
 };
@@ -2943,8 +2928,9 @@ const store = {
       const gameRaw = localStorage.getItem(CONFIG.gameKey);
       if(gameRaw){ try { const g = JSON.parse(gameRaw); for(const k in g) if(this.isGameKey(k)) d[k] = g[k]; } catch(e){} }
     }
-    // 确保模块字段存在
-    this.bizKeys.forEach(k => { if(!d[k]) d[k] = structuredClone(CONFIG.modules.find(m=>m.key===k)?.seed||[]); });
+    // 确保模块字段存在：只补「空容器」，绝不注入任何演示/示例内容。
+    // （2026-09-16 整改：账号里只允许存在用户自己录入的数据）
+    this.bizKeys.forEach(k => { if(!Array.isArray(d[k])) d[k] = []; });
     return d;
   },
 
@@ -3029,10 +3015,12 @@ const store = {
       keys.forEach(k => {
         if(seen.has(k)) return; seen.add(k);
         const L = local ? local[k] : undefined, C = cloud ? cloud[k] : undefined;
+        /* 删除墓碑：本地已删除的 id 不得再从云端（或本地残留）并回，否则「删了又复活」 */
+        const dead = ((local && local.__deleted && local.__deleted[k]) || []).map(String);
         if(Array.isArray(L) && Array.isArray(C)){
           const m = new Map();
-          C.forEach(x => { if(x && x.id != null) m.set(String(x.id), x); });
-          L.forEach(x => { if(x && x.id != null) m.set(String(x.id), x); else if(x != null) m.set("noid-" + JSON.stringify(x).slice(0,80), x); });
+          C.forEach(x => { if(x && x.id != null && dead.indexOf(String(x.id)) < 0) m.set(String(x.id), x); });
+          L.forEach(x => { if(x && x.id != null){ if(dead.indexOf(String(x.id)) < 0) m.set(String(x.id), x); } else if(x != null) m.set("noid-" + JSON.stringify(x).slice(0,80), x); });
           out[k] = [...m.values()];
         } else if(L && typeof L === "object" && !Array.isArray(L) && C && typeof C === "object" && !Array.isArray(C)){
           out[k] = Object.assign({}, C, L);   // 对象：云端为底、本地覆盖（本地空对象不会删云端键）
@@ -3150,7 +3138,8 @@ const store = {
               const map = new Map();
               (remote||[]).forEach(x=>{ if(x && x.id!=null && dead.indexOf(String(x.id))<0) map.set(String(x.id), x); });
               (local==null?[]:(Array.isArray(local)?local:[local])).forEach(x=>{
-                if(x && x.id!=null) map.set(String(x.id), x);
+                /* 墓碑对本地同样生效：本地残留的已删除条目不得被并回云端 */
+                if(x && x.id!=null){ if(dead.indexOf(String(x.id))<0) map.set(String(x.id), x); }
                 else map.set("noid-"+JSON.stringify(x).slice(0,80), x);
               });
               all[k] = [...map.values()];
@@ -3293,82 +3282,11 @@ function persist(){ store.save(); render();
 }
 
 // === 一次性数据注入：确保三条新记录已存在于当前数据中（对已有 localStorage 数据生效） ===
-function injectSeed(){
-  const seeds = {
-    money: [
-      { id: 9002, title: "抹茶拿铁 · 远家", type: "expense", amount: 40, category: "饮品", date: "2026-08-23" },
-      // 盒马鲜生（大源店）订单 · 2026-08-30 · 实付合计 ¥57.97
-      { id: 9005, title: "得宝 卫生湿巾 40片 · 盒马", type: "expense", amount: 6.78, category: "居家", date: "2026-08-30" },
-      { id: 9006, title: "每日鲜语 0乳糖低GI牛乳 1L · 盒马", type: "expense", amount: 17.29, category: "餐饮", date: "2026-08-30" },
-      { id: 9007, title: "盒马 羽衣甘蓝膳食恰巴塔 200g · 盒马", type: "expense", amount: 8.84, category: "餐饮", date: "2026-08-30" },
-      { id: 9008, title: "【水果荟】红千禧小番茄 约500g · 盒马", type: "expense", amount: 5.48, category: "餐饮", date: "2026-08-30" },
-      { id: 9009, title: "盒马 应急去渍湿巾 12片 · 盒马", type: "expense", amount: 6.78, category: "居家", date: "2026-08-30" },
-      { id: 9010, title: "盒马 全麦烟熏三文鱼三明治 175g · 盒马", type: "expense", amount: 11.80, category: "餐饮", date: "2026-08-30" },
-      { id: 9011, title: "盒马 · 打包费", type: "expense", amount: 1, category: "餐饮", date: "2026-08-30" },
-      // PRAMY 柏瑞美 loopy 联名 · 抖音订单 · 2026-08-30 10:21 下单
-      { id: 9012, title: "PRAMY 柏瑞美 loopy 联名 柔焦雾面（黑瓶）100ml×2 · 抖音", type: "expense", amount: 79.80, category: "购物", date: "2026-08-30" },
-      // 远家咖啡 · 2026-08-30 12:36 下单
-      { id: 9013, title: "冰博客dirty · 远家", type: "expense", amount: 36, category: "饮品", date: "2026-08-30" },
-      // 远家咖啡 · 2026-08-30 晚 + 健身 · 2026-08-31
-      { id: 9014, title: "抹茶拿铁（热·燕麦奶）· 远家", type: "expense", amount: 44, category: "饮品", date: "2026-08-30" },
-      { id: 9015, title: "健身停车 · 速停车", type: "expense", amount: 6, category: "交通", date: "2026-08-31" },
-      { id: 9016, title: "健身饮品 · 智能货柜", type: "expense", amount: 5.50, category: "饮品", date: "2026-08-31" },
-      // 团油 · 能链石化 · 2026-08-31 20:18 招行信用卡(8774)
-      { id: 9017, title: "加油 · 团油", type: "expense", amount: 344.16, category: "交通", date: "2026-08-31" },
-      // 瑞幸 · 领地环金中心A座店 · 2026-09-01 10:33 抹茶拿铁 大杯/热/燕麦奶
-      { id: 9018, title: "抹茶拿铁 · 瑞幸", type: "expense", amount: 10.9, category: "饮品", date: "2026-09-01" },
-      // Wagas 沃歌斯（成都万科店）· 2026-09-02 香草鸡肉拉法卷 ¥36.9（原价¥58 减¥21.1，配送费另减¥4.1，订单号 8003060371113307585）
-      { id: 9019, title: "香草鸡肉拉法卷 · Wagas", type: "expense", amount: 36.9, category: "餐饮", date: "2026-09-02" },
-      { id: 9020, title: "电解质水", type: "expense", amount: 5.9, category: "饮品", date: "2026-09-05" },
-      // 2026-09-05 账单
-      { id: 9021, title: "速停车 · 香月湖地下停车场", type: "expense", amount: 6.00, category: "交通", date: "2026-09-05" },
-      { id: 9022, title: "悦花隐·和牛寿喜锅 · 美团", type: "expense", amount: 149.00, category: "餐饮", date: "2026-09-05" },
-      { id: 9023, title: "滴滴出行", type: "expense", amount: 11.90, category: "交通", date: "2026-09-05" },
-      { id: 9024, title: "红旗连锁", type: "expense", amount: 17.40, category: "日用", date: "2026-09-05" },
-      // 2026-09-06 账单
-      { id: 9025, title: "滴滴出行", type: "expense", amount: 11.20, category: "交通", date: "2026-09-06" },
-      { id: 9026, title: "远家 · 冰博客dirty", type: "expense", amount: 36.00, category: "饮品", date: "2026-09-06" },
-      { id: 9027, title: "远家 · 抹茶拿铁(热燕麦奶)", type: "expense", amount: 44.00, category: "饮品", date: "2026-09-06" },
-      // 2026-09-08 账单
-      { id: 9028, title: "瑞幸咖啡 · 羽衣轻体果蔬茶+抹茶拿铁+虎斑橘", type: "expense", amount: 34.3, category: "饮品", date: "2026-09-08" },
-      // 2026-09-08 淘宝订单
-      { id: 9029, title: "程十安的店 · 颂境身体油霜 110g", type: "expense", amount: 102.03, category: "购物", date: "2026-09-08" },
-      { id: 9030, title: "OLAY超白瓶身体乳 三瓶囤货装 260g*3", type: "expense", amount: 145.99, category: "购物", date: "2026-09-08" },
-      { id: 9031, title: "BLACKMORES澳佳宝女生鱼油 omega3", type: "expense", amount: 90.34, category: "购物", date: "2026-09-08" },
-      { id: 9032, title: "卡诗元气姜粉洗发水 500ml", type: "expense", amount: 357.95, category: "购物", date: "2026-09-08" },
-      // 2026-09-02 账单
-      { id: 9033, title: "创意书咖", type: "expense", amount: 10.00, category: "饮品", date: "2026-09-02" },
-      { id: 9034, title: "瑞幸咖啡", type: "expense", amount: 10.90, category: "饮品", date: "2026-09-02" },
-      { id: 9035, title: "怪兽充电", type: "expense", amount: 6.00, category: "日用", date: "2026-09-02" },
-      { id: 9036, title: "中洲·里程名邸停车场", type: "expense", amount: 9.00, category: "交通", date: "2026-09-02" },
-      // 2026-09-03 账单
-      { id: 9037, title: "瑞幸咖啡", type: "expense", amount: 11.30, category: "饮品", date: "2026-09-03" },
-      // 2026-09-04 账单
-      { id: 9038, title: "广州骑安 · 共享单车", type: "expense", amount: 1.80, category: "交通", date: "2026-09-04" },
-      { id: 9039, title: "广州骑安 · 共享单车", type: "expense", amount: 1.80, category: "交通", date: "2026-09-04" },
-      { id: 9040, title: "滴滴出行", type: "expense", amount: 19.10, category: "交通", date: "2026-09-04" },
-      { id: 9041, title: "西西弗书店", type: "expense", amount: 38.00, category: "购物", date: "2026-09-04" },
-      { id: 9042, title: "滴滴出行", type: "expense", amount: 14.93, category: "交通", date: "2026-09-04" },
-      // 2026-09-15 账单
-      { id: 9043, title: "盒马鲜生 · 瑞士卷+天然水5L*2+0乳糖牛乳1L", type: "expense", amount: 51.70, category: "餐饮", date: "2026-09-15" },
-      { id: 9044, title: "美团闪购 · 隐形眼镜护理液2瓶", type: "expense", amount: 17.20, category: "购物", date: "2026-09-15" },
-    ],
-    note: [
-      { id: 9001, title: "Warren Buffett 沃伦・巴菲特", content: "Be fearful when others are greedy. Be greedy when others are fearful.\n别人贪婪时我恐惧，别人恐惧时我贪婪。", mood: "灵感", category: "金融知识", date: "2026-08-21", layout: "quote" },
-      { id: 9003, title: "周日早晨 · 远家", content: "暖光台灯、透明水杯、屏幕上 09:33 的周日。木桌百叶窗，窗外绿植，一切都慢下来——和那杯抹茶拿铁一个味道。", mood: "备忘", category: "生活随笔", date: "2026-08-23", layout: "feature", image: "assets/matcha-sunday.jpg" },
-      { id: 9004, title: "《权利》读书笔记", content: "去除三块绊脚石：公平世界假设、成功者美化建议、自我设限\n\n建立高权力感的三种方法：\n1. 敢于提要求（敢于开口，敢于求助，敢于被看见）\n2. 学会表演权力感（敢于愤怒，敢于打断别人，敢于表达相反的观点，敢于不被喜欢，有余力时尽量多帮助别人尤其是跨部门可以帮你传播扩大声望的，说话时的身体姿态舒展/眼神坚定/声音语调放慢）\n3. 建立自己的声望（敢于展示自己，展示自己的资源）", mood: "复盘", category: "读书摘录", date: "2026-08-27" },
-    ],
-  };
-  let changed = false;
-  for(const k in seeds){
-    if(!data[k]) data[k] = [];
-    for(const r of seeds[k]){
-      if(!data[k].some(x => x.id === r.id)){ data[k].unshift(r); changed = true; }
-    }
-  }
-  if(changed) store.saveLocal(data);
-  return changed;
-}
+// === 已停用（2026-09-16 整改）：绝不向用户账号注入任何示例/演示数据 ===
+// 原实现会在每次加载时把一批硬编码记录（记账 9002、9005~9047；备忘 9001/9003/9004）按 id 补回 data，
+// 再经 unionData()→saveCloud() 并回云端，导致「每次登录都多出用户自己没录入的内容」。
+// 现为空实现：账号里只允许存在用户本人录入的数据。历史版本见 index.html.bak-injectseed-20260916 / git。
+function injectSeed(){ return false; }
 
 // 异步初始化：先渲染本地数据，云端加载完后再更新
 // 注意：auth 系统在下方定义，此处不做 auth 检查
@@ -8720,7 +8638,8 @@ function migrateToDualKey(legacyKey, bizKey, gameKey) {
     // 合并业务+游戏数据到分组 key
     const merged = bizRaw ? JSON.parse(bizRaw) : {};
     if(!bizHasReal && hasRealContent) {
-      store.bizKeys.forEach(k => { merged[k] = legacyData[k] || structuredClone(CONFIG.modules.find(m=>m.key===k)?.seed||[]); });
+      // 迁移只搬用户真实数据；旧 key 里没有的模块补空数组，绝不注入演示数据（2026-09-16 整改）
+      store.bizKeys.forEach(k => { merged[k] = Array.isArray(legacyData[k]) ? legacyData[k] : []; });
     }
     // 迁移游戏数据（如果分组 key 还没有）
     if(!merged.__candyLog && hasGameData) {
