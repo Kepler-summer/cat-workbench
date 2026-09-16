@@ -5378,7 +5378,10 @@ function openNoteDetail(key, id, editing, flipIn){
 
 function streak(log){
   if(!log) return 0; let n=0; const d=new Date();
-  for(;;){ const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); if(log[key]){ n++; d.setDate(d.getDate()-1); } else break; }
+  const k=()=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  /* 今天尚未打卡不算断签：改从昨天起算。否则当天一打开页面就显示「连续 0 天」，与实际不符 */
+  if(!log[k()]) d.setDate(d.getDate()-1);
+  for(;;){ if(log[k()]){ n++; d.setDate(d.getDate()-1); } else break; }
   return n;
 }
 
@@ -6710,89 +6713,117 @@ const candy = {
   },
 
   // ========== 连续记录系统 ==========
+  /* 连续天数以「真实数据」为唯一准绳，不再依赖易失的当日计数器：
+     - 记账连续 = data.money 各条记录的 date（本地日期）
+     - 任务连续 = __candyLog 中 type=task 的记录（含「完成任务」与「完成打卡」），按本地时区折算日期
+     今天还没记 → 从昨天往前数（当天未结束不算断签）；昨天也没有 → 0
+     旧版把天数存在 __streaks 里靠「当天触发动作」累加，一旦该字段丢失（云端覆盖/并集冲突）
+     就永久归零且与实际完全脱节 —— 这是「连续天数与实际不符」的根因。 */
   _getStreaks() {
-    if(!data.__streaks) {
-      data.__streaks = {
-        taskStreak: 0,
-        taskLastDate: null,
-        moneyStreak: 0,
-        moneyLastDate: null,
-        taskMilestones: {},
-        moneyMilestones: {}
-      };
+    if(!data.__streaks || typeof data.__streaks !== "object") {
+      data.__streaks = {};
     }
-    return data.__streaks;
+    const s = data.__streaks;
+    if(typeof s.taskStreak !== "number") s.taskStreak = 0;
+    if(typeof s.moneyStreak !== "number") s.moneyStreak = 0;
+    if(!s.taskMilestones) s.taskMilestones = {};
+    if(!s.moneyMilestones) s.moneyMilestones = {};
+    return s;
   },
 
-  getTaskStreak() {
-    return this._getStreaks().taskStreak || 0;
-  },
-  getMoneyStreak() {
-    return this._getStreaks().moneyStreak || 0;
+  _fmtDay(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
   },
 
-  // 更新任务连续天数
-  updateTaskStreak() {
+  /* ISO 时间串（UTC）→ 本地日期；已是 YYYY-MM-DD 的原样返回 */
+  _localDayOf(v) {
+    if(!v) return null;
+    const s = String(v);
+    if(s.length === 10 && /^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    const d = new Date(s);
+    if(isNaN(d.getTime())) return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : null;
+    return this._fmtDay(d);
+  },
+
+  /* 从日期集合推导「截至当前」的连续天数 */
+  _streakFromDates(set) {
+    if(!set || !set.size) return 0;
+    const t = today();
+    let cur = set.has(t) ? t : null;
+    if(!cur) {
+      const y = this._getYesterday();
+      if(set.has(y)) cur = y;
+    }
+    if(!cur) return 0;
+    const d = new Date(cur + "T00:00:00");
+    let n = 0;
+    while(set.has(this._fmtDay(d)) && n < 3650) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  },
+
+  computeMoneyStreak() {
+    const set = new Set();
+    (data.money || []).forEach(m => {
+      const ds = this._localDayOf(m && (m.date || m.time));
+      if(ds) set.add(ds);
+    });
+    return this._streakFromDates(set);
+  },
+
+  computeTaskStreak() {
+    const set = new Set();
+    (data.__candyLog || []).forEach(x => {
+      if(x && x.type === "task") { const ds = this._localDayOf(x.time); if(ds) set.add(ds); }
+    });
+    return this._streakFromDates(set);
+  },
+
+  getTaskStreak() { return this.computeTaskStreak(); },
+  getMoneyStreak() { return this.computeMoneyStreak(); },
+
+  /* 里程碑「是否真的发过奖」——以糖币流水为凭据（__streaks 里的标记会随覆盖丢失，不可靠） */
+  _milestoneText(type, days) { return `连续${days}天${type === "task" ? "任务" : "记账"}里程碑`; },
+  isMilestoneAwarded(type, days) {
+    const pre = this._milestoneText(type, days);
+    return (data.__candyLog || []).some(x => x && x.type === "streak" && String(x.description || "").indexOf(pre) === 0);
+  },
+
+  /* 按真实数据校准连续天数并检查里程碑（awardTask / awardFinance 之后调用）
+     采用「基线」机制：首次运行只记录当前天数、不追溯发放历史里程碑，
+     避免修好显示后凭空补出一批糖币；此后只在「本次新跨越某档」时发放。 */
+  updateTaskStreak() { return this._syncStreak("task"); },
+  updateMoneyStreak() { return this._syncStreak("money"); },
+
+  _syncStreak(type) {
     const s = this._getStreaks();
-    const tdy = today();
-    if(s.taskLastDate === tdy) return; // 今天已更新
-
-    const yesterday = this._getYesterday();
-    if(s.taskLastDate === yesterday) {
-      s.taskStreak = (s.taskStreak || 0) + 1;
-    } else if(s.taskLastDate) {
-      // 断签1天：衰减3天而非归零
-      s.taskStreak = Math.max(0, (s.taskStreak || 0) - 3);
-      if(s.taskStreak === 0) s.taskStreak = 1; // 衰减到0则重新从1开始
-    } else {
-      s.taskStreak = 1; // 首次记录
-    }
-    s.taskLastDate = tdy;
-
-    // 检测里程碑
-    this._checkStreakMilestones("task", s.taskStreak);
-  },
-
-  // 更新记账连续天数
-  updateMoneyStreak() {
-    const s = this._getStreaks();
-    const tdy = today();
-    if(s.moneyLastDate === tdy) return; // 今天已更新
-
-    const yesterday = this._getYesterday();
-    if(s.moneyLastDate === yesterday) {
-      s.moneyStreak = (s.moneyStreak || 0) + 1;
-    } else if(s.moneyLastDate) {
-      // 断签1天：衰减3天而非归零
-      s.moneyStreak = Math.max(0, (s.moneyStreak || 0) - 3);
-      if(s.moneyStreak === 0) s.moneyStreak = 1;
-    } else {
-      s.moneyStreak = 1; // 首次记录
-    }
-    s.moneyLastDate = tdy;
-
-    // 检测里程碑
-    this._checkStreakMilestones("money", s.moneyStreak);
+    const cur = type === "task" ? this.computeTaskStreak() : this.computeMoneyStreak();
+    const baseKey = type === "task" ? "taskBase" : "moneyBase";
+    const prev = (typeof s[baseKey] === "number") ? s[baseKey] : cur;   // 首次以当前天数为基线
+    s[baseKey] = cur;
+    if(type === "task") { s.taskStreak = cur; s.taskLastDate = today(); }
+    else { s.moneyStreak = cur; s.moneyLastDate = today(); }
+    this._checkStreakMilestones(type, cur, prev);
+    return cur;
   },
 
   _getYesterday() {
     const d = new Date();
     d.setDate(d.getDate() - 1);
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    return this._fmtDay(d);
   },
 
-  // 检测连续里程碑奖励
-  _checkStreakMilestones(type, currentDays) {
+  // 检测连续里程碑奖励（prevDays = 上次检查时的天数；只在「新跨越」时发放，已发过的不重复发）
+  _checkStreakMilestones(type, currentDays, prevDays) {
     const s = this._getStreaks();
-    const milestones = STREAK_MILESTONES[type];
     const key = type + "Milestones";
     if(!s[key]) s[key] = {};
+    const prev = (typeof prevDays === "number") ? prevDays : currentDays;
 
-    for(const m of milestones) {
-      if(currentDays >= m.days && !s[key][m.days]) {
+    for(const m of STREAK_MILESTONES[type]) {
+      const crossed = currentDays >= m.days && prev < m.days;
+      if(crossed && !s[key][m.days] && !this.isMilestoneAwarded(type, m.days)) {
         s[key][m.days] = true;
-        // 发放奖励
-        this._add(m.reward, "streak", `连续${m.days}天${type === 'task' ? '任务' : '记账'}里程碑`, null);
+        this._add(m.reward, "streak", this._milestoneText(type, m.days), "streak-" + type + "-" + m.days);
         showCatPopup(`连续${m.days}天达成！`, `+${m.reward} 糖币`, false);
       }
     }
@@ -7024,11 +7055,11 @@ const candy = {
     return true;
   },
 
-  // 今日获得
+  // 今日获得（time 为 UTC ISO，必须先折成本地日期再比较，否则凌晨 0-8 点的记录会算到前一天）
   todayEarned() {
     const tdy = today();
     return (data.__candyLog || [])
-      .filter(x => x.amount > 0 && x.time && x.time.startsWith(tdy))
+      .filter(x => x.amount > 0 && this._localDayOf(x.time) === tdy)
       .reduce((s, x) => s + x.amount, 0);
   },
 
@@ -7523,9 +7554,9 @@ function renderGame() {
           <div style="font-size:24px;font-weight:800;color:var(--accent);">${taskStreak}天</div>
           <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">
             ${STREAK_MILESTONES.task.map(m => {
-              const s = candy._getStreaks();
-              const achieved = s.taskMilestones && s.taskMilestones[m.days];
-              return `<span class="milestone-badge" style="opacity:${achieved?1:.4};margin:2px;">${m.days}天 +${m.reward}糖币</span>`;
+              const ok = taskStreak >= m.days;                        /* 已达成：按真实连续天数 */
+              const paid = candy.isMilestoneAwarded("task", m.days);  /* 已发放：按糖币流水凭据 */
+              return `<span class="milestone-badge" style="opacity:${ok?1:.4};margin:2px;">${m.days}天 +${m.reward}糖币${ok && !paid ? '<i style="font-style:normal;color:var(--accent);font-size:.85em"> 待发放</i>' : ""}</span>`;
             }).join("")}
           </div>
         </div>
@@ -7534,9 +7565,9 @@ function renderGame() {
           <div style="font-size:24px;font-weight:800;color:var(--module-4);">${moneyStreak}天</div>
           <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">
             ${STREAK_MILESTONES.money.map(m => {
-              const s = candy._getStreaks();
-              const achieved = s.moneyMilestones && s.moneyMilestones[m.days];
-              return `<span class="milestone-badge" style="opacity:${achieved?1:.4};margin:2px;">${m.days}天 +${m.reward}糖币</span>`;
+              const ok = moneyStreak >= m.days;
+              const paid = candy.isMilestoneAwarded("money", m.days);
+              return `<span class="milestone-badge" style="opacity:${ok?1:.4};margin:2px;">${m.days}天 +${m.reward}糖币${ok && !paid ? '<i style="font-style:normal;color:var(--module-4);font-size:.85em"> 待发放</i>' : ""}</span>`;
             }).join("")}
           </div>
         </div>
@@ -8558,8 +8589,10 @@ async function bootstrap() {
   await loadUserRoleMap();
   tagLegacyRecords();
 
-  // 4.2 如果糖币数据丢失（有历史记录但糖币余额为0），重置结算标记重新核算
-  if(candy.total() === 0) {
+  // 4.2 如果糖币流水真的丢失（数组不存在或为空），才重置结算标记重新核算
+  //     判据不能用 candy.total()===0：用户把糖币花光时净额同样是 0，
+  //     会被误判成「数据丢失」→ 删掉兑换记录 + 重发历史奖励（糖币虚增、已消费商品白得）
+  if(!Array.isArray(data.__candyLog) || data.__candyLog.length === 0) {
     const todoKey = CONFIG.modules.find(m => m.type === "todo")?.key || "todo";
     const moneyKey = CONFIG.modules.find(m => m.type === "finance")?.key || "money";
     const hasDone = (data[todoKey] || []).some(x => x.done);
