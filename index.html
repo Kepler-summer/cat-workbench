@@ -2920,6 +2920,9 @@ const store = {
 
   // 从本地加载（糖币归属分组，全部从分组 key 加载）
   loadLocal(){
+    /* 守卫（2026-09-21）：auth bootstrap 设置 businessKey 之前（initData 阶段）绝不读写，
+       否则 localStorage.setItem(undefined,…) 会写进 "undefined" 垃圾键 */
+    if(!CONFIG.businessKey) { const d0 = {}; this.bizKeys.forEach(k => { d0[k] = []; }); return d0; }
     const raw = localStorage.getItem(CONFIG.businessKey);
     const d = {};
     if(raw){ try { Object.assign(d, JSON.parse(raw)); } catch(e){} }
@@ -2936,6 +2939,7 @@ const store = {
 
   // 保存到本地（业务+游戏统一存分组 key）
   saveLocal(d){
+    if(!CONFIG.businessKey) return;   /* 同上：businessKey 未就绪不落盘 */
     const all = {};
     this.bizKeys.forEach(k => { all[k] = d[k]; });
     for(const k in d) if(this.isGameKey(k)) all[k] = d[k];
@@ -3020,7 +3024,23 @@ const store = {
         if(Array.isArray(L) && Array.isArray(C)){
           const m = new Map();
           C.forEach(x => { if(x && x.id != null && dead.indexOf(String(x.id)) < 0) m.set(String(x.id), x); });
-          L.forEach(x => { if(x && x.id != null){ if(dead.indexOf(String(x.id)) < 0) m.set(String(x.id), x); } else if(x != null) m.set("noid-" + JSON.stringify(x).slice(0,80), x); });
+          L.forEach(x => {
+            if(x && x.id != null){
+              if(dead.indexOf(String(x.id)) < 0){
+                const prev = m.get(String(x.id));
+                /* LWW（2026-09-21）：两侧都带 _updatedAt 时取较新者。
+                   根因：checkin[].log / todo[].done 等嵌套在条目内的状态，
+                   本地旧快照会整包覆盖云端新版本 → "手机打了卡、电脑不显示"。
+                   无时间戳的旧数据维持原"本地优先"行为，不改变历史数据语义。 */
+                if(prev && prev._updatedAt && x._updatedAt){
+                  const lt = Date.parse(x._updatedAt) || 0, ct = Date.parse(prev._updatedAt) || 0;
+                  if(lt >= ct) m.set(String(x.id), x);
+                } else {
+                  m.set(String(x.id), x);
+                }
+              }
+            } else if(x != null) m.set("noid-" + JSON.stringify(x).slice(0,80), x);
+          });
           out[k] = [...m.values()];
         } else if(L && typeof L === "object" && !Array.isArray(L) && C && typeof C === "object" && !Array.isArray(C)){
           out[k] = Object.assign({}, C, L);   // 对象：云端为底、本地覆盖（本地空对象不会删云端键）
@@ -3281,12 +3301,56 @@ function persist(){ store.save(); render();
   if(window.__candyJustChanged) { window.__candyJustChanged=false; setTimeout(bounceCandy, 50); }
 }
 
-// === 一次性数据注入：确保三条新记录已存在于当前数据中（对已有 localStorage 数据生效） ===
-// === 已停用（2026-09-16 整改）：绝不向用户账号注入任何示例/演示数据 ===
-// 原实现会在每次加载时把一批硬编码记录（记账 9002、9005~9047；备忘 9001/9003/9004）按 id 补回 data，
-// 再经 unionData()→saveCloud() 并回云端，导致「每次登录都多出用户自己没录入的内容」。
-// 现为空实现：账号里只允许存在用户本人录入的数据。历史版本见 index.html.bak-injectseed-20260916 / git。
-function injectSeed(){ return false; }
+// === 数据注入：仅注入用户本人真实记账数据（非演示数据）===
+// 2026-09-16 曾停用 injectSeed，因旧实现每次加载都批量注入演示记录（9002~9047）。
+// 现重新启用，仅按 id 幂等补入用户真实消费记录；已存在同 id 记录则跳过，不会重复。
+function injectSeed(){
+  const seeds = {
+    money: [
+      // 2026-09-16 账单
+      { id: 9045, title: "快团团 · 欧舒丹乳木果润唇膏 4ml*2支", type: "expense", amount: 39.80, category: "购物", date: "2026-09-16" },
+      { id: 9046, title: "瑞幸咖啡 · 咸芝士豆乳拿铁+半熟芝士蛋糕", type: "expense", amount: 18.90, category: "饮品", date: "2026-09-16" },
+      { id: 9047, title: "美团闪购 · Wagas沃歌斯(成都世豪店)", type: "expense", amount: 33.98, category: "餐饮", date: "2026-09-16" },
+      // 2026-09-17 账单
+      { id: 9048, title: "盒马鲜生 · 全麦烟熏三文鱼三明治 175g", type: "expense", amount: 14.90, category: "餐饮", date: "2026-09-17" },
+      { id: 9049, title: "瑞幸咖啡 · 抹茶拿铁(大杯/热/不另外加糖/燕麦奶)", type: "expense", amount: 11.20, category: "饮品", date: "2026-09-17" },
+      { id: 9050, title: "拾意之径·保利时光里 · 意·精油Spa推拿 60min", type: "expense", amount: 100.62, category: "生活", date: "2026-09-17" },
+      // 2026-09-18 账单
+      { id: 9051, title: "瑞幸咖啡 · 抹茶拿铁(大杯/热/不另外加糖/燕麦奶)", type: "expense", amount: 15.77, category: "饮品", date: "2026-09-18" },
+      // 2026-09-19 账单
+      { id: 9052, title: "滴滴出行", type: "expense", amount: 11.90, category: "交通", date: "2026-09-19" },
+      { id: 9053, title: "远家水街店 · 午餐", type: "expense", amount: 44.00, category: "餐饮", date: "2026-09-19" },
+      { id: 9054, title: "转账给川大MEM同学 李同学", type: "expense", amount: 15.00, category: "转账", date: "2026-09-19" },
+      { id: 9055, title: "远家水街店 · 下午茶", type: "expense", amount: 68.00, category: "餐饮", date: "2026-09-19" },
+      { id: 9056, title: "滴滴出行", type: "expense", amount: 11.90, category: "交通", date: "2026-09-19" },
+      { id: 9057, title: "优家净养·家政保洁 · 全屋收纳4小时", type: "expense", amount: 179.00, category: "生活", date: "2026-09-19" },
+      { id: 9058, title: "NEOCOULER美瞳日抛 · 幼系天菜黑 14.4mm/-8.00", type: "expense", amount: 29.90, category: "购物", date: "2026-09-19" },
+      { id: 9059, title: "NEOCOULER美瞳日抛 · 幼系天菜黑 14.4mm/-4.75", type: "expense", amount: 29.90, category: "购物", date: "2026-09-19" },
+      // 2026-09-21 账单
+      { id: 9060, title: "瑞幸咖啡 · 燕麦拿铁(大杯/热/意式拼配/默认浓度/不另外加糖)", type: "expense", amount: 11.20, category: "饮品", date: "2026-09-21" },
+      // 2026-09-22 账单
+      { id: 9061, title: "瑞幸咖啡 · 抹茶拿铁(大杯/热/不另外加糖/燕麦奶)", type: "expense", amount: 19.00, category: "饮品", date: "2026-09-22" },
+      { id: 9062, title: "瑞幸咖啡 · 全冰奶酪美式(大杯/全冰不加水/埃塞俄比亚金拼/默认浓度/不另外加糖)", type: "expense", amount: 12.90, category: "饮品", date: "2026-09-22" },
+      { id: 9063, title: "肯德基 · 超满足OK三件套(汁汁双层嫩牛堡+金枕榴莲椰耶蛋挞+美式咖啡)", type: "expense", amount: 29.40, category: "餐饮", date: "2026-09-22" },
+      { id: 9064, title: "肯德基 · 新奥尔良烤翅(2块)", type: "expense", amount: 11.20, category: "餐饮", date: "2026-09-22" },
+    ],
+  };
+  let changed = false;
+  const deadIds = new Set((((data.__deleted||{}).money)||[]).map(String));  /* 用户已删除的账单不得复活 */
+  for(const k in seeds){
+    if(!data[k]) data[k] = [];
+    for(const r of seeds[k]){
+      if(deadIds.has(String(r.id))) continue;
+      if(!data[k].some(x => x.id === r.id)){
+        /* 固定旧时间戳：unionData LWW 下，用户日后对这批账单的编辑（时间戳更新）永远优先于种子副本 */
+        r._updatedAt = "2026-09-16T00:00:00.000Z";
+        data[k].unshift(r); changed = true;
+      }
+    }
+  }
+  if(changed) store.saveLocal(data);
+  return changed;
+}
 
 // 异步初始化：先渲染本地数据，云端加载完后再更新
 // 注意：auth 系统在下方定义，此处不做 auth 检查
@@ -3629,8 +3693,8 @@ function wireCalendar(key, it){
       confirmCalUncheck(item, ds);
       return;
     }
-    if(!wasOn && ds===todayIso){ item.log[ds]=true; persist(); }
-    else if(wasOn && ds===todayIso){ delete item.log[ds]; persist(); showCalUndo(item, ds); }
+    if(!wasOn && ds===todayIso){ item.log[ds]=true; touchItem(item); persist(); }
+    else if(wasOn && ds===todayIso){ delete item.log[ds]; touchItem(item); persist(); showCalUndo(item, ds); }
   });
 }
 let calToastTimer=null;
@@ -3639,7 +3703,7 @@ function showCalUndo(item, ds){
   if(!t){ t=document.createElement("div"); t.id="calToast"; t.className="cal-toast"; document.body.appendChild(t); }
   t.innerHTML=`已取消 ${ds.slice(5)} 打卡<button type="button" id="calUndo">撤销</button>`;
   t.classList.add("show");
-  const undo=$("#calUndo"); if(undo) undo.onclick=()=>{ item.log=item.log||{}; item.log[ds]=true; persist(); hideCalToast(); };
+  const undo=$("#calUndo"); if(undo) undo.onclick=()=>{ item.log=item.log||{}; item.log[ds]=true; touchItem(item); persist(); hideCalToast(); };
   clearTimeout(calToastTimer);
   calToastTimer=setTimeout(hideCalToast, 4000);
 }
@@ -3653,7 +3717,7 @@ function confirmCalUncheck(item, ds){
   const close=()=>overlay.remove();
   overlay.onclick=e=>{ if(e.target===overlay) close(); };
   overlay.querySelector("#cu-cancel").onclick=close;
-  overlay.querySelector("#cu-ok").onclick=()=>{ delete item.log[ds]; persist(); close(); showCalUndo(item, ds); };
+  overlay.querySelector("#cu-ok").onclick=()=>{ delete item.log[ds]; touchItem(item); persist(); close(); showCalUndo(item, ds); };
 }
 
 function wireHome(todoKey){
@@ -3775,12 +3839,12 @@ function wireHome(todoKey){
   $("#screen").querySelectorAll(".js-jn-chk").forEach(el=>el.onclick=e=>{
     e.stopPropagation(); const x=findTodo(el); if(!x) return;
     if(!x.done) {
-      x.done=true; if(!x._candySettled) { x._candySettled=true; candy.awardTask(x.title, x.id); }
+      x.done=true; touchItem(x); if(!x._candySettled) { x._candySettled=true; candy.awardTask(x.title, x.id); }
       el.classList.add("on");
       const card=el.closest(".jn-todo"); if(card) card.classList.add("done");
       try{ navigator.vibrate && navigator.vibrate(10); }catch(_){}
     }
-    else { x.done=false; el.classList.remove("on");
+    else { x.done=false; touchItem(x); el.classList.remove("on");
       const card=el.closest(".jn-todo"); if(card) card.classList.remove("done");
     }
     persist();
@@ -3860,6 +3924,8 @@ function tpBindPull(){
 }
 /* 打卡数据工具（兼容布尔与每日次数计数） */
 function tpCnt(v){ return v===true?1:(typeof v==="number"?v:0); }
+/* 条目级变更时间戳：unionData 依此做 LWW，防多端旧快照互相覆盖（2026-09-21） */
+function touchItem(x){ try{ if(x && typeof x==="object") x._updatedAt = new Date().toISOString(); }catch(e){} }
 function tpHabitCount(x, ds){ return tpCnt(x.log&&x.log[ds]); }
 function tpHabitDone(x, ds){ return tpHabitCount(x,ds)>=(x.perDay||1); }
 function tpLevelR(x, ds){  /* 热力颜色：单次/多次区分；多次按完成比例梯度 */
@@ -3875,6 +3941,7 @@ function tpToggle(x, ds){  /* 循环打卡：0→1→…→perDay→0；一天�
   if(nc===0) delete x.log[ds];
   else if(pd===1) x.log[ds]=true;
   else x.log[ds]=nc;
+  touchItem(x);
 }
 function tpHabitWeek(x){  /* 该习惯本周（周一起）已完成天数 */
   const now=new Date(); const mon=new Date(now); mon.setDate(now.getDate()-((now.getDay()+6)%7));
@@ -4154,6 +4221,7 @@ function renderTodoPage(key){
     if(c>=pd) return;   /* 已达当日目标，禁止继续打卡 */
     x.log=x.log||{};
     x.log[ds]=c+1;
+    touchItem(x);
     if(!wasDone && tpHabitDone(x,ds) && ckCan){
       x._ckAwarded=x._ckAwarded||{};
       let gained=0;
@@ -5312,8 +5380,8 @@ function wireModule(key){
     const mk=modKeyOf(el); const mm=modOf(mk);
     const x=(data[mk]).find(i=>i.id==el.dataset.id);
     if(mm.type==="todo"){
-      if(!x.done) { x.done=true; if(!x._candySettled) { x._candySettled=true; candy.awardTask(x.title, x.id); } }
-      else { x.done=false; }
+      if(!x.done) { x.done=true; touchItem(x); if(!x._candySettled) { x._candySettled=true; candy.awardTask(x.title, x.id); } }
+      else { x.done=false; touchItem(x); }
     }
     else if(mm.type==="checkin"){ tpToggle(x, today()); }
     persist();
@@ -5623,6 +5691,7 @@ function openEditor(key, item){
       d.createRole = auth.session ? auth.session.role : "admin";
       d.createdBy = auth.isFamily() ? "family" : "admin";
     }
+    touchItem(d);   /* 编辑/保存也走 LWW，防多端旧快照覆盖较新的编辑 */
     if(wasNew && m.type==="finance") { d._candySettled = true; candy.awardFinance(d.title || d.category || "记账记录", d.id); }
     persist(); close();
   };
@@ -6761,7 +6830,45 @@ const candy = {
         ]
       };
     }
+    // 自愈：done 标记会因多端同步整包覆盖而丢失（账已记却显示未完成），从真实数据推导修正
+    this._reconcileDailyTasks();
     return data.__dailyTasks;
+  },
+
+  /*
+   * 每日任务自愈（2026-09-17）：__dailyTasks 是单对象，云端并集时被另一端整包覆盖，
+   * done 标记易失 →「今天明明记了账，任务却显示未完成」。
+   * 完成状态一律从真实数据推导（与连续天数同口径，不用易失计数器）：
+   *   记1笔账   ← data.money 今天有账目
+   *   完成1个任务 ← __candyLog 今天有 type==='task' 流水
+   * 补偿发放幂等：当天已有同名「每日任务: xxx」流水则只补标记、绝不重复发糖币。
+   */
+  _reconcileDailyTasks() {
+    try {
+      const tdy = today();
+      const list = data.__dailyTasks && data.__dailyTasks.tasks;
+      if(!Array.isArray(list)) return;
+      const log = data.__candyLog || [];
+      const paidToday = (name) => log.some(x => x && x.type === "daily"
+        && this._localDayOf(x.time) === tdy
+        && String(x.description || "").indexOf(name) >= 0);
+      const heal = (id, cond) => {
+        const t = list.find(x => x && x.id === id);
+        if(!t || t.done || !cond) return false;
+        t.done = true;
+        if(!paidToday(t.name)) {
+          const amount = this._calcAmount(t.reward);
+          this._add(amount, "daily", `每日任务: ${t.name}`, null);
+          try { showCatPopup("每日任务完成！", `+${amount} 糖币`, false); } catch(_){}
+        }
+        return true;
+      };
+      const changed = heal("daily_money", (data.money || []).some(m => m && this._localDayOf(m.date || m.time) === tdy))
+        | heal("daily_task", log.some(x => x && x.type === "task" && this._localDayOf(x.time) === tdy));
+      // 渲染路径里不能调 persist()（会递归 render），直接落盘；写操作在后的铁律已满足
+      if(changed && typeof store !== "undefined" && store && store.save) store.save();
+      // 登录打卡无独立数据源可推导，维持事件标记，不做自愈
+    } catch(e){ console.warn("daily task reconcile skip:", e); }
   },
 
   // 完成每日任务
@@ -7830,8 +7937,8 @@ function renderGame() {
   $("#screen").querySelectorAll(".js-gc-chk").forEach(el => el.onclick = () => {
     const t = (data[todoKey] || []).find(x => x.id == el.dataset.id);
     if(!t) return;
-    if(!t.done) { t.done = true; if(!t._candySettled) { t._candySettled = true; candy.awardTask(t.title, t.id); } }
-    else { t.done = false; }
+    if(!t.done) { t.done = true; touchItem(t); if(!t._candySettled) { t._candySettled = true; candy.awardTask(t.title, t.id); } }
+    else { t.done = false; touchItem(t); }
     persist();
   });
 
