@@ -812,36 +812,39 @@
     animation:shimmer 2.5s ease-in-out infinite;
   }
 
-  /* ---------- CAT POPUP ---------- */
-  .cat-popup { position:fixed; top:35%; left:50%; transform:translate(-50%,-50%) scale(.5); z-index:10000;
-    background:rgba(255,255,255,.98); border-radius:24px; padding:24px 32px 20px;
-    box-shadow:0 16px 48px rgba(26,41,56,.15);
-    display:flex; flex-direction:column; align-items:center; gap:8px; opacity:0; pointer-events:none;
-    transition:all .35s cubic-bezier(.34,1.56,.64,1); min-width:180px; }
+  /* ---------- CAT POPUP（奖励 / 提示对话框） ---------- */
+  .cat-popup { position:fixed; top:32%; left:50%; transform:translate(-50%,-50%) scale(.6); z-index:10000;
+    background:var(--surface-card); border:1.6px solid var(--candy-light);
+    border-radius:26px; padding:26px 38px 22px;
+    box-shadow:0 18px 50px color-mix(in srgb, var(--candy) 16%, transparent);
+    display:flex; flex-direction:column; align-items:center; gap:10px; opacity:0; pointer-events:none;
+    transition:all .4s cubic-bezier(.34,1.56,.64,1); min-width:204px; }
   .cat-popup.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
-  .cat-popup .cp-ic { width:56px; height:56px; border-radius:50%; overflow:hidden;
-    border:3px solid #fff; box-shadow:0 4px 12px rgba(26,41,56,.1); }
+  .cat-popup .cp-ic { width:66px; height:66px; border-radius:50%; overflow:hidden;
+    border:3px solid #fff; box-shadow:0 6px 16px color-mix(in srgb, var(--text) 12%, transparent);
+    animation:cpCatWobble .65s cubic-bezier(.34,1.56,.64,1) both; }
   .cat-popup .cp-ic img { width:100%; height:100%; object-fit:cover; }
-  .cat-popup .cp-msg { font-size:15px; font-weight:700; color:var(--text-primary); }
-  .cat-popup .cp-pts { font-size:28px; font-weight:800; color:var(--accent);
-    animation:ptsBounce .5s cubic-bezier(.34,1.56,.64,1) .1s both; }
+  @keyframes cpCatWobble { 0%{transform:rotate(-14deg) scale(.82)} 45%{transform:rotate(11deg) scale(1.1)} 100%{transform:rotate(0) scale(1)} }
+  .cat-popup .cp-msg { font-size:16px; font-weight:800; color:var(--text-primary); letter-spacing:1px; text-align:center; }
+  /* 默认（次要说明文字）样式 */
+  .cat-popup .cp-pts { font-size:17px; font-weight:700; color:var(--text-secondary); text-align:center; line-height:1.5; }
   .cat-popup .cp-pts.minus { color:var(--danger); }
-  .cat-popup .cp-tail {
-    position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
-    width:16px; height:16px; background:rgba(255,255,255,.98);
-    transform:translateX(-50%) rotate(45deg);
-  }
+  /* 糖币奖励态：放大 + 糖果暖橙 + 弹跳 */
+  .cat-popup.reward .cp-pts { font-size:36px; font-weight:900; color:var(--candy);
+    display:flex; align-items:center; gap:6px;
+    animation:ptsBounce .55s cubic-bezier(.34,1.56,.64,1) .12s both; }
+  .cat-popup .cp-tail { display:none; }
   .cat-popup .cp-deco {
-    position:absolute; font-size:18px; opacity:0;
+    position:absolute; font-size:22px; opacity:0; line-height:1;
     transition:all .5s cubic-bezier(.34,1.56,.64,1);
   }
   .cat-popup.show .cp-deco { opacity:1; }
-  .cat-popup.show .cp-deco-1 { top:-6px; left:-4px; transform:rotate(-20deg) scale(1); animation:decoPop .6s cubic-bezier(.34,1.56,.64,1) .05s both; }
-  .cat-popup.show .cp-deco-2 { top:-12px; right:10px; animation:decoPop .6s cubic-bezier(.34,1.56,.64,1) .15s both; }
-  .cat-popup.show .cp-deco-3 { top:0; right:-10px; animation:decoPop .6s cubic-bezier(.34,1.56,.64,1) .1s both; }
+  .cat-popup.show .cp-deco-1 { top:-12px; left:-8px; animation:decoPop .6s cubic-bezier(.34,1.56,.64,1) .05s both; }
+  .cat-popup.show .cp-deco-2 { top:-16px; right:6px; animation:decoPop .6s cubic-bezier(.34,1.56,.64,1) .18s both; }
+  .cat-popup.show .cp-deco-3 { top:-2px; right:-12px; animation:decoPop .6s cubic-bezier(.34,1.56,.64,1) .1s both; }
   @keyframes decoPop {
-    0% { opacity:0; transform:scale(0) rotate(0deg); }
-    60% { transform:scale(1.2) rotate(15deg); }
+    0% { opacity:0; transform:scale(0) rotate(-30deg); }
+    60% { transform:scale(1.35) rotate(18deg); }
     100% { opacity:1; transform:scale(1) rotate(10deg); }
   }
 
@@ -2287,12 +2290,18 @@
     text-shadow:0 1px 4px rgba(184,131,122,.35); }
   @keyframes petHeartFloat { 0%{opacity:0; transform:translateY(8px) scale(.5)}
     20%{opacity:1} 100%{opacity:0; transform:translateY(-78px) translateX(var(--hx,0px)) scale(1.3)} }
-  .pet-bubble { position:absolute; top:-10px; left:50%; background:var(--surface-card); border:1px solid var(--border-soft);
-    border-radius:14px 14px 14px 4px; padding:6px 13px; font-family:var(--font-journal); font-size:12.5px; letter-spacing:1px;
-    color:var(--ink-strong); white-space:nowrap; pointer-events:none; box-shadow:var(--shadow-card); z-index:3;
-    animation:petBubble 1.7s ease both; }
-  .pet-bubble.reward { border-color:var(--candy); color:var(--candy); font-weight:700;
-    background:color-mix(in srgb, var(--candy) 9%, var(--surface-card)); }
+  .pet-bubble { position:absolute; top:-4px; left:50%; transform:translate(-50%,-100%); background:var(--surface-card);
+    border:1.6px solid var(--candy-light); border-radius:18px 18px 18px 5px; padding:9px 16px;
+    font-family:var(--font-journal); font-size:14px; letter-spacing:1.2px; font-weight:600;
+    color:var(--ink-strong); white-space:nowrap; pointer-events:none;
+    box-shadow:0 8px 20px color-mix(in srgb, var(--text) 9%, transparent); z-index:3;
+    animation:petBubble 1.9s ease both; max-width:80vw; }
+  .pet-bubble::after { content:""; position:absolute; bottom:-8px; left:28px;
+    width:15px; height:15px; background:var(--surface-card);
+    border-right:1.6px solid var(--candy-light); border-bottom:1.6px solid var(--candy-light);
+    transform:rotate(45deg); border-radius:0 0 5px 0; }
+  .pet-bubble.reward { border-color:var(--candy); color:var(--candy); font-weight:800;
+    background:color-mix(in srgb, var(--candy) 12%, var(--surface-card)); }
   @keyframes petBubble { 0%{opacity:0; transform:translate(-50%,-88%) scale(.55) rotate(var(--tilt,0deg))}
     16%{opacity:1; transform:translate(-50%,-100%) scale(1.06) rotate(var(--tilt,0deg))}
     28%{transform:translate(-50%,-101%) scale(.97) rotate(var(--tilt,0deg))}
@@ -2799,7 +2808,7 @@ const CONFIG = {
     {
       key: "money", name: "记账本", icon: "wallet", tint: "#d0efef", color: "var(--module-4)",
       type: "finance", desc: "收支流水 · 分类占比 · 月度小结",
-      categories: ["餐饮", "饮品", "交通", "购物", "学习", "居家", "日用", "娱乐", "兼职", "其他"],
+      categories: ["餐饮", "饮品", "交通", "购物", "美容", "学习", "居家", "日用", "娱乐", "兼职", "其他"],
       // 已停用演示种子（2026-09-16 整改）：模块不再向账号注入任何示例记录
       seed: [],
     },
@@ -3333,6 +3342,12 @@ function injectSeed(){
       { id: 9062, title: "瑞幸咖啡 · 全冰奶酪美式(大杯/全冰不加水/埃塞俄比亚金拼/默认浓度/不另外加糖)", type: "expense", amount: 12.90, category: "饮品", date: "2026-09-22" },
       { id: 9063, title: "肯德基 · 超满足OK三件套(汁汁双层嫩牛堡+金枕榴莲椰耶蛋挞+美式咖啡)", type: "expense", amount: 29.40, category: "餐饮", date: "2026-09-22" },
       { id: 9064, title: "肯德基 · 新奥尔良烤翅(2块)", type: "expense", amount: 11.20, category: "餐饮", date: "2026-09-22" },
+      // 2026-09-23 账单
+      { id: 9065, title: "天猫 · 优斐斯氨甲环酸精华液传明酸 10ml", type: "expense", amount: 101.63, category: "购物", date: "2026-09-23" },
+      { id: 9066, title: "天猫国际 · HR赫莲娜黑绷带面霜 10ml[2×5ml]", type: "expense", amount: 220.05, category: "购物", date: "2026-09-23" },
+      { id: 9067, title: "天猫 · 可复美医用透明质酸钠修复贴 10片", type: "expense", amount: 66.75, category: "购物", date: "2026-09-23" },
+      { id: 9068, title: "天猫 · 木子言身体素颜霜 2盒(买一送一)", type: "expense", amount: 34.65, category: "购物", date: "2026-09-23" },
+      { id: 9069, title: "天猫 · 优斐斯氨甲环酸精华液传明酸5% 4ml", type: "expense", amount: 17.59, category: "购物", date: "2026-09-23" },
     ],
   };
   let changed = false;
@@ -3789,10 +3804,11 @@ function wireHome(todoKey){
       let st=data.__petPet;
       if(!st || st.date!==t){ st=data.__petPet={date:t, count:0, rewards:0}; }
       st.count++;
-      let gained=0, tier=0;
-      if(st.count%20===0 && st.rewards<3){
-        st.rewards++; tier=st.rewards; gained=tier===1?10:5;
-        candy._add(gained, "pet", `撸猫奖励 第${tier}档（今日互动 ${st.count} 次）`, null);
+      let gained=0;
+      /* 摸头奖励规则（2026-09-23）：第5次起、每5次发放一次；每日最多领取5次 */
+      if(st.count%5===0 && st.rewards<5){
+        st.rewards++; gained=5;
+        candy._add(gained, "pet", `撸猫奖励（今日第${st.rewards}次抚摸）`, null);
       }
       store.save();   /* 只存不渲染，不打断动画 */
       /* 小心心：奖励档撒 8 颗，平时 3-5 颗 */
@@ -3810,24 +3826,24 @@ function wireHome(todoKey){
         wrap.appendChild(h);
         h.addEventListener("animationend",()=>h.remove());
       }
-      /* 气泡：奖励档金色 +10 糖币；差 5 下时给隐藏暗示；平时颜文字卖萌 */
+      /* 气泡：奖励统一由奖励弹窗呈现，此处只做小猫卖萌 / 进度暗示 / 领满提示 */
       if(!wrap.querySelector(".pet-bubble")){
         const b=document.createElement("div");
-        b.className="pet-bubble"+(gained?" reward":"");
         let txt;
-        if(gained){ txt=`+${gained} \u7cd6\u5e01 \uD83C\uDF6C \u55b5\uff01`; }
-          else if(!transformed && 20-(st.count%20)===5){ txt="\u518d\u6478 5 \u4e0b\u2026\u597d\u50cf\u6709\u60ca\u559c\u55b5\uff1f"; }
+        if(st.rewards>=5){ txt="今天糖糖摸够啦，明天再来喵～"; }
         else {
-          const F=HERO_FORMS[window.__heroForm];
-          txt=F.says[Math.floor(Math.random()*F.says.length)];
+          const rem=5-(st.count%5);
+          if(rem>0 && rem<5){ txt=`再摸 ${rem} 下有糖糖哦～`; }
+          else { const F=HERO_FORMS[window.__heroForm]; txt=F.says[Math.floor(Math.random()*F.says.length)]; }
         }
         b.textContent=txt;
         b.style.setProperty("--tilt",(Math.random()*8-4).toFixed(1)+"deg");
         wrap.appendChild(b);
         b.addEventListener("animationend",()=>b.remove());
       }
-      /* 奖励档：不整页重渲染，直接补糖币数字并弹跳 */
+      /* 奖励档：统一用奖励弹窗，更明显更可爱；直接补糖币数字并弹跳（不整页重渲染） */
       if(gained){
+        showCatPopup(`撸猫奖励！第${st.count}下抚摸`, `+${gained} 🍬`, false);
         const numEl=document.getElementById("homeCandyNum");
         if(numEl && numEl.firstChild){ numEl.firstChild.nodeValue=candy.total(); }
         bounceCandy();
@@ -7432,12 +7448,18 @@ function showCatPopup(msg, pts, isMinus) {
   const pe = p.querySelector(".cp-pts");
   pe.textContent = pts;
   pe.className = "cp-pts" + (isMinus ? " minus" : "");
+  /* 仅糖币奖励态：放大糖果色 + 撒星星；错误/说明态保持克制 */
+  const isSugar = typeof pts === "string" && /糖币|🍬/.test(pts);
+  const isReward = isSugar && !isMinus;
+  p.classList.toggle("reward", isReward);
+  const decoEmojis = ["✨", "🍬", "🌟"];
+  p.querySelectorAll(".cp-deco").forEach((d, i) => { d.textContent = isReward ? decoEmojis[i % decoEmojis.length] : ""; });
   p.classList.remove("show");
   // force reflow for animation restart
   void p.offsetWidth;
   p.classList.add("show");
   clearTimeout(p._timer);
-  p._timer = setTimeout(() => p.classList.remove("show"), 2000);
+  p._timer = setTimeout(() => p.classList.remove("show"), 2200);
 }
 
 // 糖币数字弹跳动画 + 卡片发光
